@@ -1,0 +1,266 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\lucas.freitas\\source\\repos\\mvp_estagios\\PlataformaEstagios\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{2F6EDF8C-4755-4C8A-A511-2B831DD9CDB1}|shared\\PlataformaEstagios.Exceptions\\PlataformaEstagios.Exceptions.csproj|c:\\users\\lucas.freitas\\source\\repos\\mvp_estagios\\plataformaestagios\\shared\\plataformaestagios.exceptions\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2F6EDF8C-4755-4C8A-A511-2B831DD9CDB1}|shared\\PlataformaEstagios.Exceptions\\PlataformaEstagios.Exceptions.csproj|solutionrelative:shared\\plataformaestagios.exceptions\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E9B0046F-7C0F-43C6-9C83-07760F1C4FC1}|shared\\PlataformaEstagios.Communication\\PlataformaEstagios.Communication.csproj|c:\\users\\lucas.freitas\\source\\repos\\mvp_estagios\\plataformaestagios\\shared\\plataformaestagios.communication\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E9B0046F-7C0F-43C6-9C83-07760F1C4FC1}|shared\\PlataformaEstagios.Communication\\PlataformaEstagios.Communication.csproj|solutionrelative:shared\\plataformaestagios.communication\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FA7A6439-0429-42F5-8127-9F948AE922A5}|backend\\PlataformaEstagios.Infraestructure\\PlataformaEstagios.Infraestructure.csproj|c:\\users\\lucas.freitas\\source\\repos\\mvp_estagios\\plataformaestagios\\backend\\plataformaestagios.infraestructure\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FA7A6439-0429-42F5-8127-9F948AE922A5}|backend\\PlataformaEstagios.Infraestructure\\PlataformaEstagios.Infraestructure.csproj|solutionrelative:backend\\plataformaestagios.infraestructure\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{165BF51B-8108-489A-B549-AB8020983B68}|backend\\PlataformaEstagios.Application\\PlataformaEstagios.Application.csproj|c:\\users\\lucas.freitas\\source\\repos\\mvp_estagios\\plataformaestagios\\backend\\plataformaestagios.application\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{165BF51B-8108-489A-B549-AB8020983B68}|backend\\PlataformaEstagios.Application\\PlataformaEstagios.Application.csproj|solutionrelative:backend\\plataformaestagios.application\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{50DEDAA7-6957-473A-A8F1-2099AB7D85F9}|backend\\PlataformaEstagios.Domain\\PlataformaEstagios.Domain.csproj|c:\\users\\lucas.freitas\\source\\repos\\mvp_estagios\\plataformaestagios\\backend\\plataformaestagios.domain\\enums\\applicationstatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{50DEDAA7-6957-473A-A8F1-2099AB7D85F9}|backend\\PlataformaEstagios.Domain\\PlataformaEstagios.Domain.csproj|solutionrelative:backend\\plataformaestagios.domain\\enums\\applicationstatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{50DEDAA7-6957-473A-A8F1-2099AB7D85F9}|backend\\PlataformaEstagios.Domain\\PlataformaEstagios.Domain.csproj|c:\\users\\lucas.freitas\\source\\repos\\mvp_estagios\\plataformaestagios\\backend\\plataformaestagios.domain\\enums\\usertype.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{50DEDAA7-6957-473A-A8F1-2099AB7D85F9}|backend\\PlataformaEstagios.Domain\\PlataformaEstagios.Domain.csproj|solutionrelative:backend\\plataformaestagios.domain\\enums\\usertype.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{50DEDAA7-6957-473A-A8F1-2099AB7D85F9}|backend\\PlataformaEstagios.Domain\\PlataformaEstagios.Domain.csproj|c:\\users\\lucas.freitas\\source\\repos\\mvp_estagios\\plataformaestagios\\backend\\plataformaestagios.domain\\entities\\vacancy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{50DEDAA7-6957-473A-A8F1-2099AB7D85F9}|backend\\PlataformaEstagios.Domain\\PlataformaEstagios.Domain.csproj|solutionrelative:backend\\plataformaestagios.domain\\entities\\vacancy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{50DEDAA7-6957-473A-A8F1-2099AB7D85F9}|backend\\PlataformaEstagios.Domain\\PlataformaEstagios.Domain.csproj|c:\\users\\lucas.freitas\\source\\repos\\mvp_estagios\\plataformaestagios\\backend\\plataformaestagios.domain\\entities\\course.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{50DEDAA7-6957-473A-A8F1-2099AB7D85F9}|backend\\PlataformaEstagios.Domain\\PlataformaEstagios.Domain.csproj|solutionrelative:backend\\plataformaestagios.domain\\entities\\course.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{50DEDAA7-6957-473A-A8F1-2099AB7D85F9}|backend\\PlataformaEstagios.Domain\\PlataformaEstagios.Domain.csproj|c:\\users\\lucas.freitas\\source\\repos\\mvp_estagios\\plataformaestagios\\backend\\plataformaestagios.domain\\entities\\application.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{50DEDAA7-6957-473A-A8F1-2099AB7D85F9}|backend\\PlataformaEstagios.Domain\\PlataformaEstagios.Domain.csproj|solutionrelative:backend\\plataformaestagios.domain\\entities\\application.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{50DEDAA7-6957-473A-A8F1-2099AB7D85F9}|backend\\PlataformaEstagios.Domain\\PlataformaEstagios.Domain.csproj|c:\\users\\lucas.freitas\\source\\repos\\mvp_estagios\\plataformaestagios\\backend\\plataformaestagios.domain\\entities\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{50DEDAA7-6957-473A-A8F1-2099AB7D85F9}|backend\\PlataformaEstagios.Domain\\PlataformaEstagios.Domain.csproj|solutionrelative:backend\\plataformaestagios.domain\\entities\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{50DEDAA7-6957-473A-A8F1-2099AB7D85F9}|backend\\PlataformaEstagios.Domain\\PlataformaEstagios.Domain.csproj|c:\\users\\lucas.freitas\\source\\repos\\mvp_estagios\\plataformaestagios\\backend\\plataformaestagios.domain\\entities\\enterprise.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{50DEDAA7-6957-473A-A8F1-2099AB7D85F9}|backend\\PlataformaEstagios.Domain\\PlataformaEstagios.Domain.csproj|solutionrelative:backend\\plataformaestagios.domain\\entities\\enterprise.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{50DEDAA7-6957-473A-A8F1-2099AB7D85F9}|backend\\PlataformaEstagios.Domain\\PlataformaEstagios.Domain.csproj|c:\\users\\lucas.freitas\\source\\repos\\mvp_estagios\\plataformaestagios\\backend\\plataformaestagios.domain\\entities\\candidate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{50DEDAA7-6957-473A-A8F1-2099AB7D85F9}|backend\\PlataformaEstagios.Domain\\PlataformaEstagios.Domain.csproj|solutionrelative:backend\\plataformaestagios.domain\\entities\\candidate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{50DEDAA7-6957-473A-A8F1-2099AB7D85F9}|backend\\PlataformaEstagios.Domain\\PlataformaEstagios.Domain.csproj|c:\\users\\lucas.freitas\\source\\repos\\mvp_estagios\\plataformaestagios\\backend\\plataformaestagios.domain\\entities\\entitybase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{50DEDAA7-6957-473A-A8F1-2099AB7D85F9}|backend\\PlataformaEstagios.Domain\\PlataformaEstagios.Domain.csproj|solutionrelative:backend\\plataformaestagios.domain\\entities\\entitybase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{50DEDAA7-6957-473A-A8F1-2099AB7D85F9}|backend\\PlataformaEstagios.Domain\\PlataformaEstagios.Domain.csproj|c:\\users\\lucas.freitas\\source\\repos\\mvp_estagios\\plataformaestagios\\backend\\plataformaestagios.domain\\entities\\address.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{50DEDAA7-6957-473A-A8F1-2099AB7D85F9}|backend\\PlataformaEstagios.Domain\\PlataformaEstagios.Domain.csproj|solutionrelative:backend\\plataformaestagios.domain\\entities\\address.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Class1.cs",
+              "DocumentMoniker": "C:\\Users\\lucas.freitas\\source\\repos\\mvp_estagios\\PlataformaEstagios\\shared\\PlataformaEstagios.Exceptions\\Class1.cs",
+              "RelativeDocumentMoniker": "shared\\PlataformaEstagios.Exceptions\\Class1.cs",
+              "ToolTip": "C:\\Users\\lucas.freitas\\source\\repos\\mvp_estagios\\PlataformaEstagios\\shared\\PlataformaEstagios.Exceptions\\Class1.cs",
+              "RelativeToolTip": "shared\\PlataformaEstagios.Exceptions\\Class1.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-11T18:42:30.534Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Class1.cs",
+              "DocumentMoniker": "C:\\Users\\lucas.freitas\\source\\repos\\mvp_estagios\\PlataformaEstagios\\shared\\PlataformaEstagios.Communication\\Class1.cs",
+              "RelativeDocumentMoniker": "shared\\PlataformaEstagios.Communication\\Class1.cs",
+              "ToolTip": "C:\\Users\\lucas.freitas\\source\\repos\\mvp_estagios\\PlataformaEstagios\\shared\\PlataformaEstagios.Communication\\Class1.cs",
+              "RelativeToolTip": "shared\\PlataformaEstagios.Communication\\Class1.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-11T18:41:04.912Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\lucas.freitas\\source\\repos\\mvp_estagios\\PlataformaEstagios\\backend\\PlataformaEstagios.Infraestructure\\Program.cs",
+              "RelativeDocumentMoniker": "backend\\PlataformaEstagios.Infraestructure\\Program.cs",
+              "ToolTip": "C:\\Users\\lucas.freitas\\source\\repos\\mvp_estagios\\PlataformaEstagios\\backend\\PlataformaEstagios.Infraestructure\\Program.cs",
+              "RelativeToolTip": "backend\\PlataformaEstagios.Infraestructure\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-11T18:35:00.9Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Class1.cs",
+              "DocumentMoniker": "C:\\Users\\lucas.freitas\\source\\repos\\mvp_estagios\\PlataformaEstagios\\backend\\PlataformaEstagios.Application\\Class1.cs",
+              "RelativeDocumentMoniker": "backend\\PlataformaEstagios.Application\\Class1.cs",
+              "ToolTip": "C:\\Users\\lucas.freitas\\source\\repos\\mvp_estagios\\PlataformaEstagios\\backend\\PlataformaEstagios.Application\\Class1.cs",
+              "RelativeToolTip": "backend\\PlataformaEstagios.Application\\Class1.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-11T18:34:07.705Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "ApplicationStatus.cs",
+              "DocumentMoniker": "C:\\Users\\lucas.freitas\\source\\repos\\mvp_estagios\\PlataformaEstagios\\backend\\PlataformaEstagios.Domain\\Enums\\ApplicationStatus.cs",
+              "RelativeDocumentMoniker": "backend\\PlataformaEstagios.Domain\\Enums\\ApplicationStatus.cs",
+              "ToolTip": "C:\\Users\\lucas.freitas\\source\\repos\\mvp_estagios\\PlataformaEstagios\\backend\\PlataformaEstagios.Domain\\Enums\\ApplicationStatus.cs",
+              "RelativeToolTip": "backend\\PlataformaEstagios.Domain\\Enums\\ApplicationStatus.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-11T18:23:46.64Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "UserType.cs",
+              "DocumentMoniker": "C:\\Users\\lucas.freitas\\source\\repos\\mvp_estagios\\PlataformaEstagios\\backend\\PlataformaEstagios.Domain\\Enums\\UserType.cs",
+              "RelativeDocumentMoniker": "backend\\PlataformaEstagios.Domain\\Enums\\UserType.cs",
+              "ToolTip": "C:\\Users\\lucas.freitas\\source\\repos\\mvp_estagios\\PlataformaEstagios\\backend\\PlataformaEstagios.Domain\\Enums\\UserType.cs",
+              "RelativeToolTip": "backend\\PlataformaEstagios.Domain\\Enums\\UserType.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-11T18:23:12.549Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Vacancy.cs",
+              "DocumentMoniker": "C:\\Users\\lucas.freitas\\source\\repos\\mvp_estagios\\PlataformaEstagios\\backend\\PlataformaEstagios.Domain\\Entities\\Vacancy.cs",
+              "RelativeDocumentMoniker": "backend\\PlataformaEstagios.Domain\\Entities\\Vacancy.cs",
+              "ToolTip": "C:\\Users\\lucas.freitas\\source\\repos\\mvp_estagios\\PlataformaEstagios\\backend\\PlataformaEstagios.Domain\\Entities\\Vacancy.cs",
+              "RelativeToolTip": "backend\\PlataformaEstagios.Domain\\Entities\\Vacancy.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-11T18:21:43.353Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Course.cs",
+              "DocumentMoniker": "C:\\Users\\lucas.freitas\\source\\repos\\mvp_estagios\\PlataformaEstagios\\backend\\PlataformaEstagios.Domain\\Entities\\Course.cs",
+              "RelativeDocumentMoniker": "backend\\PlataformaEstagios.Domain\\Entities\\Course.cs",
+              "ToolTip": "C:\\Users\\lucas.freitas\\source\\repos\\mvp_estagios\\PlataformaEstagios\\backend\\PlataformaEstagios.Domain\\Entities\\Course.cs",
+              "RelativeToolTip": "backend\\PlataformaEstagios.Domain\\Entities\\Course.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-11T18:20:54.987Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "Enterprise.cs",
+              "DocumentMoniker": "C:\\Users\\lucas.freitas\\source\\repos\\mvp_estagios\\PlataformaEstagios\\backend\\PlataformaEstagios.Domain\\Entities\\Enterprise.cs",
+              "RelativeDocumentMoniker": "backend\\PlataformaEstagios.Domain\\Entities\\Enterprise.cs",
+              "ToolTip": "C:\\Users\\lucas.freitas\\source\\repos\\mvp_estagios\\PlataformaEstagios\\backend\\PlataformaEstagios.Domain\\Entities\\Enterprise.cs",
+              "RelativeToolTip": "backend\\PlataformaEstagios.Domain\\Entities\\Enterprise.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAmAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-11T18:15:16.249Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "User.cs",
+              "DocumentMoniker": "C:\\Users\\lucas.freitas\\source\\repos\\mvp_estagios\\PlataformaEstagios\\backend\\PlataformaEstagios.Domain\\Entities\\User.cs",
+              "RelativeDocumentMoniker": "backend\\PlataformaEstagios.Domain\\Entities\\User.cs",
+              "ToolTip": "C:\\Users\\lucas.freitas\\source\\repos\\mvp_estagios\\PlataformaEstagios\\backend\\PlataformaEstagios.Domain\\Entities\\User.cs",
+              "RelativeToolTip": "backend\\PlataformaEstagios.Domain\\Entities\\User.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-11T18:14:39.62Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "Candidate.cs",
+              "DocumentMoniker": "C:\\Users\\lucas.freitas\\source\\repos\\mvp_estagios\\PlataformaEstagios\\backend\\PlataformaEstagios.Domain\\Entities\\Candidate.cs",
+              "RelativeDocumentMoniker": "backend\\PlataformaEstagios.Domain\\Entities\\Candidate.cs",
+              "ToolTip": "C:\\Users\\lucas.freitas\\source\\repos\\mvp_estagios\\PlataformaEstagios\\backend\\PlataformaEstagios.Domain\\Entities\\Candidate.cs",
+              "RelativeToolTip": "backend\\PlataformaEstagios.Domain\\Entities\\Candidate.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAABCAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-11T18:14:02.959Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Application.cs",
+              "DocumentMoniker": "C:\\Users\\lucas.freitas\\source\\repos\\mvp_estagios\\PlataformaEstagios\\backend\\PlataformaEstagios.Domain\\Entities\\Application.cs",
+              "RelativeDocumentMoniker": "backend\\PlataformaEstagios.Domain\\Entities\\Application.cs",
+              "ToolTip": "C:\\Users\\lucas.freitas\\source\\repos\\mvp_estagios\\PlataformaEstagios\\backend\\PlataformaEstagios.Domain\\Entities\\Application.cs",
+              "RelativeToolTip": "backend\\PlataformaEstagios.Domain\\Entities\\Application.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAApAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-11T18:13:22.199Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "EntityBase.cs",
+              "DocumentMoniker": "C:\\Users\\lucas.freitas\\source\\repos\\mvp_estagios\\PlataformaEstagios\\backend\\PlataformaEstagios.Domain\\Entities\\EntityBase.cs",
+              "RelativeDocumentMoniker": "backend\\PlataformaEstagios.Domain\\Entities\\EntityBase.cs",
+              "ToolTip": "C:\\Users\\lucas.freitas\\source\\repos\\mvp_estagios\\PlataformaEstagios\\backend\\PlataformaEstagios.Domain\\Entities\\EntityBase.cs",
+              "RelativeToolTip": "backend\\PlataformaEstagios.Domain\\Entities\\EntityBase.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-11T18:10:39.188Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "Address.cs",
+              "DocumentMoniker": "C:\\Users\\lucas.freitas\\source\\repos\\mvp_estagios\\PlataformaEstagios\\backend\\PlataformaEstagios.Domain\\Entities\\Address.cs",
+              "RelativeDocumentMoniker": "backend\\PlataformaEstagios.Domain\\Entities\\Address.cs",
+              "ToolTip": "C:\\Users\\lucas.freitas\\source\\repos\\mvp_estagios\\PlataformaEstagios\\backend\\PlataformaEstagios.Domain\\Entities\\Address.cs",
+              "RelativeToolTip": "backend\\PlataformaEstagios.Domain\\Entities\\Address.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-11T18:10:22.502Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
