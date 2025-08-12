@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlataformaEstagios.Domain",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlataformaEstagios.Application", "backend\PlataformaEstagios.Application\PlataformaEstagios.Application.csproj", "{165BF51B-8108-489A-B549-AB8020983B68}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlataformaEstagios.Infraestructure", "backend\PlataformaEstagios.Infraestructure\PlataformaEstagios.Infraestructure.csproj", "{FA7A6439-0429-42F5-8127-9F948AE922A5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlataformaEstagios.Infrastructure", "backend\PlataformaEstagios.Infraestructure\PlataformaEstagios.Infrastructure.csproj", "{FA7A6439-0429-42F5-8127-9F948AE922A5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "frontend", "frontend", "{3A6C2B24-81AD-4B73-ADB6-B0063C7DB70A}"
 EndProject
