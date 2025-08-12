@@ -1,7 +1,8 @@
 ﻿using FluentValidation;
+using PlataformaEstagios.Communication.Requests;
 namespace PlataformaEstagios.Application.UseCases.User.Create
 {
-    public class CreateUserValidator : AbstractValidator<Domain.Entities.User>
+    public class CreateUserValidator : AbstractValidator<ResquestCreateUserJson>
     {
         public CreateUserValidator()
         {
@@ -24,8 +25,8 @@ namespace PlataformaEstagios.Application.UseCases.User.Create
                 .MinimumLength(32).WithMessage("Password looks invalid (too short).")
                 .MaximumLength(200).WithMessage("Password looks invalid (too long).");
 
-            RuleFor(u => u.UserType)
-                .IsInEnum().WithMessage("UserType is invalid.");
+            //RuleFor(u => u.UserType)
+            //    .IsInEnum().WithMessage("UserType is invalid.");
         }
     }
 }
