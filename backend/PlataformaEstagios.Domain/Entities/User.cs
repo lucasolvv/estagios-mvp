@@ -1,4 +1,6 @@
-﻿namespace PlataformaEstagios.Domain.Entities
+﻿using PlataformaEstagios.Domain.Enums;
+
+namespace PlataformaEstagios.Domain.Entities
 {
     public class User : EntityBase
     {
