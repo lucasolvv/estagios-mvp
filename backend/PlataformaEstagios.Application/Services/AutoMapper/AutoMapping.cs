@@ -13,7 +13,7 @@ namespace PlataformaEstagios.Application.Services.AutoMapper
 
         private void RequestToDomain()
         {
-            CreateMap<ResquestCreateUserJson, Domain.Entities.User>()
+            CreateMap<RequestCreateUserJson, Domain.Entities.User>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.UserIdentifier, opt => opt.Ignore())
                 .ForMember(dest => dest.Password, opt => opt.Ignore())

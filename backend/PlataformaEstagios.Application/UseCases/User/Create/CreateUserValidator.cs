@@ -2,7 +2,7 @@
 using PlataformaEstagios.Communication.Requests;
 namespace PlataformaEstagios.Application.UseCases.User.Create
 {
-    public class CreateUserValidator : AbstractValidator<ResquestCreateUserJson>
+    public class CreateUserValidator : AbstractValidator<RequestCreateUserJson>
     {
         public CreateUserValidator()
         {
@@ -22,7 +22,7 @@ namespace PlataformaEstagios.Application.UseCases.User.Create
             RuleFor(u => u.Password)
                 .Cascade(CascadeMode.Stop)
                 .NotEmpty().WithMessage("Password is required.")
-                .MinimumLength(32).WithMessage("Password looks invalid (too short).")
+                .MinimumLength(10).WithMessage("Password looks invalid (too short).")
                 .MaximumLength(200).WithMessage("Password looks invalid (too long).");
 
             //RuleFor(u => u.UserType)

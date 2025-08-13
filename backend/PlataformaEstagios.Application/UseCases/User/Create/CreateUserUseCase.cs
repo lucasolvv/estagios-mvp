@@ -1,6 +1,8 @@
 ﻿using PlataformaEstagios.Communication.Requests;
+using PlataformaEstagios.Exceptions.ExceptionBase;
 using PlataformaEstagios.Domain.Repositories.User;
-using System.Net;
+using FluentValidation.Results;
+
 
 namespace PlataformaEstagios.Application.UseCases.User.Create
 {
@@ -12,13 +14,23 @@ namespace PlataformaEstagios.Application.UseCases.User.Create
             _userWriteOnlyRepository = userWriteOnlyRepository;
         }
 
-        public async Task ExecuteAsync(ResquestCreateUserJson request)
+        public async Task ExecuteAsync(RequestCreateUserJson request)
+        {
+
+            await Validate(request);
+        }
+
+        private async Task Validate(RequestCreateUserJson request)
         {
             var validator = new CreateUserValidator();
 
-            await validator.Validate(request);
+            ValidationResult result = await validator.ValidateAsync(request);
 
-
+            if (!result.IsValid)
+            {
+                var errorMessages = result.Errors.Select(e => e.ErrorMessage).ToList();
+                throw new ErrorOnValidationException(errorMessages);
+            } 
         }
     }
 }

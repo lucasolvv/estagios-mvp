@@ -1,4 +1,6 @@
-using PlataformaEstagios.Infraestructure;
+using PlataformaEstagios.Api.Filters;
+using PlataformaEstagios.Infrastructure;
+using PlataformaEstagios.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +16,8 @@ builder.Configuration
     .AddJsonFile("appsettings.json", optional: false)
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
     .AddEnvironmentVariables();
-
+builder.Services.AddMvc(options => options.Filters.Add(typeof(ExceptionFilter)));
+builder.Services.AddAppDependencies();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();

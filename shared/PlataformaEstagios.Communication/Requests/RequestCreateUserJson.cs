@@ -1,6 +1,6 @@
 ﻿namespace PlataformaEstagios.Communication.Requests
 {
-    public class ResquestCreateUserJson
+    public class RequestCreateUserJson
     {
         public string Nickname { get; set; }
         public string Email { get; set; }

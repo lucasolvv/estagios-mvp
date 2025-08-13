@@ -1,9 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using PlataformaEstagios.Domain.Repositories.User;
 using PlataformaEstagios.Infrastructure.DataAccess;
+using PlataformaEstagios.Infrastructure.Repositories;
 
-namespace PlataformaEstagios.Infraestructure
+namespace PlataformaEstagios.Infrastructure
 {
     public static class DependecyInjectionExtension
     {
@@ -13,11 +15,14 @@ namespace PlataformaEstagios.Infraestructure
             AddRepositories(services);
         }
 
-        private static void AddRepositories(IServiceCollection services) { }
+        private static void AddRepositories(IServiceCollection services)
+        {
+            services.AddScoped<IUserWriteOnlyRepository, UserRepository>();
+        }
 
         private static void AddDbContext_PostGreSQL(IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<AppDbcontext>(options => options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<AppDbContext>(options => options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
         }
     }
 }

@@ -11,8 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlataformaEstagios.Domain",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlataformaEstagios.Application", "backend\PlataformaEstagios.Application\PlataformaEstagios.Application.csproj", "{165BF51B-8108-489A-B549-AB8020983B68}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlataformaEstagios.Infrastructure", "backend\PlataformaEstagios.Infraestructure\PlataformaEstagios.Infrastructure.csproj", "{FA7A6439-0429-42F5-8127-9F948AE922A5}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "frontend", "frontend", "{3A6C2B24-81AD-4B73-ADB6-B0063C7DB70A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shared", "shared", "{FE96C682-50B2-4CE4-B803-035CB9088201}"
@@ -22,6 +20,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlataformaEstagios.Communication", "shared\PlataformaEstagios.Communication\PlataformaEstagios.Communication.csproj", "{E9B0046F-7C0F-43C6-9C83-07760F1C4FC1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlataformaEstagios.Exceptions", "shared\PlataformaEstagios.Exceptions\PlataformaEstagios.Exceptions.csproj", "{2F6EDF8C-4755-4C8A-A511-2B831DD9CDB1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlataformaEstagios.Infrastructure", "backend\PlataformaEstagios.Infrastructure\PlataformaEstagios.Infrastructure.csproj", "{3AFD21F8-DD1C-C783-823F-9314B50A14DB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,10 +41,6 @@ Global
 		{165BF51B-8108-489A-B549-AB8020983B68}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{165BF51B-8108-489A-B549-AB8020983B68}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{165BF51B-8108-489A-B549-AB8020983B68}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FA7A6439-0429-42F5-8127-9F948AE922A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FA7A6439-0429-42F5-8127-9F948AE922A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FA7A6439-0429-42F5-8127-9F948AE922A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FA7A6439-0429-42F5-8127-9F948AE922A5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CC8068BE-0CF6-4901-8AAA-C0B4AEEA3DF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CC8068BE-0CF6-4901-8AAA-C0B4AEEA3DF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CC8068BE-0CF6-4901-8AAA-C0B4AEEA3DF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -57,6 +53,10 @@ Global
 		{2F6EDF8C-4755-4C8A-A511-2B831DD9CDB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F6EDF8C-4755-4C8A-A511-2B831DD9CDB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2F6EDF8C-4755-4C8A-A511-2B831DD9CDB1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3AFD21F8-DD1C-C783-823F-9314B50A14DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3AFD21F8-DD1C-C783-823F-9314B50A14DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3AFD21F8-DD1C-C783-823F-9314B50A14DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3AFD21F8-DD1C-C783-823F-9314B50A14DB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -65,10 +65,10 @@ Global
 		{7E0C3A8E-E281-4A29-B3AA-02703926A5E7} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{50DEDAA7-6957-473A-A8F1-2099AB7D85F9} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{165BF51B-8108-489A-B549-AB8020983B68} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
-		{FA7A6439-0429-42F5-8127-9F948AE922A5} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{CC8068BE-0CF6-4901-8AAA-C0B4AEEA3DF4} = {3A6C2B24-81AD-4B73-ADB6-B0063C7DB70A}
 		{E9B0046F-7C0F-43C6-9C83-07760F1C4FC1} = {FE96C682-50B2-4CE4-B803-035CB9088201}
 		{2F6EDF8C-4755-4C8A-A511-2B831DD9CDB1} = {FE96C682-50B2-4CE4-B803-035CB9088201}
+		{3AFD21F8-DD1C-C783-823F-9314B50A14DB} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BFD0AB15-69A0-496C-990F-470096D00362}

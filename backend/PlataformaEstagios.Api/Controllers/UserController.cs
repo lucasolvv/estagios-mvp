@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using PlataformaEstagios.Application.UseCases.User.Create;
 using PlataformaEstagios.Communication.Requests;
 
 namespace PlataformaEstagios.Api.Controllers
@@ -9,7 +10,7 @@ namespace PlataformaEstagios.Api.Controllers
     public class UserController : ControllerBase
     {
         [HttpPost("/usuario")]
-        public async Task<IActionResult> CreateUser([FromBody] ResquestCreateUserJson request, [FromServices] ICreateUserUseCase useCase)
+        public async Task<IActionResult> CreateUser([FromBody] RequestCreateUserJson request, [FromServices] ICreateUserUseCase useCase)
         {
             await useCase.ExecuteAsync(request);
             return Ok();

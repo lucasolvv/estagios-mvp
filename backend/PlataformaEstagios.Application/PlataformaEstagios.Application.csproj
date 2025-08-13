@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="15.0.1" />
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="FluentValidation" Version="12.0.0" />
   </ItemGroup>
 
@@ -16,6 +16,7 @@
     <ProjectReference Include="..\..\shared\PlataformaEstagios.Exceptions\PlataformaEstagios.Exceptions.csproj" />
     <ProjectReference Include="..\PlataformaEstagios.Domain\PlataformaEstagios.Domain.csproj" />
     <ProjectReference Include="..\PlataformaEstagios.Infraestructure\PlataformaEstagios.Infrastructure.csproj" />
+    <ProjectReference Include="..\PlataformaEstagios.Infrastructure\PlataformaEstagios.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
