@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using PlataformaEstagios.Domain.Repositories;
 using PlataformaEstagios.Domain.Repositories.User;
 using PlataformaEstagios.Infrastructure.DataAccess;
 using PlataformaEstagios.Infrastructure.Repositories;
@@ -17,6 +18,8 @@ namespace PlataformaEstagios.Infrastructure
 
         private static void AddRepositories(IServiceCollection services)
         {
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+
             services.AddScoped<IUserWriteOnlyRepository, UserRepository>();
         }
 
