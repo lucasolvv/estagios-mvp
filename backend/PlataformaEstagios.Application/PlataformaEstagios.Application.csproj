@@ -15,7 +15,6 @@
     <ProjectReference Include="..\..\shared\PlataformaEstagios.Communication\PlataformaEstagios.Communication.csproj" />
     <ProjectReference Include="..\..\shared\PlataformaEstagios.Exceptions\PlataformaEstagios.Exceptions.csproj" />
     <ProjectReference Include="..\PlataformaEstagios.Domain\PlataformaEstagios.Domain.csproj" />
-    <ProjectReference Include="..\PlataformaEstagios.Infraestructure\PlataformaEstagios.Infrastructure.csproj" />
     <ProjectReference Include="..\PlataformaEstagios.Infrastructure\PlataformaEstagios.Infrastructure.csproj" />
   </ItemGroup>
 

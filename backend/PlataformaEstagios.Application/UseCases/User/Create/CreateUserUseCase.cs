@@ -2,6 +2,8 @@
 using PlataformaEstagios.Exceptions.ExceptionBase;
 using PlataformaEstagios.Domain.Repositories.User;
 using FluentValidation.Results;
+using AutoMapper;
+using PlataformaEstagios.Domain.Repositories;
 
 
 namespace PlataformaEstagios.Application.UseCases.User.Create
@@ -9,15 +11,20 @@ namespace PlataformaEstagios.Application.UseCases.User.Create
     public class CreateUserUseCase : ICreateUserUseCase
     {
         private readonly IUserWriteOnlyRepository _userWriteOnlyRepository;
-        public CreateUserUseCase(IUserWriteOnlyRepository userWriteOnlyRepository)
+        private readonly IMapper _mapper;
+        private readonly IUnitOfWork _unitOfWork;
+        public CreateUserUseCase(IUserWriteOnlyRepository userWriteOnlyRepository, IMapper mapper, IUnitOfWork unitOfWork)
         {
             _userWriteOnlyRepository = userWriteOnlyRepository;
+            _mapper = mapper;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task ExecuteAsync(RequestCreateUserJson request)
         {
-
             await Validate(request);
+            await _userWriteOnlyRepository.CreateUser(_mapper.Map<Domain.Entities.User>(request));
+
         }
 
         private async Task Validate(RequestCreateUserJson request)

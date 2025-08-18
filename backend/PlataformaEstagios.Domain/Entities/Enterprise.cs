@@ -3,7 +3,7 @@
     public class Enterprise : EntityBase
     {
         public Guid EnterpriseIdentifier { get; set; } = Guid.NewGuid();
-        public Guid UserId { get; set; }
+        public Guid UserIdentifier { get; set; }
         public User? User { get; set; }
         public string? EnterpriseName { get; set; }
         public string? Cnpj { get; set; }

@@ -25,7 +25,15 @@ namespace PlataformaEstagios.Infrastructure
 
         private static void AddDbContext_PostGreSQL(IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<AppDbContext>(options => options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+            var connString = configuration.GetConnectionString("Default")
+               ?? throw new InvalidOperationException("Connection string 'Default' not found.");
+
+            services.AddDbContext<AppDbContext>(options =>
+                options.UseNpgsql(connString, npgsql =>
+                {
+                    // Optional: keep migrations in Infrastructure
+                    npgsql.MigrationsAssembly(typeof(AppDbContext).Assembly.GetName().Name);
+                }));
         }
     }
 }

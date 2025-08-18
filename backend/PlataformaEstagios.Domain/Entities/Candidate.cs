@@ -1,11 +1,11 @@
 ﻿namespace PlataformaEstagios.Domain.Entities
 {
-    public class Candidate
+    public class Candidate : EntityBase
     {
-        public Guid UserIdentifier { get; set; } = Guid.NewGuid();
-        public User? User { get; set; }
+        public Guid UserIdentifier { get; set; }
+        public User User { get; set; }
 
-        public int CandidateId { get; set; }
+        public Guid CandidateIdentifier { get; set; } = Guid.NewGuid();
 
         public string Name { get; set; }
 
