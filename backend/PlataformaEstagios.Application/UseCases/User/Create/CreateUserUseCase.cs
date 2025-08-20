@@ -4,6 +4,7 @@ using PlataformaEstagios.Domain.Repositories.User;
 using FluentValidation.Results;
 using AutoMapper;
 using PlataformaEstagios.Domain.Repositories;
+using PlataformaEstagios.Application.Helpers;
 
 
 namespace PlataformaEstagios.Application.UseCases.User.Create
@@ -23,7 +24,11 @@ namespace PlataformaEstagios.Application.UseCases.User.Create
         public async Task ExecuteAsync(RequestCreateUserJson request)
         {
             await Validate(request);
-            await _userWriteOnlyRepository.CreateUser(_mapper.Map<Domain.Entities.User>(request));
+            var newUser = _mapper.Map<Domain.Entities.User>(request);
+            newUser.Password = PasswordHasher.Encrypt(request.Password);
+            await _userWriteOnlyRepository.CreateUser(newUser);
+
+            await _unitOfWork.Commit();
 
         }
 
