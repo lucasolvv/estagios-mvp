@@ -3,7 +3,6 @@
     public class Candidate : EntityBase
     {
         public Guid UserIdentifier { get; set; }
-        public User User { get; set; }
 
         public Guid CandidateIdentifier { get; set; } = Guid.NewGuid();
 

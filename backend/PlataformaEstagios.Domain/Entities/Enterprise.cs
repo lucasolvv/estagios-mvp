@@ -4,12 +4,10 @@
     {
         public Guid EnterpriseIdentifier { get; set; } = Guid.NewGuid();
         public Guid UserIdentifier { get; set; }
-        public User? User { get; set; }
         public string? EnterpriseName { get; set; }
         public string? Cnpj { get; set; }
         public string? ActivityArea { get; set; }
-        public Guid? AddressIdentifier { get; set; }
         public Address? Address { get; set; }
-        public ICollection<Vacancy>? Vacancys { get; set; } = new List<Vacancy>();
+        public ICollection<Vacancy>? Vacancies { get; set; } = new List<Vacancy>();
     }
 }
