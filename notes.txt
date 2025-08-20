@@ -1,0 +1,10 @@
+----- MIGRATIONS 
+
+dotnet ef migrations add InitialProfiles -p . -s ../PlataformaEstagios.Api -o DataAccess/Migrations
+dotnet ef database update               -p . -s ../PlataformaEstagios.Api
+
+
+------ RODANDO BANCO NO DOCKER
+
+docker exec -it <container> psql -U estagios -d plataforma_estagios -c "\dt"
+docker exec -it <container> psql -U estagios -d plataforma_estagios -c "SELECT * FROM \"__EFMigrationsHistory\";"
