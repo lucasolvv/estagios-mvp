@@ -39,7 +39,9 @@ namespace PlataformaEstagios.Infrastructure.DataAccess
                     .OnDelete(DeleteBehavior.Restrict);
 
                 e.Property(c => c.Active).HasDefaultValue(true);
-                e.Property(c => c.CreatedOn).HasDefaultValueSql("CURRENT_TIMESTAMP AT TIME ZONE 'UTC'");
+                e.Property(c => c.CreatedOn)
+                .HasColumnType("timestampz")
+                .HasDefaultValueSql("now()");
             });
 
             // --- Enterprise ---
@@ -66,7 +68,9 @@ namespace PlataformaEstagios.Infrastructure.DataAccess
                     .OnDelete(DeleteBehavior.Restrict);
 
                 e.Property(x => x.Active).HasDefaultValue(true);
-                e.Property(x => x.CreatedOn).HasDefaultValueSql("CURRENT_TIMESTAMP AT TIME ZONE 'UTC'");
+                e.Property(x => x.CreatedOn)
+                .HasColumnType("timestampz")
+                .HasDefaultValueSql("now()");
             });
 
             // --- Address ---
@@ -113,7 +117,9 @@ namespace PlataformaEstagios.Infrastructure.DataAccess
                     "OR (\"CandidateIdentifier\" IS NULL AND \"EnterpriseIdentifier\" IS NOT NULL)");
 
                 e.Property(a => a.Active).HasDefaultValue(true);
-                e.Property(a => a.CreatedOn).HasDefaultValueSql("CURRENT_TIMESTAMP AT TIME ZONE 'UTC'");
+                e.Property(a => a.CreatedOn)
+                .HasColumnType("timestampz")
+                .HasDefaultValueSql("now()");
             });
 
             // Se ainda não vai mapear essas entidades agora:

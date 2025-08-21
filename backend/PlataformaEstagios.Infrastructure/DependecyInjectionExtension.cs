@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PlataformaEstagios.Domain.Repositories;
+using PlataformaEstagios.Domain.Repositories.Candidate;
+using PlataformaEstagios.Domain.Repositories.Enterprise;
 using PlataformaEstagios.Domain.Repositories.User;
 using PlataformaEstagios.Infrastructure.DataAccess;
 using PlataformaEstagios.Infrastructure.Repositories;
@@ -21,6 +23,8 @@ namespace PlataformaEstagios.Infrastructure
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddScoped<IUserWriteOnlyRepository, UserRepository>();
+            services.AddScoped<ICandidateWriteOnlyRepository, CandidateRepository>();
+            services.AddScoped<IEnterpriseWriteOnlyRepository, EnterpriseRepository>();
         }
 
         private static void AddDbContext_PostGreSQL(IServiceCollection services, IConfiguration configuration)
