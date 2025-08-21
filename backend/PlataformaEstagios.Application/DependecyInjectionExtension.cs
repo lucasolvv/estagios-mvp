@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using FluentValidation;
+using Microsoft.Extensions.DependencyInjection;
 using PlataformaEstagios.Application.Services.AutoMapper;
 using PlataformaEstagios.Application.UseCases.User.Create;
-
 
 namespace PlataformaEstagios.Application
 {
@@ -11,7 +11,7 @@ namespace PlataformaEstagios.Application
         {
             AddUseCases(services);
             AddAutoMapper(services);
-
+            AddValidators(services);
         }
         private static void AddAutoMapper(this IServiceCollection services)
         {
@@ -22,6 +22,11 @@ namespace PlataformaEstagios.Application
         private static void AddUseCases(IServiceCollection services)
         {
             services.AddScoped<ICreateUserUseCase, CreateUserUseCase>();
+        }
+
+        private static void AddValidators(IServiceCollection services)
+        {
+           services.AddValidatorsFromAssemblyContaining<CreateUserValidator>();
         }
     }
 }
