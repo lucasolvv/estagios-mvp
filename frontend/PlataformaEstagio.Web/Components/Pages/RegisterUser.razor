@@ -1,0 +1,148 @@
+﻿@page "/criar-usuario"
+@using MudBlazor
+
+@using PlataformaEstagio.Web.Components.Services
+@using PlataformaEstagios.Communication.Requests
+@using PlataformaEstagios.Domain.Enums
+@inject ISnackbar Snackbar
+@inject IUserServices UserServices
+
+<MudPaper Class="pa-6 mx-auto mt-12" Style="max-width: 80%">
+    <MudText Typo="Typo.h5">Criar Novo Usuário</MudText>
+
+    <MudForm @ref="_form" OnValidSubmit="HandleValidSubmit">
+
+        <MudTextField @bind-Value="_user.Nickname" Label="Nome de Usuário" Required="true" />
+        <MudTextField @bind-Value="_user.Email" Label="Email" Required="true" />
+        <MudTextField @bind-Value="_user.Password" Label="Senha" InputType="InputType.Password" Required="true" />
+
+        <MudSelect T="UserType" Label="Tipo de Usuário"
+                   Value="_user.UserType" Required="true" Class="my-2"
+                   ValueChanged="OnUserTypeChange"
+                   ValueExpression="() => _user.UserType">
+            <MudSelectItem Value="UserType.Candidate">Candidato</MudSelectItem>
+            <MudSelectItem Value="UserType.Enterprise">Empresa</MudSelectItem>
+        </MudSelect>
+
+        @if (_user.UserType == UserType.Candidate)
+        {
+            <MudDivider Class="my-4" />
+            <MudText Typo="Typo.h6">Dados Pessoais</MudText>
+
+            <MudTextField @bind-Value="_user.Candidate.FullName" Label="Nome Completo" />
+            <MudDatePicker @bind-Date="_user.Candidate.BirthDate" Label="Data de Nascimento" />
+            <MudText Typo="Typo.h6" Class="mt-4">Endereço</MudText>
+            <MudTextField @bind-Value="_user.Candidate.Address.Street" Label="Logradouro e número" />
+            <MudTextField @bind-Value="_user.Candidate.Address.Neighborhood" Label="Bairro" />
+            <MudTextField @bind-Value="_user.Candidate.Address.Complement" Label="Complemento" />
+            <MudTextField @bind-Value="_user.Candidate.Address.City" Label="Cidade" />
+
+            <MudSelect T="string" Label="Estado" @bind-Value="_user.Candidate.Address.UF" Required="true">
+                @foreach (var estado in SiglasEstados)
+                {
+                    <MudSelectItem Value="@estado">@estado</MudSelectItem>
+                }
+            </MudSelect>
+
+            <MudTextField @bind-Value="_user.Candidate.Address.Cep"
+                          Label="CEP"
+                          Mask="@(new PatternMask("00000-000"))"
+                          MaskChar="_"
+                          InputMode="InputMode.text" />
+        }
+
+        @if (_user.UserType == UserType.Enterprise)
+        {
+            <MudDivider Class="my-4" />
+            <MudText Typo="Typo.h6">Dados da Empresa</MudText>
+
+            <MudTextField @bind-Value="_user.Enterprise.TradeName" Label="Nome Fantasia" />
+            <MudTextField @bind-Value="_user.Enterprise.Cnpj"
+                          Label="CNPJ"
+                          Mask="@(new PatternMask("00.000.000/0000-00"))"
+                          MaskChar="_"
+                          InputMode="InputMode.text" />
+            <MudTextField @bind-Value="_user.Enterprise.ActivityArea" Label="Área de Atuação" />
+
+            <MudTextField @bind-Value="_user.Enterprise.Address.Street" Label="Logradouro e número" />
+            <MudTextField @bind-Value="_user.Enterprise.Address.City" Label="Cidade" />
+            <MudTextField @bind-Value="_user.Enterprise.Address.Neighborhood" Label="Bairro" />
+
+            <MudSelect T="string" Label="Estado" @bind-Value="_user.Enterprise.Address.UF" Required="true">
+                @foreach (var estado in SiglasEstados)
+                {
+                    <MudSelectItem Value="@estado">@estado</MudSelectItem>
+                }
+            </MudSelect>
+
+            <MudTextField @bind-Value="_user.Enterprise.Address.Cep"
+                          Label="CEP"
+                          Mask="@(new PatternMask("00000-000"))"
+                          MaskChar="_"
+                          InputMode="InputMode.text" />
+        }
+
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   Class="mt-4"
+                   ButtonType="ButtonType.Submit">
+            Criar
+        </MudButton>
+    </MudForm>
+</MudPaper>
+
+@code {
+    private MudForm _form;
+
+    // Inicializa como Candidato por padrão para evitar nulls em binding
+    private RequestCreateUserJson _user = new()
+    {
+        UserType = UserType.Candidate,
+        Candidate = new RequestCandidateJson
+        {
+            Address = new RequestAddressJson()
+        }
+    };
+
+    private async Task OnUserTypeChange(UserType tipo)
+    {
+        _user.UserType = tipo;
+        // Recria o objeto específico e zera o outro para refletir o estado atual dos DTOs
+        if (tipo == UserType.Candidate)
+        {
+            _user.Candidate ??= new RequestCandidateJson { Address = new RequestAddressJson() };
+            _user.Enterprise = null;
+        }
+        else // Empresa
+        {
+            _user.Enterprise ??= new RequestEnterpriseJson { Address = new RequestAddressJson() };
+            _user.Candidate = null;
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            await UserServices.CreateUserAsync(_user);
+            Snackbar.Add("Usuário criado com sucesso!", Severity.Success);
+            // Opcional: limpar o formulário mantendo o tipo atual selecionado
+            var tipo = _user.UserType;
+            _user = new RequestCreateUserJson { UserType = tipo };
+            await OnUserTypeChange(tipo);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Erro: {ex.Message}", Severity.Error);
+        }
+    }
+
+    public static readonly string[] SiglasEstados = new[]
+    {
+        "AC","AL","AP","AM","BA","CE","DF","ES","GO",
+        "MA","MT","MS","MG","PA","PB","PR","PE","PI",
+        "RJ","RN","RS","RO","RR","SC","SP","SE","TO"
+    };
+}
