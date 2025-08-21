@@ -9,7 +9,7 @@ namespace PlataformaEstagios.Api.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        [HttpPost("/usuario")]
+        [HttpPost("/new-user")]
         public async Task<IActionResult> CreateUser([FromBody] RequestCreateUserJson request, [FromServices] ICreateUserUseCase useCase)
         {
             await useCase.ExecuteAsync(request);
