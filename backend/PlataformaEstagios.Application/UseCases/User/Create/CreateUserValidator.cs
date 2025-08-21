@@ -1,5 +1,7 @@
 ﻿using FluentValidation;
 using PlataformaEstagios.Communication.Requests;
+using PlataformaEstagios.Domain.Enums;
+
 namespace PlataformaEstagios.Application.UseCases.User.Create
 {
     public class CreateUserValidator : AbstractValidator<RequestCreateUserJson>
@@ -25,8 +27,28 @@ namespace PlataformaEstagios.Application.UseCases.User.Create
                 .MinimumLength(10).WithMessage("Password looks invalid (too short).")
                 .MaximumLength(200).WithMessage("Password looks invalid (too long).");
 
-            //RuleFor(u => u.UserType)
-            //    .IsInEnum().WithMessage("UserType is invalid.");
+            RuleFor(u => u.UserType)
+                .IsInEnum().WithMessage("UserType is invalid.");
+
+            // Conditional: Candidate
+            When(u => u.UserType == UserType.Candidate, () =>
+            {
+                RuleFor(u => u.Candidate)
+                    .NotNull().WithMessage("Candidate payload is required for UserType.Candidate.")
+                    .SetValidator(new RequestCandidateValidator());
+                RuleFor(u => u.Enterprise)
+                    .Null().WithMessage("Enterprise payload must be null for UserType.Candidate.");
+            });
+
+            // Conditional: Enterprise
+            When(u => u.UserType == UserType.Enterprise, () =>
+            {
+                RuleFor(u => u.Enterprise)
+                    .NotNull().WithMessage("Enterprise payload is required for UserType.Enterprise.")
+                    .SetValidator(new RequestEnterpriseValidator());
+                RuleFor(u => u.Candidate)
+                    .Null().WithMessage("Candidate payload must be null for UserType.Enterprise.");
+            });
         }
     }
 }
