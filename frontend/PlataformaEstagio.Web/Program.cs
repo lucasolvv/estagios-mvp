@@ -17,7 +17,7 @@ builder.Services.AddHttpClient<IUserServices, UserServices>(client =>
 {
     // Ajuste a URL base da API aqui ou via appsettings: "Backend:BaseUrl"
     client.BaseAddress = new Uri(
-        builder.Configuration["Backend:BaseUrl"] ?? "https://localhost:7266/"
+        builder.Configuration["Backend:BaseUrl"] ?? "https://localhost:7095/"
     );
 });
 

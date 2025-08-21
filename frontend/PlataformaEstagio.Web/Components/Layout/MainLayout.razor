@@ -1,23 +1,118 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page">
-    <div class="sidebar">
+<MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+<MudLayout>
+    <MudAppBar Elevation="1">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        <MudText Typo="Typo.h5" Class="ml-3">Plataforma de Estagios</MudText>
+        <MudSpacer />
+        <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />
+        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
+    </MudAppBar>
+    <MudDrawer id="nav-drawer" @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
         <NavMenu />
-    </div>
+    </MudDrawer>
+    <MudMainContent Class="pt-16 pa-4">
+        @Body
+    </MudMainContent>
+</MudLayout>
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
 
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
-
-<div id="blazor-error-ui">
+<div id="blazor-error-ui" data-nosnippet>
     An unhandled error has occurred.
-    <a href="" class="reload">Reload</a>
-    <a class="dismiss">🗙</a>
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">🗙</span>
 </div>
+
+@code {
+    private bool _drawerOpen = true;
+    private bool _isDarkMode = false;
+    private MudTheme? _theme = null;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        _theme = new()
+        {
+            PaletteLight = _lightPalette,
+            PaletteDark = _darkPalette,
+            LayoutProperties = new LayoutProperties()
+        };
+    }
+
+    private void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    private void DarkModeToggle()
+    {
+        _isDarkMode = !_isDarkMode;
+    }
+
+    private readonly PaletteLight _lightPalette = new()
+    {
+        Primary = "#0a66c2", // Azul estilo LinkedIn
+        PrimaryDarken = "#004182",
+        PrimaryLighten = "#e5f0fb",
+        Secondary = "#0056a0",
+        AppbarBackground = "#ffffff",
+        AppbarText = "#2c2c2c",
+        Background = "#f3f6f9",
+        Surface = "#ffffff",
+        DrawerBackground = "#ffffff",
+        DrawerText = "#2c2c2c",
+        DrawerIcon = "#0a66c2",
+        TextPrimary = "#2c2c2c",
+        TextSecondary = "#4a4a4a",
+        ActionDefault = "#0a66c2",
+        ActionDisabled = "#9e9e9e",
+        ActionDisabledBackground = "#e0e0e0",
+        LinesDefault = "#e0e0e0",
+        TableLines = "#f0f0f0",
+        Divider = "#e0e0e0",
+        Success = "#2e7d32",
+        Warning = "#ed6c02",
+        Error = "#d32f2f",
+        Info = "#0288d1",
+    };
+
+    private readonly PaletteDark _darkPalette = new()
+    {
+        Primary = "#0a66c2",
+        PrimaryDarken = "#004182",
+        PrimaryLighten = "#5b9bd5",
+        Background = "#1a1a27",
+        Surface = "#20202f",
+        AppbarBackground = "#1a1a27",
+        AppbarText = "#e0e0e0",
+        DrawerBackground = "#1a1a27",
+        DrawerText = "#e0e0e0",
+        DrawerIcon = "#0a66c2",
+        TextPrimary = "#ffffff",
+        TextSecondary = "#c0c0c0",
+        ActionDefault = "#0a66c2",
+        ActionDisabled = "#9999994d",
+        ActionDisabledBackground = "#605f6d4d",
+        LinesDefault = "#2f2f2f",
+        TableLines = "#3a3a3a",
+        Divider = "#33323e",
+        Success = "#3dcb6c",
+        Warning = "#ffb545",
+        Error = "#ff3f5f",
+        Info = "#4a86ff",
+        OverlayLight = "#1e1e2d80",
+    };
+
+
+    public string DarkLightModeButtonIcon => _isDarkMode switch
+    {
+        true => Icons.Material.Rounded.AutoMode,
+        false => Icons.Material.Outlined.DarkMode,
+    };
+}
+

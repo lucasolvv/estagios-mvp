@@ -1,4 +1,4 @@
-﻿@page "/criar-usuario"
+﻿@page "/"
 @using MudBlazor
 
 @using PlataformaEstagio.Web.Components.Services
@@ -17,7 +17,7 @@
         <MudTextField @bind-Value="_user.Password" Label="Senha" InputType="InputType.Password" Required="true" />
 
         <MudSelect T="UserType" Label="Tipo de Usuário"
-                   Value="_user.UserType" Required="true" Class="my-2"
+                   Value="_user.UserType" Required="true" Class="my-4"
                    ValueChanged="OnUserTypeChange"
                    ValueExpression="() => _user.UserType">
             <MudSelectItem Value="UserType.Candidate">Candidato</MudSelectItem>
@@ -85,7 +85,8 @@
         <MudButton Variant="Variant.Filled"
                    Color="Color.Primary"
                    Class="mt-4"
-                   ButtonType="ButtonType.Submit">
+                   OnClick="HandleValidSubmit">
+                   
             Criar
         </MudButton>
     </MudForm>
