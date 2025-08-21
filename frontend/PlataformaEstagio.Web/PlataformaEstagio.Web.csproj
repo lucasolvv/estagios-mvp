@@ -6,4 +6,15 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="MudBlazor" Version="8.11.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\backend\PlataformaEstagios.Api\PlataformaEstagios.Api.csproj" />
+    <ProjectReference Include="..\..\backend\PlataformaEstagios.Domain\PlataformaEstagios.Domain.csproj" />
+    <ProjectReference Include="..\..\shared\PlataformaEstagios.Communication\PlataformaEstagios.Communication.csproj" />
+    <ProjectReference Include="..\..\shared\PlataformaEstagios.Exceptions\PlataformaEstagios.Exceptions.csproj" />
+  </ItemGroup>
+
 </Project>
