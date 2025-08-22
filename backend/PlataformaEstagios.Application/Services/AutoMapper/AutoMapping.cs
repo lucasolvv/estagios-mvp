@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Globalization;
+using AutoMapper;
 using PlataformaEstagios.Communication.Requests;
 using PlataformaEstagios.Domain.Entities;
 
@@ -8,40 +9,47 @@ namespace PlataformaEstagios.Application.Services.AutoMapper
     {
         public AutoMapping()
         {
+            // Converters
+            CreateMap<DateTime?, DateOnly?>()
+                .ConvertUsing(src => src.HasValue ? DateOnly.FromDateTime(src.Value) : (DateOnly?)null);
+
+            CreateMap<string?, DateOnly?>()
+                .ConvertUsing(s => string.IsNullOrWhiteSpace(s) ? null : DateOnly.Parse(s!, CultureInfo.InvariantCulture));
+
             RequestToDomain();
         }
 
         private void RequestToDomain()
         {
-            // User (top-level)
+            // User (igual ao que já tinha)
             CreateMap<RequestCreateUserJson, User>()
                 .ForMember(d => d.Id, o => o.Ignore())
                 .ForMember(d => d.UserIdentifier, o => o.Ignore())
                 .ForMember(d => d.Active, o => o.Ignore())
                 .ForMember(d => d.CreatedOn, o => o.Ignore())
-                .ForMember(d => d.Password, o => o.Ignore()) // hashed in use case
+                .ForMember(d => d.Password, o => o.Ignore()) // hash no use case
                 .ForMember(d => d.Nickname, o => o.MapFrom(s => s.Nickname))
                 .ForMember(d => d.Email, o => o.MapFrom(s => s.Email))
                 .ForMember(d => d.UserType, o => o.MapFrom(s => s.UserType));
 
-            // Candidate (nested payload)
+            // Candidate: BirthDate (DateTime? -> DateOnly?) usa o converter acima automaticamente
             CreateMap<RequestCandidateJson, Candidate>()
                 .ForMember(d => d.Id, o => o.Ignore())
                 .ForMember(d => d.CandidateIdentifier, o => o.Ignore())
-                .ForMember(d => d.UserIdentifier, o => o.Ignore()) // set in use case
+                .ForMember(d => d.UserIdentifier, o => o.Ignore())
                 .ForMember(d => d.Active, o => o.Ignore())
                 .ForMember(d => d.CreatedOn, o => o.Ignore())
                 .ForMember(d => d.Name, o => o.MapFrom(s => s.FullName))
-                .ForMember(d => d.BirthDate, o => o.MapFrom(s => s.BirthDate))
+                .ForMember(d => d.BirthDate, o => o.MapFrom(s => s.BirthDate)) // DateTime? -> DateOnly?
                 .ForMember(d => d.CourseName, o => o.MapFrom(s => s.CourseName))
                 .ForMember(d => d.Address, o => o.MapFrom(s => s.Address))
                 .ForMember(d => d.Applications, o => o.Ignore());
 
-            // Enterprise (nested payload)
+            // Enterprise
             CreateMap<RequestEnterpriseJson, Enterprise>()
                 .ForMember(d => d.Id, o => o.Ignore())
                 .ForMember(d => d.EnterpriseIdentifier, o => o.Ignore())
-                .ForMember(d => d.UserIdentifier, o => o.Ignore()) // set in use case
+                .ForMember(d => d.UserIdentifier, o => o.Ignore())
                 .ForMember(d => d.Active, o => o.Ignore())
                 .ForMember(d => d.CreatedOn, o => o.Ignore())
                 .ForMember(d => d.EnterpriseName, o => o.MapFrom(s => s.TradeName))
@@ -50,7 +58,7 @@ namespace PlataformaEstagios.Application.Services.AutoMapper
                 .ForMember(d => d.Address, o => o.MapFrom(s => s.Address))
                 .ForMember(d => d.Vacancies, o => o.Ignore());
 
-            // Address (shared)
+            // Address
             CreateMap<RequestAddressJson, Address>()
                 .ForMember(d => d.Id, o => o.Ignore())
                 .ForMember(d => d.AddressIdentifier, o => o.Ignore())
