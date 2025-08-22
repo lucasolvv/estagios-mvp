@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿@page "/Register"
 @using MudBlazor
 
 @using PlataformaEstagio.Web.Components.Services
@@ -31,6 +31,7 @@
 
             <MudTextField @bind-Value="_user.Candidate.FullName" Label="Nome Completo" />
             <MudDatePicker @bind-Date="_user.Candidate.BirthDate" Label="Data de Nascimento" />
+            <MudTextField @bind-Value="_user.Candidate.CourseName" Label="Curso" />
             <MudText Typo="Typo.h6" Class="mt-4">Endereço</MudText>
             <MudTextField @bind-Value="_user.Candidate.Address.Street" Label="Logradouro e número" />
             <MudTextField @bind-Value="_user.Candidate.Address.Neighborhood" Label="Bairro" />

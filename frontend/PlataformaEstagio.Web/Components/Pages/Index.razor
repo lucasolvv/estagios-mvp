@@ -1,0 +1,111 @@
+﻿@page "/"
+@using System.ComponentModel.DataAnnotations
+@using MudBlazor
+@inject NavigationManager Nav
+
+<style>
+    .hero-img {
+        width: 100%;
+        height: 100vh; /* ocupa a altura total da tela */
+        object-fit: cover;
+    }
+</style>
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge">
+    <MudGrid Justify="Justify.Center" AlignItems="AlignItems.Center" Class="mt-2">
+        <MudItem xs="12" md="6">
+            <MudPaper Class="pa-6">
+                <MudStack>
+                    <MudText Typo="Typo.h4" Color="Color.Secondary" Class="font-weight-bold">
+                        Bem-vindo ao StartCarreira
+                    </MudText>
+                    <MudText Typo="Typo.subtitle2" Class="text-medium-emphasis">
+                        Acesse sua conta para acompanhar vagas e candidaturas.
+                    </MudText>
+
+                    <MudForm @ref="_form" Model="_model" OnValidSubmit="HandleLogin">
+                        <MudTextField @bind-Value="_model.Username"
+                                      Label="Usuário ou e‑mail"
+                                      For="@(() => _model.Username)"
+                                      Required="true"
+                                      Immediate="true" />
+
+                        <MudTextField @bind-Value="_model.Password"
+                                      Label="Senha"
+                                      For="@(() => _model.Password)"
+                                      InputType="InputType.Password"
+                                      Required="true"
+                                      Immediate="true" />
+
+                        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                            <MudLink Href="/esqueci-minha-senha">Esqueci minha senha</MudLink>
+                        </MudStack>
+
+                        <MudButton Type="Button" OnClick="Submit" Variant="Variant.Filled" Color="Color.Primary" Class="mt-2" FullWidth="true">
+                            Entrar
+                        </MudButton>
+                    </MudForm>
+
+                    <MudDivider Class="my-2" />
+
+                    <MudText Typo="Typo.body2">
+                        Não possui cadastro?
+                        <MudLink Href="/criar-usuario">Cadastre-se</MudLink>
+                    </MudText>
+                </MudStack>
+                <MudStack Row="true" Spacing="3" Class="mt-6">
+                    <MudChip T="string" Color="Color.Primary" Href="/" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Work">
+                        Vagas verificadas
+                    </MudChip>
+
+                    <MudChip T="string" Color="Color.Primary" Href="/" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Verified">
+                        Empresas parceiras
+                    </MudChip>
+
+                    <MudChip T="string" Color="Color.Primary" Href="/" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Timeline">
+                        Acompanhe processos
+                    </MudChip>
+
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+
+@*         <MudItem xs="12" md="5" Class="border-solid mud-border-primary">
+            <MudPaper Class="">
+                <MudImage Src="images/home.jpg"
+                          Alt="Estudante usando a plataforma"
+                          Class="object-cover" />
+            </MudPaper>
+
+
+        </MudItem> *@
+    </MudGrid>
+
+</MudContainer>
+
+@code {
+    private MudForm? _form;
+    private LoginModel _model = new();
+
+    private async Task Submit()
+    {
+        if (_form is not null)
+            await _form.Validate();
+    }
+
+    private void HandleLogin()
+    {
+        // TODO: chame seu endpoint de autenticação aqui.
+        // Exemplo de navegação após login bem-sucedido:
+        Nav.NavigateTo("/dashboard");
+    }
+
+    public class LoginModel
+    {
+        [Required(ErrorMessage = "Informe o usuário ou e‑mail.")]
+        public string Username { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Informe a senha.")]
+        public string Password { get; set; } = string.Empty;
+    }
+}
