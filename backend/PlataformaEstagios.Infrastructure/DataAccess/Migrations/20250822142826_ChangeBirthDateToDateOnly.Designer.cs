@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PlataformaEstagios.Infrastructure.DataAccess;
@@ -11,9 +12,11 @@ using PlataformaEstagios.Infrastructure.DataAccess;
 namespace PlataformaEstagios.Infrastructure.DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250822142826_ChangeBirthDateToDateOnly")]
+    partial class ChangeBirthDateToDateOnly
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -149,8 +152,8 @@ namespace PlataformaEstagios.Infrastructure.DataAccess.Migrations
                         .HasColumnType("character varying(120)");
 
                     b.Property<string>("Cnpj")
-                        .HasMaxLength(18)
-                        .HasColumnType("character varying(18)");
+                        .HasMaxLength(14)
+                        .HasColumnType("character varying(14)");
 
                     b.Property<DateTime>("CreatedOn")
                         .ValueGeneratedOnAdd()
