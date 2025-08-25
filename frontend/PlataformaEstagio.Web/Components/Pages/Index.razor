@@ -1,12 +1,16 @@
 ﻿@page "/"
 @using System.ComponentModel.DataAnnotations
+@using System.Net.Http.Json
 @using MudBlazor
 @inject NavigationManager Nav
+@inject HttpClient Http
+@inject ISnackbar Snackbar
+@inject Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage.ProtectedLocalStorage Storage
 
 <style>
     .hero-img {
         width: 100%;
-        height: 100vh; /* ocupa a altura total da tela */
+        height: 100vh;
         object-fit: cover;
     }
 </style>
@@ -24,9 +28,9 @@
                     </MudText>
 
                     <MudForm @ref="_form" Model="_model" OnValidSubmit="HandleLogin">
-                        <MudTextField @bind-Value="_model.Username"
+                        <MudTextField @bind-Value="_model.EmailOrNickname"
                                       Label="Usuário ou e‑mail"
-                                      For="@(() => _model.Username)"
+                                      For="@(() => _model.EmailOrNickname)"
                                       Required="true"
                                       Immediate="true" />
 
@@ -41,8 +45,13 @@
                             <MudLink Href="/esqueci-minha-senha">Esqueci minha senha</MudLink>
                         </MudStack>
 
-                        <MudButton Type="Button" OnClick="Submit" Variant="Variant.Filled" Color="Color.Primary" Class="mt-2" FullWidth="true">
-                            Entrar
+                        <MudButton Disabled="_isSubmitting"
+                                   Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   Class="mt-2"
+                                   FullWidth="true"
+                                   OnClick="Submit">
+                            @(_isSubmitting ? "Entrando..." : "Entrar")
                         </MudButton>
                     </MudForm>
 
@@ -53,6 +62,7 @@
                         <MudLink Href="/Register">Cadastre-se</MudLink>
                     </MudText>
                 </MudStack>
+
                 <MudStack Row="true" Spacing="3" Class="mt-6">
                     <MudChip T="string" Color="Color.Primary" Href="/" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Work">
                         Vagas verificadas
@@ -65,27 +75,16 @@
                     <MudChip T="string" Color="Color.Primary" Href="/" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Timeline">
                         Acompanhe processos
                     </MudChip>
-
                 </MudStack>
             </MudPaper>
         </MudItem>
-
-@*         <MudItem xs="12" md="5" Class="border-solid mud-border-primary">
-            <MudPaper Class="">
-                <MudImage Src="images/home.jpg"
-                          Alt="Estudante usando a plataforma"
-                          Class="object-cover" />
-            </MudPaper>
-
-
-        </MudItem> *@
     </MudGrid>
-
 </MudContainer>
 
 @code {
     private MudForm? _form;
     private LoginModel _model = new();
+    private bool _isSubmitting;
 
     private async Task Submit()
     {
@@ -93,19 +92,84 @@
             await _form.Validate();
     }
 
-    private void HandleLogin()
+    private async Task HandleLogin()
     {
-        // TODO: chame seu endpoint de autenticação aqui.
-        // Exemplo de navegação após login bem-sucedido:
-        Nav.NavigateTo("/dashboard");
+        if (_isSubmitting) return;
+
+        _isSubmitting = true;
+        try
+        {
+            var payload = new LoginRequestJson
+            {
+                EmailOrNickname = _model.EmailOrNickname,
+                Password = _model.Password
+            };
+
+            // Ajuste a BaseAddress do HttpClient no Program.cs (ex: https://localhost:5001/)
+            var response = await Http.PostAsJsonAsync("api/auth/login", payload);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                // Tenta ler mensagens de erro padrão que você já usa (ErrorOnValidationException retorna lista?)
+                var text = await response.Content.ReadAsStringAsync();
+                Snackbar.Add($"Falha no login: {text}", Severity.Error);
+                return;
+            }
+
+            var login = await response.Content.ReadFromJsonAsync<LoginResponseJson>();
+            if (login is null)
+            {
+                Snackbar.Add("Falha no login: resposta inválida.", Severity.Error);
+                return;
+            }
+
+            // Guarda o token e informações úteis
+            await Storage.SetAsync("auth.token", login.AccessToken);
+            await Storage.SetAsync("auth.expiresAtUtc", login.ExpiresAtUtc);
+            await Storage.SetAsync("auth.nickname", login.Nickname);
+            await Storage.SetAsync("auth.userIdentifier", login.UserIdentifier);
+            await Storage.SetAsync("auth.email", login.Email);
+            await Storage.SetAsync("auth.userType", login.UserType.ToString());
+
+            Snackbar.Add("Login realizado com sucesso!", Severity.Success);
+
+            // navega para o dashboard
+            Nav.NavigateTo("/dashboard", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Erro inesperado: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _isSubmitting = false;
+            StateHasChanged();
+        }
     }
 
     public class LoginModel
     {
         [Required(ErrorMessage = "Informe o usuário ou e‑mail.")]
-        public string Username { get; set; } = string.Empty;
+        public string EmailOrNickname { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Informe a senha.")]
         public string Password { get; set; } = string.Empty;
+    }
+
+    // DTOs alinhados ao backend (MVP)
+    private sealed class LoginRequestJson
+    {
+        public string EmailOrNickname { get; set; } = null!;
+        public string Password { get; set; } = null!;
+    }
+
+    private sealed class LoginResponseJson
+    {
+        public string AccessToken { get; set; } = null!;
+        public DateTime ExpiresAtUtc { get; set; }
+        public Guid UserIdentifier { get; set; }
+        public string Nickname { get; set; } = null!;
+        public string Email { get; set; } = null!;
+        public int UserType { get; set; } // ou string, se preferir
     }
 }

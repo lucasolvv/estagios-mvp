@@ -23,6 +23,7 @@ namespace PlataformaEstagios.Infrastructure
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddScoped<IUserWriteOnlyRepository, UserRepository>();
+            services.AddScoped<IUserReadOnlyRepository, UserRepository>();
             services.AddScoped<ICandidateWriteOnlyRepository, CandidateRepository>();
             services.AddScoped<IEnterpriseWriteOnlyRepository, EnterpriseRepository>();
         }

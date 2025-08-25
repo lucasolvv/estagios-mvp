@@ -22,6 +22,8 @@ builder.Services.AddHttpClient<IUserServices, UserServices>(client =>
     );
 });
 
+builder.Services.AddProtectedBrowserStorage();
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
