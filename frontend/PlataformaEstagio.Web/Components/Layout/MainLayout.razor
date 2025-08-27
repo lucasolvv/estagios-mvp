@@ -1,4 +1,6 @@
 ﻿@inherits LayoutComponentBase
+@inject AuthenticationStateProvider AuthStateProvider
+@using PlataformaEstagio.Web.Components.Services.Auth
 
 <MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode" />
 <MudPopoverProvider />
@@ -84,6 +86,14 @@
             PaletteDark = _darkPalette,
             LayoutProperties = new LayoutProperties()
         };
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && AuthStateProvider is JwtAuthenticationStateProvider jwt)
+        {
+            await jwt.RestoreAsync();   // aqui o JS interop já está habilitado
+            //StateHasChanged();          // refaz o render já autenticado
+        }
     }
 
     private void DrawerToggle()
