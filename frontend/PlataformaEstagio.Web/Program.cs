@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor.Services;
-using PlataformaEstagio.Web; // ajuste para o namespace onde está o componente App
 using PlataformaEstagio.Web.Components;
-using PlataformaEstagio.Web.Components.Services; // onde ficará o IUserServices/UserServices
-using Microsoft.AspNetCore.Components.Routing;
+using PlataformaEstagio.Web.Components.Services;
+using PlataformaEstagio.Web.Components.Services.Auth;
+using PlataformaEstagios.Web.Services.Auth; // onde ficará o IUserServices/UserServices
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,16 +15,23 @@ builder.Services.AddRazorComponents()
 // MudBlazor (Snackbar, Dialog, etc.)
 builder.Services.AddMudServices();
 
-// HttpClient tipado para sua API
-builder.Services.AddHttpClient<IUserServices, UserServices>(client =>
+
+
+
+builder.Services.AddHttpClient("Backend", (sp, client) =>
 {
-    // Ajuste a URL base da API aqui ou via appsettings: "Backend:BaseUrl"
-    client.BaseAddress = new Uri(
-        builder.Configuration["Backend:BaseUrl"] ?? "https://localhost:7095/"
-    );
+    var cfg = sp.GetRequiredService<IConfiguration>();
+    var baseUrl = cfg["Backend:BaseUrl"] ?? "https://localhost:7095/";
+    client.BaseAddress = new Uri(baseUrl);
 });
 
-builder.Services.AddProtectedBrowserStorage();
+builder.Services.AddScoped<HttpClient>(sp =>
+    sp.GetRequiredService<IHttpClientFactory>().CreateClient("Backend"));
+
+builder.Services.AddAuthorizationCore();
+builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthenticationStateProvider>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddHttpClient<IUserServices, UserServices>("Backend");
 
 var app = builder.Build();
 
