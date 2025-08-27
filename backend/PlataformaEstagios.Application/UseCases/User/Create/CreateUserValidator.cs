@@ -24,7 +24,7 @@ namespace PlataformaEstagios.Application.UseCases.User.Create
             RuleFor(u => u.Password)
                 .Cascade(CascadeMode.Stop)
                 .NotEmpty().WithMessage("Password is required.")
-                .MinimumLength(10).WithMessage("Password looks invalid (too short).")
+                .MinimumLength(4).WithMessage("Password looks invalid (too short). Minimal 4 chars")
                 .MaximumLength(200).WithMessage("Password looks invalid (too long).");
 
             RuleFor(u => u.UserType)
