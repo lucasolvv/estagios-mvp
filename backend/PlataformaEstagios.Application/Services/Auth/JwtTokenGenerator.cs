@@ -26,7 +26,7 @@ namespace PlataformaEstagios.Application.Services.Auth
                 new Claim("uid", user.UserIdentifier.ToString()),
                 new Claim("nickname", user.Nickname),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.UserType.ToString())
+                new Claim(ClaimTypes.Role, user.UserType.ToString()) // candidate ou enterprise
             };
 
             var creds = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)), SecurityAlgorithms.HmacSha256);

@@ -1,0 +1,286 @@
+﻿@page "/candidato/home"
+@using System.Security.Claims
+@inject AuthenticationStateProvider AuthProvider
+@inject ISnackbar Snackbar
+
+<AuthorizeView Context="auth" Roles="Candidate">
+    <MudContainer MaxWidth="MaxWidth.False" Class="px-6 py-4">
+    <MudGrid>
+        <!-- Header / Perfil -->
+        <MudItem xs="12">
+            <MudPaper Class="p-4">
+                <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Spacing="2">
+                    <MudStack>
+                        <MudText Typo="Typo.h5" Class="font-weight-bold">
+                                Olá, @GetDisplayName(auth.User) 👋
+                        </MudText>
+                        <MudText Typo="Typo.subtitle2" Color="Color.Secondary">
+                            Continue seu perfil para receber recomendações mais precisas.
+                        </MudText>
+                    </MudStack>
+
+                    <MudStack Row Spacing="1">
+                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Person" Color="Color.Primary" OnClick="OnIrParaPerfil">
+                            Completar Perfil (@ProfileCompletion% )
+                        </MudButton>
+                        <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Search" OnClick="OnBuscarvagas">
+                            Buscar Vagas
+                        </MudButton>
+                        <MudButton Variant="Variant.Text" StartIcon="@Icons.Material.Filled.Alarm" OnClick="OnConfigurarAlertas">
+                            Alertas
+                        </MudButton>
+                    </MudStack>
+                </MudStack>
+
+                <MudProgressLinear Class="mt-3" Value="@ProfileCompletion" Color="Color.Success" />
+            </MudPaper>
+        </MudItem>
+
+        <!-- Coluna esquerda -->
+        <MudItem xs="12" md="8">
+            <!-- Vagas recomendadas -->
+            <MudCard Class="mb-4">
+                <MudCardHeader>
+                    <MudText Typo="Typo.h6">Vagas recomendadas</MudText>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudTable Items="RecommendedJobs" Hover="true" Dense="true">
+                        <HeaderContent>
+                            <MudTh>Vaga</MudTh>
+                            <MudTh>Empresa</MudTh>
+                            <MudTh>Carga</MudTh>
+                            <MudTh>Bolsa</MudTh>
+                            <MudTh></MudTh>
+                        </HeaderContent>
+                        <RowTemplate >
+                            <MudTd>@context.Titulo</MudTd>
+                            <MudTd>@context.Empresa</MudTd>
+                            <MudTd>@context.CargaHoraria</MudTd>
+                            <MudTd>@(context.Bolsa is null ? "-" : context.Bolsa.Value.ToString("C"))</MudTd>
+                            <MudTd Class="text-right">
+                                <MudButton Size="Size.Small" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Send" OnClick="@(()=>Apply(context))">
+                                    Candidatar-se
+                                </MudButton>
+                            </MudTd>
+                        </RowTemplate>
+                        <NoRecordsContent>
+                            <MudText Nenhum registro encontrado.></MudText>
+                        </NoRecordsContent>
+                    </MudTable>
+                </MudCardContent>
+            </MudCard>
+
+            <!-- Minhas inscrições recentes -->
+            <MudCard>
+                <MudCardHeader>
+                    <MudText Typo="Typo.h6">Minhas inscrições recentes</MudText>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudTable Items="RecentApplications" Dense="true" Hover="true">
+                        <HeaderContent>
+                            <MudTh>Vaga</MudTh>
+                            <MudTh>Empresa</MudTh>
+                            <MudTh>Data</MudTh>
+                            <MudTh>Status</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd>@context.Vaga</MudTd>
+                            <MudTd>@context.Empresa</MudTd>
+                            <MudTd>@context.Data.ToString("dd/MM/yyyy")</MudTd>
+                            <MudTd>
+                                <MudChip T="string" Color="@StatusColor(context.Status)" Variant="Variant.Filled" Size="Size.Small">
+                                    @context.Status
+                                </MudChip>
+                            </MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <!-- Coluna direita -->
+        <MudItem xs="12" md="4">
+            <!-- Horas obrigatórias -->
+            <MudCard Class="mb-4">
+                <MudCardHeader>
+                    <MudText Typo="Typo.h6">Horas obrigatórias</MudText>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudStack>
+                        <MudText>@CompletedHours/@RequiredHours h</MudText>
+                        <MudProgressLinear Value="@HoursPercent" Color="Color.Info" />
+                        <MudButton Variant="Variant.Text" StartIcon="@Icons.Material.Filled.UploadFile"
+                                   OnClick="@(()=>Snackbar.Add("Enviar relatório de horas (TODO)", Severity.Info))">
+                            Enviar relatório
+                        </MudButton>
+                    </MudStack>
+                </MudCardContent>
+            </MudCard>
+
+            <!-- Próximos compromissos -->
+            <MudCard Class="mb-4">
+                <MudCardHeader>
+                    <MudText Typo="Typo.h6">Próximos compromissos</MudText>
+                </MudCardHeader>
+                <MudCardContent>
+                    @if (Appointments.Count == 0)
+                    {
+                        <MudText Color="Color.Secondary">Sem compromissos.</MudText>
+                    }
+                    else
+                    {
+                            <MudList Dense="true" T="AppointmentVm">
+                            @foreach (var a in Appointments)
+                            {
+                                <MudListItem>
+                                    <MudListItemIcon><MudIcon Icon="@Icons.Material.Filled.Event" /></MudListItemIcon>
+                                    <MudListItemText>
+                                        <div class="font-semibold">@a.Titulo</div>
+                                        <small>@a.Data.ToString("dd/MM HH:mm") • @a.Local</small>
+                                    </MudListItemText>
+                                </MudListItem>
+                            }
+                        </MudList>
+                    }
+                </MudCardContent>
+            </MudCard>
+
+            <!-- Notificações -->
+            <MudCard>
+                <MudCardHeader>
+                    <MudText Typo="Typo.h6">Notificações</MudText>
+                </MudCardHeader>
+                <MudCardContent>
+                    @if (Notifications.Count == 0)
+                    {
+                        <MudText Color="Color.Secondary">Sem novas notificações.</MudText>
+                    }
+                    else
+                    {
+                        <MudTimeline>
+                            @foreach (var n in Notifications)
+                            {
+                                <MudTimelineItem>
+                                    <div class="font-medium">@n.Texto</div>
+                                    <small>@n.Data.ToString("dd/MM HH:mm")</small>
+                                </MudTimelineItem>
+                            }
+                        </MudTimeline>
+                    }
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+
+</AuthorizeView>
+
+
+@code {
+    private static string GetDisplayName(ClaimsPrincipal user)
+        => user.FindFirst("nickname")?.Value
+           ?? user.Identity?.Name
+           ?? user.FindFirst(ClaimTypes.Email)?.Value
+           ?? "Usuário";
+
+    // --- usuário (via Claims). Garanta que o login preenche o ClaimTypes.Name ou "name".
+    private string FirstName = "candidato";
+    private int ProfileCompletion = 60;
+
+    // --- horas obrigatórias
+    private int RequiredHours = 160;
+    private int CompletedHours = 48;
+    private double HoursPercent => RequiredHours == 0 ? 0 : (CompletedHours * 100.0 / RequiredHours);
+
+    // --- dados mockados (substituir por serviços/repo)
+    private List<JobVm> RecommendedJobs = new()
+    {
+        new("Estágio Frontend (Blazor)", "Tech Corp", "20h/sem", 1200m),
+        new("Estágio QA", "Quality Labs", "30h/sem", 1500m),
+        new("Estágio Suporte TI", "HelpDesk BR", "30h/sem", null),
+    };
+
+    private List<ApplicationVm> RecentApplications = new()
+    {
+        new("Estágio Frontend (Blazor)", "Tech Corp", DateTime.Today.AddDays(-2), "Aguardando triagem"),
+        new("Estágio QA", "Quality Labs", DateTime.Today.AddDays(-5), "Entrevista marcada")
+    };
+
+    private List<AppointmentVm> Appointments = new()
+    {
+        new("Entrevista • Tech Corp", DateTime.Today.AddDays(1).AddHours(14), "Google Meet")
+    };
+
+    private List<NotificationVm> Notifications = new()
+    {
+        new("Sua inscrição na Tech Corp mudou para 'Em análise'", DateTime.Today.AddHours(-5)),
+        new("Nova vaga de Blazor publicada pela DevHouse", DateTime.Today.AddDays(-1))
+    };
+
+    [CascadingParameter] private Task<AuthenticationState> AuthenticationStateTask { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _ = LoadUserAsync();
+
+        AuthProvider.AuthenticationStateChanged += OnAuthChanged;
+    }
+
+    private async void OnAuthChanged(Task<AuthenticationState> task)
+    {
+        await LoadUserAsync(task);
+        StateHasChanged();
+    }
+    private async Task LoadUserAsync(Task<AuthenticationState>? stateTask = null)
+    {
+        var state = stateTask is null ? await AuthProvider.GetAuthenticationStateAsync()
+                                      : await stateTask;
+        var user = state.User;
+
+        var name = user.FindFirst(ClaimTypes.Name)?.Value
+               ?? user.FindFirst("name")?.Value
+               ?? user.Identity?.Name;
+
+        if (!string.IsNullOrWhiteSpace(name))
+            FirstName = name.Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? name;
+    }
+
+    public void Dispose()
+    {
+        AuthProvider.AuthenticationStateChanged -= OnAuthChanged;
+    }
+
+    private void OnIrParaPerfil()
+    {
+        Snackbar.Add("Ir para perfil (TODO)", Severity.Info);
+    }
+    private void OnBuscarvagas()
+    {
+        Snackbar.Add("Ir para perfil (TODO)", Severity.Info);
+    }
+    private void OnConfigurarAlertas()
+    {
+        Snackbar.Add("Ir para perfil (TODO)", Severity.Info);
+    }
+
+    private void Apply(JobVm job)
+    {
+        Snackbar.Add($"Inscrição enviada para \"{job.Titulo}\" (mock).", Severity.Success);
+        // TODO: chamar serviço real de candidatura
+    }
+
+    private Color StatusColor(string status) => status switch
+    {
+        "Aprovado" => Color.Success,
+        "Entrevista marcada" => Color.Info,
+        "Reprovado" => Color.Error,
+        _ => Color.Warning
+    };
+
+    // --- VMs simples (poderiam virar DTOs no projeto)
+    private record JobVm(string Titulo, string Empresa, string CargaHoraria, decimal? Bolsa);
+    private record ApplicationVm(string Vaga, string Empresa, DateTime Data, string Status);
+    private record AppointmentVm(string Titulo, DateTime Data, string Local);
+    private record NotificationVm(string Texto, DateTime Data);
+}

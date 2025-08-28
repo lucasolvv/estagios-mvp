@@ -6,6 +6,7 @@ using PlataformaEstagios.Infrastructure.DataAccess;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,7 +43,9 @@ builder.Services
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(key),
             ValidateLifetime = true,
-            ClockSkew = TimeSpan.FromSeconds(30) // small skew for clock differences
+            ClockSkew = TimeSpan.FromSeconds(30), // small skew for clock differences
+            RoleClaimType = ClaimTypes.Role,
+            NameClaimType = ClaimTypes.Name
         };
     });
 

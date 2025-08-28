@@ -1,6 +1,10 @@
 ﻿@inherits LayoutComponentBase
 @inject AuthenticationStateProvider AuthStateProvider
 @using PlataformaEstagio.Web.Components.Services.Auth
+@inject PlataformaEstagio.Web.Components.Services.Auth.IAuthService Auth
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+@inject NavigationManager Nav
 
 <MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode" />
 <MudPopoverProvider />
@@ -8,13 +12,67 @@
 <MudSnackbarProvider />
 
 <MudLayout>
-    <MudAppBar Elevation="1">
+    <MudAppBar Color="Color.Primary" Fixed="false">
+        <MudText Typo="Typo.h6">StartCarreira</MudText>
+        <MudSpacer />
+
+        <AuthorizeView>
+            <NotAuthorized>
+                <MudButton Variant="Variant.Text" Color="Color.Inherit"
+                           StartIcon="@Icons.Material.TwoTone.Login"
+                           OnClick="@(() => Nav.NavigateTo("/"))">
+                    Sign In
+                </MudButton>
+            </NotAuthorized>
+
+            <Authorized Context="auth">
+                <MudText Class="mr-2">@GetDisplayName(auth.User)</MudText>
+
+                <MudMenu Dense Variant="Variant.Text" Size="Size.Medium" Color="Color.Inherit"
+                         Icon="@Icons.Material.TwoTone.MoreVert">
+
+                    <MudMenu StartIcon="@Icons.Material.TwoTone.Settings"
+                             IconColor="Color.Primary"
+                             Label="Settings">
+                        <MudMenuItem Icon="@Icons.Material.TwoTone.DarkMode"
+                                     IconColor="Color.Secondary"
+                                     OnClick="@DarkModeToggle"
+                                     Label="Dark Theme" />
+                    </MudMenu>
+
+                    <MudDivider />
+
+                    @if (auth.User.IsInRole("Candidate"))
+                    {
+                        <MudMenuItem Icon="@Icons.Material.Filled.Work"
+                                     Label="Minhas vagas"
+                                     OnClick="@(() => Nav.NavigateTo("/candidato/home"))" />
+                    }
+
+                    @if (auth.User.IsInRole("Enterprise"))
+                    {
+                        <MudMenuItem Icon="@Icons.Material.Filled.Dashboard"
+                                     Label="Painel da empresa"
+                                     OnClick="@(() => Nav.NavigateTo("/empresa/home"))" />
+                    }
+
+                    <MudDivider />
+
+                    <MudMenuItem Icon="@Icons.Material.TwoTone.Logout"
+                                 IconColor="Color.Primary"
+                                 Label="Sign Out"
+                                 OnClick="Logout" />
+                </MudMenu>
+            </Authorized>
+        </AuthorizeView>
+    </MudAppBar>
+    @* <MudAppBar Elevation="1">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudText Typo="Typo.h5" Class="ml-3">StartCarreira</MudText>
         <MudSpacer />
         <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />
         <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
-    </MudAppBar>
+    </MudAppBar> *@
     <MudDrawer id="nav-drawer" @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
         <NavMenu />
     </MudDrawer>
@@ -75,6 +133,15 @@
     private bool _drawerOpen = false;
     private bool _isDarkMode = false;
     private MudTheme? _theme = null;
+
+    private async Task Logout() => await Auth.LogoutAsync();
+
+    // Usa Name ou um claim "nickname" se existir
+    private static string GetDisplayName(ClaimsPrincipal user)
+        => user.FindFirst("nickname")?.Value
+           ?? user.Identity?.Name
+           ?? user.FindFirst(ClaimTypes.Email)?.Value
+           ?? "Usuário";
 
     protected override void OnInitialized()
     {

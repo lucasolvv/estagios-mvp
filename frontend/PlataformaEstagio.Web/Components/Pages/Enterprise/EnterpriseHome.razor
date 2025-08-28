@@ -1,0 +1,10 @@
+﻿@page "/empresa/home"
+
+<AuthorizeView Roles="Enterprise">
+  <Authorized>
+    <h3>Área da empresa</h3>
+  </Authorized>
+  <NotAuthorized>
+    <RedirectToLogin />
+  </NotAuthorized>
+</AuthorizeView>

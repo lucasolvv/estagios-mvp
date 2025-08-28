@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using MudBlazor.Services;
 using PlataformaEstagio.Web.Components;
 using PlataformaEstagio.Web.Components.Services;
@@ -29,6 +30,8 @@ builder.Services.AddScoped<HttpClient>(sp =>
     sp.GetRequiredService<IHttpClientFactory>().CreateClient("Backend"));
 
 builder.Services.AddAuthorizationCore();
+builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddScoped<ProtectedLocalStorage>();
 builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthenticationStateProvider>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddHttpClient<IUserServices, UserServices>("Backend");

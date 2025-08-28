@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.WebUtilities
 @using MudBlazor
 @using PlataformaEstagios.Communication.Requests
 @inject ISnackbar Snackbar
@@ -62,8 +63,26 @@
                 return;
             }
 
-            //Snackbar.Add("Login realizado com sucesso!", Severity.Success);
-            Nav.NavigateTo("/dashboard", forceLoad: true);
+            // 1) Se vem de uma rota protegida, volte pra ela:
+            if (TryGetReturnUrl(out var returnUrl))
+            {
+                Nav.NavigateTo(returnUrl);
+            }
+
+            // 2) Caso contrário, vá para a home conforme tipo:
+            var session = await Auth.GetSessionAsync();
+            switch (session?.UserType.ToString())
+            {
+                case "Candidate":
+                    Nav.NavigateTo("/candidato/home");
+                    break;
+                case "Enterprise":
+                    Nav.NavigateTo("/empresa/home");
+                    break;
+                default:
+                    Nav.NavigateTo("/");
+                    break;
+            }
         }
         catch (Exception ex)
         {
@@ -74,5 +93,21 @@
             _isSubmitting = false;
             StateHasChanged();
         }
+    }
+    private bool TryGetReturnUrl(out string url)
+    {
+        var uri = new Uri(Nav.Uri);
+        var query = QueryHelpers.ParseQuery(uri.Query);
+        if (query.TryGetValue("returnUrl", out var val))
+        {
+            var candidate = val.ToString();
+            if (Uri.IsWellFormedUriString(candidate, UriKind.Relative))
+            {
+                url = candidate;
+                return true;
+            }
+        }
+        url = default!;
+        return false;
     }
 }
