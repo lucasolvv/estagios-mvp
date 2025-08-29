@@ -12,6 +12,7 @@ namespace PlataformaEstagios.Communication.Responses
         public string Nickname { get; set; } = null!;
         public string Email { get; set; } = null!;
         public UserType UserType { get; set; }
+        public Guid? UserTypeId { get; set; } // CandidateId or EnterpriseId
 
     }
 }

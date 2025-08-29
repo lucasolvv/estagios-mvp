@@ -30,7 +30,9 @@ namespace PlataformaEstagios.Application.Services.AutoMapper
                 .ForMember(d => d.Password, o => o.Ignore()) // hash no use case
                 .ForMember(d => d.Nickname, o => o.MapFrom(s => s.Nickname))
                 .ForMember(d => d.Email, o => o.MapFrom(s => s.Email))
-                .ForMember(d => d.UserType, o => o.MapFrom(s => s.UserType));
+                .ForMember(d => d.UserType, o => o.MapFrom(s => s.UserType))
+                .ForMember(d => d.UserTypeId, o => o.Ignore()); // setado no use case
+                                                               
 
             // Candidate: BirthDate (DateTime? -> DateOnly?) usa o converter acima automaticamente
             CreateMap<RequestCandidateJson, Candidate>()
@@ -64,6 +66,19 @@ namespace PlataformaEstagios.Application.Services.AutoMapper
                 .ForMember(d => d.AddressIdentifier, o => o.Ignore())
                 .ForMember(d => d.Active, o => o.Ignore())
                 .ForMember(d => d.CreatedOn, o => o.Ignore());
+
+            //Vacancy
+
+            CreateMap<RequestCreateVacancyJson, Vacancy>()
+                .ForMember(d => d.VacancyIdentifier, o => o.Ignore())
+                .ForMember(d => d.EnterpriseIdentifier, o => o.MapFrom(s => s.EnterpriseIdentifier))
+                .ForMember(d => d.Title, o => o.MapFrom(s => s.Title))
+                .ForMember(d => d.Description, o => o.MapFrom(s => s.Description))
+                .ForMember(d => d.IsActive, o => o.MapFrom(s => s.IsActive))
+                .ForMember(d => d.UpdatedAt, o => o.Ignore())
+                .ForMember(d => d.Applications, o => o.Ignore());
+
+
         }
     }
 }

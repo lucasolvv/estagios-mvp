@@ -1,10 +1,304 @@
 ﻿@page "/empresa/home"
+@using System.Security.Claims
+@inject AuthenticationStateProvider AuthProvider
+@inject ISnackbar Snackbar
+@inject NavigationManager Nav
 
-<AuthorizeView Roles="Enterprise">
-  <Authorized>
-    <h3>Área da empresa</h3>
-  </Authorized>
-  <NotAuthorized>
-    <RedirectToLogin />
-  </NotAuthorized>
+<AuthorizeView Context="auth" Roles="Enterprise">
+    <MudContainer MaxWidth="MaxWidth.False" Class="px-6 py-2">
+        <MudGrid>
+
+            <!-- Header / Ações rápidas -->
+            <MudItem xs="12">
+                <MudPaper Class="pa-6">
+                    <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Spacing="4" Class="py-4 px-2">
+                        <MudStack>
+                            <MudText Typo="Typo.h5" Class="font-weight-bold">
+                                Olá, @GetDisplayName(auth.User) 👋
+                                
+                            </MudText>
+                            <MudText Typo="Typo.subtitle2" Color="Color.Secondary">
+                                Veja o resumo das suas vagas, candidatos e entrevistas.
+                            </MudText>
+                        </MudStack>
+
+                        <MudStack Row Spacing="1">
+                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AddBusiness" Color="Color.Primary" OnClick="OnCriarVaga">
+                                Criar Vaga
+                            </MudButton>
+                            <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.ListAlt" OnClick="OnGerenciarVagas">
+                                Gerenciar Vagas
+                            </MudButton>
+                            <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Groups" OnClick="OnBancoTalentos">
+                                Banco de Talentos
+                            </MudButton>
+                            <MudButton Variant="Variant.Text" StartIcon="@Icons.Material.Filled.Event" OnClick="OnConfigurarEntrevistas">
+                                Entrevistas
+                            </MudButton>
+                        </MudStack>
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
+
+            <!-- Coluna esquerda -->
+            <MudItem xs="12" md="8">
+                <!-- Minhas Vagas Ativas -->
+                <MudCard Class="mb-4">
+                    <MudCardHeader>
+                        <MudText Typo="Typo.h6">Minhas vagas ativas</MudText>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudTable Items="ActiveJobs" Dense="true" Hover="true">
+                            <HeaderContent>
+                                <MudTh>Título</MudTh>
+                                <MudTh>Abertura</MudTh>
+                                <MudTh>Inscritos</MudTh>
+                                <MudTh>Status</MudTh>
+                                <MudTh></MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd>@context.Titulo</MudTd>
+                                <MudTd>@context.DataAbertura.ToString("dd/MM/yyyy")</MudTd>
+                                <MudTd>@context.Inscritos</MudTd>
+                                <MudTd>
+                                    <MudChip T="string" Color="@JobStatusColor(context.Status)" Variant="Variant.Filled" Size="Size.Small">
+                                        @context.Status
+                                    </MudChip>
+                                </MudTd>
+                                <MudTd Class="text-right">
+                                    <MudButton Size="Size.Small" Variant="Variant.Text" StartIcon="@Icons.Material.Filled.Visibility"
+                                               OnClick="@(()=>OnVerInscritos(context))">
+                                        Ver inscritos
+                                    </MudButton>
+                                    <MudButton Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined"
+                                               StartIcon="@Icons.Material.Filled.Edit" OnClick="@(()=>OnEditarVaga(context))">
+                                        Editar
+                                    </MudButton>
+                                </MudTd>
+                            </RowTemplate>
+                            <NoRecordsContent>
+                                <MudText Color="Color.Secondary">Nenhuma vaga ativa.</MudText>
+                            </NoRecordsContent>
+                        </MudTable>
+                    </MudCardContent>
+                </MudCard>
+
+                <!-- Candidatos recentes -->
+                <MudCard>
+                    <MudCardHeader>
+                        <MudText Typo="Typo.h6">Candidatos recentes</MudText>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudTable Items="RecentCandidates" Dense="true" Hover="true">
+                            <HeaderContent>
+                                <MudTh>Nome</MudTh>
+                                <MudTh>Curso</MudTh>
+                                <MudTh>Vaga</MudTh>
+                                <MudTh>Data</MudTh>
+                                <MudTh></MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd>@context.Nome</MudTd>
+                                <MudTd>@context.Curso</MudTd>
+                                <MudTd>@context.Vaga</MudTd>
+                                <MudTd>@context.Data.ToString("dd/MM/yyyy")</MudTd>
+                                <MudTd Class="text-right">
+                                    <MudButton Size="Size.Small" Color="Color.Primary" StartIcon="@Icons.Material.Filled.PersonSearch"
+                                               OnClick="@(()=>OnVerPerfil(context))">
+                                        Ver perfil
+                                    </MudButton>
+                                    <MudButton Size="Size.Small" Variant="Variant.Text" StartIcon="@Icons.Material.Filled.CalendarMonth"
+                                               OnClick="@(()=>OnAgendarEntrevista(context))">
+                                        Agendar entrevista
+                                    </MudButton>
+                                </MudTd>
+                            </RowTemplate>
+                            <NoRecordsContent>
+                                <MudText Color="Color.Secondary">Sem novas inscrições.</MudText>
+                            </NoRecordsContent>
+                        </MudTable>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+
+            <!-- Coluna direita -->
+            <MudItem xs="12" md="4">
+                <!-- Métricas rápidas -->
+                <MudGrid Class="mb-4">
+                    <MudItem xs="12" sm="6" md="12">
+                    <MudPaper Class="py-2 px-2">
+                            <MudText Typo="Typo.overline">Vagas abertas</MudText>
+                            <MudText Typo="Typo.h5">@Stats.VagasAbertas</MudText>
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="12">
+                    <MudPaper Class="py-2 px-2">
+                            <MudText Typo="Typo.overline">Inscrições recebidas</MudText>
+                            <MudText Typo="Typo.h5">@Stats.Inscricoes</MudText>
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="12">
+                    <MudPaper Class="py-2 px-2">
+                            <MudText Typo="Typo.overline">Entrevistas marcadas</MudText>
+                            <MudText Typo="Typo.h5">@Stats.Entrevistas</MudText>
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="12">
+                    <MudPaper Class="py-2 px-2">
+                            <MudText Typo="Typo.overline">Taxa de preenchimento</MudText>
+                            <MudText Typo="Typo.h5">@Stats.TaxaPreenchimento.ToString("P0")</MudText>
+                            <MudProgressLinear Class="mt-1" Value="@(Stats.TaxaPreenchimento*100)" Color="Color.Info" />
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+
+                <!-- Próximas entrevistas -->
+                <MudCard Class="mb-4">
+                    <MudCardHeader>
+                        <MudText Typo="Typo.h6">Próximas entrevistas</MudText>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        @if (UpcomingInterviews.Count == 0)
+                        {
+                            <MudText Color="Color.Secondary">Sem entrevistas marcadas.</MudText>
+                        }
+                        else
+                        {
+                            <MudList Dense="true" T="InterviewVm">
+                                @foreach (var i in UpcomingInterviews)
+                                {
+                                    <MudListItem>
+                                        <MudListItemIcon><MudIcon Icon="@Icons.Material.Filled.Event" /></MudListItemIcon>
+                                        <MudListItemText>
+                                            <div class="font-semibold">@i.Candidato • @i.Vaga</div>
+                                            <small>@i.Data.ToString("dd/MM HH:mm") • @i.Canal</small>
+                                        </MudListItemText>
+                                    </MudListItem>
+                                }
+                            </MudList>
+                        }
+                    </MudCardContent>
+                </MudCard>
+
+                <!-- Notificações -->
+                <MudCard>
+                    <MudCardHeader>
+                        <MudText Typo="Typo.h6">Notificações</MudText>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        @if (Notifications.Count == 0)
+                        {
+                            <MudText Color="Color.Secondary">Sem novas notificações.</MudText>
+                        }
+                        else
+                        {
+                            <MudTimeline>
+                                @foreach (var n in Notifications)
+                                {
+                                    <MudTimelineItem>
+                                        <div class="font-medium">@n.Texto</div>
+                                        <small>@n.Data.ToString("dd/MM HH:mm")</small>
+                                    </MudTimelineItem>
+                                }
+                            </MudTimeline>
+                        }
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        </MudGrid>
+    </MudContainer>
 </AuthorizeView>
+
+@code {
+    private static string GetDisplayName(ClaimsPrincipal user)
+        => user.FindFirst("nickname")?.Value
+           ?? user.Identity?.Name
+           ?? user.FindFirst(ClaimTypes.Email)?.Value
+           ?? "Empresa";
+
+    // --- Métricas
+    private StatsVm Stats = new(3, 28, 6, 0.65);
+
+    // --- Dados mockados
+    private List<JobCompanyVm> ActiveJobs = new()
+    {
+        new("Estagiário(a) Frontend (Blazor)", DateTime.Today.AddDays(-10), 12, "Ativa"),
+        new("QA Júnior (Estágio)", DateTime.Today.AddDays(-6), 7, "Ativa"),
+        new("Suporte TI (Home Office)", DateTime.Today.AddDays(-2), 3, "Ativa"),
+    };
+
+    private List<CandidateVm> RecentCandidates = new()
+    {
+        new("Ana Souza", "Eng. de Software (5º)", "Estagiário(a) Frontend (Blazor)", DateTime.Today.AddDays(-1)),
+        new("Bruno Lima", "Sistemas de Informação (4º)", "QA Júnior (Estágio)", DateTime.Today.AddDays(-2)),
+        new("Carla Menezes", "Ciência da Computação (6º)", "Suporte TI (Home Office)", DateTime.Today.AddDays(-3)),
+    };
+
+    private List<InterviewVm> UpcomingInterviews = new()
+    {
+        new("Ana Souza", "Estagiário(a) Frontend (Blazor)", DateTime.Today.AddDays(1).AddHours(14), "Google Meet"),
+        new("Bruno Lima", "QA Júnior (Estágio)", DateTime.Today.AddDays(2).AddHours(10), "Google Meet"),
+    };
+
+    private List<NotificationVm> Notifications = new()
+    {
+        new("Novo candidato em 'Frontend (Blazor)': Ana Souza", DateTime.Today.AddHours(-3)),
+        new("Bruno Lima confirmou entrevista para amanhã", DateTime.Today.AddHours(-6))
+    };
+
+    [CascadingParameter] private Task<AuthenticationState> AuthenticationStateTask { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _ = LoadUserAsync();
+        AuthProvider.AuthenticationStateChanged += OnAuthChanged;
+    }
+
+    private async void OnAuthChanged(Task<AuthenticationState> task)
+    {
+        await LoadUserAsync(task);
+        StateHasChanged();
+    }
+
+    private async Task LoadUserAsync(Task<AuthenticationState>? stateTask = null)
+    {
+        var state = stateTask is null ? await AuthProvider.GetAuthenticationStateAsync()
+                                      : await stateTask;
+        var user = state.User;
+        // aqui você pode popular mais coisas do usuário da empresa via Claims se quiser
+    }
+
+    public void Dispose()
+    {
+        AuthProvider.AuthenticationStateChanged -= OnAuthChanged;
+    }
+
+    // --- Ações header
+    private void OnCriarVaga()
+    {
+        Nav.NavigateTo("/empresa/vagas/nova");
+    }
+    private void OnGerenciarVagas() => Snackbar.Add("Gerenciar vagas (TODO)", Severity.Info);
+    private void OnBancoTalentos() => Snackbar.Add("Banco de talentos (TODO)", Severity.Info);
+    private void OnConfigurarEntrevistas() => Snackbar.Add("Configurar entrevistas (TODO)", Severity.Info);
+
+    // --- Ações tabelas
+    private void OnVerInscritos(JobCompanyVm job) => Snackbar.Add($"Ver inscritos de \"{job.Titulo}\" (mock).", Severity.Normal);
+    private void OnEditarVaga(JobCompanyVm job) => Snackbar.Add($"Editar vaga \"{job.Titulo}\" (mock).", Severity.Info);
+    private void OnVerPerfil(CandidateVm c) => Snackbar.Add($"Abrir perfil de {c.Nome} (mock).", Severity.Normal);
+    private void OnAgendarEntrevista(CandidateVm c) => Snackbar.Add($"Agendar entrevista com {c.Nome} (mock).", Severity.Success);
+
+    private Color JobStatusColor(string status) => status switch
+    {
+        "Ativa" => Color.Success,
+        "Encerrada" => Color.Error,
+        _ => Color.Warning
+    };
+
+    // --- VMs
+    private record StatsVm(int VagasAbertas, int Inscricoes, int Entrevistas, double TaxaPreenchimento);
+    private record JobCompanyVm(string Titulo, DateTime DataAbertura, int Inscritos, string Status);
+    private record CandidateVm(string Nome, string Curso, string Vaga, DateTime Data);
+    private record InterviewVm(string Candidato, string Vaga, DateTime Data, string Canal);
+    private record NotificationVm(string Texto, DateTime Data);
+}

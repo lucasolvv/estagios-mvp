@@ -6,13 +6,14 @@
 @using PlataformaEstagios.Domain.Enums
 @inject ISnackbar Snackbar
 @inject IUserServices UserServices
+@inject NavigationManager Nav
 
-<MudPaper Class="pa-6 mx-auto mt-4 mb-8" Style="max-width: 60%">
-    <MudText Typo="Typo.h5" Color="Color.Secondary">Novo Usuário</MudText>
+<MudPaper Class="pa-6 mt-4 mx-auto mb-8" Style="max-width: 70%">
+    <MudText Typo="Typo.h5" Color="Color.Secondary" Align="Align.Center">Aproveite sua vida profissional ao máximo</MudText>
 
     <MudForm @ref="_form" OnValidSubmit="HandleValidSubmit">
 
-        <MudTextField @bind-Value="_user.Nickname" Label="Nome de Usuário" Required="true" />
+        <MudTextField @bind-Value="_user.Nickname" Label="Usuário" Required="true" />
         <MudTextField @bind-Value="_user.Email" Label="Email" Required="true" />
         <MudTextField @bind-Value="_user.Password" Label="Senha" InputType="InputType.Password" Required="true" />
 
@@ -134,6 +135,7 @@
             var tipo = _user.UserType;
             _user = new RequestCreateUserJson { UserType = tipo };
             await OnUserTypeChange(tipo);
+            Nav.NavigateTo("/");
         }
         catch (Exception ex)
         {

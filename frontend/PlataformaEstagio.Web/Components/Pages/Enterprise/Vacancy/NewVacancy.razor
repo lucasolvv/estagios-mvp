@@ -1,0 +1,135 @@
+﻿@page "/empresa/vagas/nova"
+@using System.ComponentModel.DataAnnotations
+@using System.Net.Http.Headers
+@using PlataformaEstagios.Communication.Requests
+@inject ISnackbar Snackbar
+@inject NavigationManager Nav
+@inject IHttpClientFactory HttpFactory
+@inject AuthenticationStateProvider AuthProvider
+@inject Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage.ProtectedLocalStorage Storage
+
+<AuthorizeView Roles="Enterprise">
+    <MudContainer MaxWidth="MaxWidth.Medium" Class="px-6 py-4">
+        <MudPaper Class="px-4 py-4">
+
+            <MudText Typo="Typo.h5" Color="Color.Secondary" Class="mb-2">Criar nova vaga</MudText>
+
+            @if (!_loaded)
+            {
+                <MudStack AlignItems="AlignItems.Center" Class="py-6">
+                    <MudProgressCircular Indeterminate="true" />
+                    <MudText Color="Color.Secondary">Carregando dados da empresa...</MudText>
+                </MudStack>
+            }
+            else
+            {
+                <MudForm @ref="_form" Model="_model" OnValidSubmit="HandleSubmit">
+                    <MudTextField @bind-Value="_model.Title" Label="Título" Required="true" For="@(() => _model.Title)" />
+                    <MudTextField @bind-Value="_model.Description" Label="Descrição" Lines="6" />
+                    <MudSwitch T="bool" @bind-Checked="_model.IsActive" Color="Color.Success">Ativa</MudSwitch>
+
+                    <MudStack Row Spacing="2" Class="mt-3">
+                        <MudButton Type="Submit" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Save" Disabled="@_busy" OnClick="HandleSubmit">
+                            Salvar
+                        </MudButton>
+                        <MudButton Variant="Variant.Text" OnClick="@(() => Nav.NavigateTo("/empresa/home"))">
+                            Cancelar
+                        </MudButton>
+                    </MudStack>
+                </MudForm>
+            }
+        </MudPaper>
+    </MudContainer>
+</AuthorizeView>
+
+@code {
+    private MudForm? _form;
+    private bool _busy;
+    private bool _loaded;
+
+    // Use o DTO direto
+    private RequestCreateVacancyJson _model = new()
+    {
+        EnterpriseIdentifier = Guid.Empty,
+        IsActive = true
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadEnterpriseIdAsync();
+        _loaded = _model.EnterpriseIdentifier != Guid.Empty;
+    }
+
+    private async Task LoadEnterpriseIdAsync()
+    {
+        // 1) Tenta no storage (ex.: "enterprise.id")
+        var s = await Storage.GetAsync<string>("auth.userTypeIdentifier");
+        if (s.Success && Guid.TryParse(s.Value, out var idFromStorage))
+        {
+            _model.EnterpriseIdentifier = idFromStorage;
+            return;
+        }
+
+        // 2) Fallback: tenta nas claims
+        var state = await AuthProvider.GetAuthenticationStateAsync();
+        var user = state.User;
+
+        var raw =
+            user.FindFirst("enterprise_id")?.Value ??
+            user.FindFirst("enterpriseId")?.Value ??
+            user.FindFirst("ent_id")?.Value;
+
+        if (Guid.TryParse(raw, out var idFromClaims))
+        {
+            _model.EnterpriseIdentifier = idFromClaims;
+            // opcional: persistir no storage pra próximas vezes
+            await Storage.SetAsync("enterprise.id", idFromClaims.ToString());
+            return;
+        }
+
+        Snackbar.Add("Não foi possível identificar a empresa. Faça login novamente.", Severity.Error);
+        Nav.NavigateTo("/login", forceLoad: true);
+    }
+
+    private async Task HandleSubmit()
+    {
+        await _form!.Validate();
+        if (!_form.IsValid) return;
+
+        if (_model.EnterpriseIdentifier == Guid.Empty)
+        {
+            Snackbar.Add("Empresa não identificada. Recarregue a página ou faça login novamente.", Severity.Error);
+            return;
+        }
+
+        try
+        {
+            _busy = true;
+
+            var client = HttpFactory.CreateClient("Backend");
+
+            // (opcional) Se usa JWT armazenado:
+            var tok = await Storage.GetAsync<string>("auth.token");
+            if (tok.Success && !string.IsNullOrWhiteSpace(tok.Value))
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tok.Value);
+
+            var enterpriseId = _model.EnterpriseIdentifier;
+            var resp = await client.PostAsJsonAsync($"api/enterprises/{enterpriseId}/vacancies", _model);
+
+            if (resp.IsSuccessStatusCode)
+            {
+                Snackbar.Add("Vaga criada com sucesso!", Severity.Success);
+                Nav.NavigateTo("/empresa/home");
+            }
+            else
+            {
+                var msg = await resp.Content.ReadAsStringAsync();
+                Snackbar.Add($"Falha ao criar vaga: {msg}", Severity.Error);
+            }
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+}

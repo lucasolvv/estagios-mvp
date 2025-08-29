@@ -40,27 +40,38 @@ namespace PlataformaEstagios.Application.UseCases.User.Create
 
         public async Task ExecuteAsync(RequestCreateUserJson request)
         {
-            // 1) Valida somente o request (inclui User + Candidate/Enterprise via FluentValidation)
             await ValidateOrThrowAsync(_requestValidator, request);
 
-            // 2) Cria usuário base
+            // Mapeia o User (Guid já é conhecido ao adicionar; se preferir, atribua manualmente)
             var newUser = _mapper.Map<Domain.Entities.User>(request);
             newUser.Password = PasswordHasher.Encrypt(request.Password);
 
-            await _userWriteOnlyRepository.CreateUser(newUser);
-
-            // 3) Cria perfil relacionado (Candidate ou Enterprise)
             switch (request.UserType)
             {
                 case UserType.Candidate:
                     var candidate = _mapper.Map<Candidate>(request.Candidate!);
-                    candidate.UserIdentifier = newUser.UserIdentifier;
+
+                    // Garanta que o Id exista agora (normalmente já existe; se não, force):
+                    if (candidate.CandidateIdentifier == Guid.Empty)
+                        candidate.CandidateIdentifier = Guid.NewGuid();
+
+                    candidate.UserIdentifier = newUser.UserIdentifier; // FK
+                    newUser.UserTypeId = candidate.CandidateIdentifier; // <- já define aqui
+
+                    await _userWriteOnlyRepository.CreateUser(newUser);
                     await _candidateWriteOnlyRepository.CreateCandidate(candidate);
                     break;
 
                 case UserType.Enterprise:
                     var enterprise = _mapper.Map<Enterprise>(request.Enterprise!);
+
+                    if (enterprise.EnterpriseIdentifier == Guid.Empty)
+                        enterprise.EnterpriseIdentifier = Guid.NewGuid();
+
                     enterprise.UserIdentifier = newUser.UserIdentifier;
+                    newUser.UserTypeId = enterprise.EnterpriseIdentifier;
+
+                    await _userWriteOnlyRepository.CreateUser(newUser);
                     await _enterpriseWriteOnlyRepository.CreateEnterprise(enterprise);
                     break;
 
@@ -68,9 +79,9 @@ namespace PlataformaEstagios.Application.UseCases.User.Create
                     throw new ErrorOnValidationException(new List<string> { "Invalid UserType." });
             }
 
-            // 4) Commit único e atômico
-            await _unitOfWork.Commit();
+            await _unitOfWork.Commit(); // único commit/SaveChanges (transacional)
         }
+
 
         private static async Task ValidateOrThrowAsync<T>(IValidator<T> validator, T instance)
         {

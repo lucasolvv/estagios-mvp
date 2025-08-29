@@ -29,5 +29,15 @@ namespace PlataformaEstagios.Infrastructure.Repositories
                 .AsNoTracking()
                 .AnyAsync(u => u.Email == emailOrNickname || u.Nickname == emailOrNickname, ct);
         }
+
+        public async Task UpdateUserTypeIdOnCreation(Guid userTypeId, Guid userId)
+        {
+            var user = await _dbcontext.Users.FirstOrDefaultAsync(u => u.UserIdentifier == userId);
+            if (user is not null)
+            {
+                user.UserTypeId = userTypeId;
+                _dbcontext.Users.Update(user);
+            }
+        }
     }
 }

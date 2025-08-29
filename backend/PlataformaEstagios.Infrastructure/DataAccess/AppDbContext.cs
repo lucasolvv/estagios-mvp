@@ -8,6 +8,7 @@ namespace PlataformaEstagios.Infrastructure.DataAccess {
         public DbSet<Candidate> Candidates => Set<Candidate>();
         public DbSet<Enterprise> Enterprises => Set<Enterprise>();
         public DbSet<Address> Addresses => Set<Address>();
+        public DbSet<Vacancy> Vacancies => Set<Vacancy>();
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
             // --- Candidate ---
             modelBuilder.Entity<Candidate>(e => {
@@ -90,10 +91,25 @@ namespace PlataformaEstagios.Infrastructure.DataAccess {
                 e.Property(a => a.CreatedOn).HasDefaultValueSql("CURRENT_TIMESTAMP AT TIME ZONE 'UTC'"); });
             // Se ainda não vai mapear essas entidades agora:
 
+            modelBuilder.Entity<Vacancy>(e =>
+            {
+                e.ToTable("Vacancies");
+                e.HasKey(x => x.VacancyIdentifier);
+                e.Property(x => x.Title).HasMaxLength(120).IsRequired();
+                e.Property(x => x.Description).HasMaxLength(4000);
+                e.Property(x => x.IsActive).HasDefaultValue(true);
+                e.Property(x => x.UpdatedAt);
+
+                //se houver entidade Enterprise mapeada
+                 e.HasOne<Enterprise>()
+                  .WithMany(e => e.Vacancies)
+                  .HasForeignKey(x => x.EnterpriseIdentifier);
+            });
+            
             modelBuilder.Entity<Candidate>().Ignore(c => c.Applications);
             modelBuilder.Ignore<Application>();
             modelBuilder.Entity<Enterprise>().Ignore(e => e.Vacancies);
-            modelBuilder.Ignore<Vacancy>();
+            //modelBuilder.Ignore<Vacancy>();
             } 
     } 
 }

@@ -47,7 +47,8 @@ namespace PlataformaEstagios.Application.UseCases.Auth.Login
                 UserIdentifier = user.UserIdentifier,
                 Nickname = user.Nickname,
                 Email = user.Email,
-                UserType = user.UserType
+                UserType = user.UserType,
+                UserTypeId = user.UserTypeId
             };
         }
 

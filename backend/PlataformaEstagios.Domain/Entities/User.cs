@@ -9,5 +9,6 @@ namespace PlataformaEstagios.Domain.Entities
         public string Email { get; set; } = null!;
         public string Password { get; set; } = null!;
         public UserType UserType { get; set; }
+        public Guid? UserTypeId { get; set; } // CandidateId or EnterpriseId
     }
 }
