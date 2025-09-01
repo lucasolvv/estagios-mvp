@@ -1,10 +1,33 @@
------ MIGRATIONS 
+USUARIOS DE TESTE
+CANDIDATO:
+lvksounds
+Mir@gem18
 
-dotnet ef migrations add InitialProfiles -p . -s ../PlataformaEstagios.Api -o DataAccess/Migrations
-dotnet ef database update               -p . -s ../PlataformaEstagios.Api
+EMPRESA:
+empresa01
+Empres@01
+
+----- MIGRATIONS 
+* NA RAIZ: 
+
+dotnet ef migrations add ChangeBirthDateToDateOnly `
+  -p ./backend/PlataformaEstagios.Infrastructure `
+  -s ./backend/PlataformaEstagios.Api
+
+dotnet ef database update `
+  -p ./backend/PlataformaEstagios.Infrastructure `
+  -s ./backend/PlataformaEstagios.Api
+
 
 
 ------ RODANDO BANCO NO DOCKER
 
-docker exec -it <container> psql -U estagios -d plataforma_estagios -c "\dt"
-docker exec -it <container> psql -U estagios -d plataforma_estagios -c "SELECT * FROM \"__EFMigrationsHistory\";"
+docker exec -it plataformaestagios-postgres-1 psql -U estagios -d plataforma_estagios -c "\dt"
+docker exec -it plataformaestagios-postgres-1 psql -U estagios -d plataforma_estagios -c "SELECT * FROM \"__EFMigrationsHistory\";"
+
+
+------ RODANDO BACK E FRONT 
+* NA RAIZ:
+dotnet run --project backend/PlataformaEstagios.Api
+
+dotnet run --project frontend/PlataformaEstagio.Web
