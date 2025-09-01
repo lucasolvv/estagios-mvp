@@ -7,6 +7,8 @@
 @inject IHttpClientFactory HttpFactory
 @inject AuthenticationStateProvider AuthProvider
 @inject Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage.ProtectedLocalStorage Storage
+@inject IUserContext CurrentUser
+
 
 <AuthorizeView Roles="Enterprise">
     <MudContainer MaxWidth="MaxWidth.Medium" Class="px-6 py-4">
@@ -50,55 +52,54 @@
     // Use o DTO direto
     private RequestCreateVacancyJson _model = new()
     {
-        EnterpriseIdentifier = Guid.Empty,
         IsActive = true
     };
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadEnterpriseIdAsync();
-        _loaded = _model.EnterpriseIdentifier != Guid.Empty;
+        await CurrentUser.RefreshAsync();
+        _loaded = true;
     }
 
-    private async Task LoadEnterpriseIdAsync()
-    {
-        // 1) Tenta no storage (ex.: "enterprise.id")
-        var s = await Storage.GetAsync<string>("auth.userTypeIdentifier");
-        if (s.Success && Guid.TryParse(s.Value, out var idFromStorage))
-        {
-            _model.EnterpriseIdentifier = idFromStorage;
-            return;
-        }
+    // private async Task LoadEnterpriseIdAsync()
+    // {
+    //     // 1) Tenta no storage (ex.: "enterprise.id")
+    //     var s = await Storage.GetAsync<string>("auth.userTypeIdentifier");
+    //     if (s.Success && Guid.TryParse(s.Value, out var idFromStorage))
+    //     {
+    //         _model.EnterpriseIdentifier = idFromStorage;
+    //         return;
+    //     }
 
-        // 2) Fallback: tenta nas claims
-        var state = await AuthProvider.GetAuthenticationStateAsync();
-        var user = state.User;
+    //     // 2) Fallback: tenta nas claims
+    //     var state = await AuthProvider.GetAuthenticationStateAsync();
+    //     var user = state.User;
 
-        var raw =
-            user.FindFirst("enterprise_id")?.Value ??
-            user.FindFirst("enterpriseId")?.Value ??
-            user.FindFirst("ent_id")?.Value;
+    //     var raw =
+    //         user.FindFirst("enterprise_id")?.Value ??
+    //         user.FindFirst("enterpriseId")?.Value ??
+    //         user.FindFirst("ent_id")?.Value;
 
-        if (Guid.TryParse(raw, out var idFromClaims))
-        {
-            _model.EnterpriseIdentifier = idFromClaims;
-            // opcional: persistir no storage pra próximas vezes
-            await Storage.SetAsync("enterprise.id", idFromClaims.ToString());
-            return;
-        }
+    //     if (Guid.TryParse(raw, out var idFromClaims))
+    //     {
+    //         _model.EnterpriseIdentifier = idFromClaims;
+    //         // opcional: persistir no storage pra próximas vezes
+    //         await Storage.SetAsync("enterprise.id", idFromClaims.ToString());
+    //         return;
+    //     }
 
-        Snackbar.Add("Não foi possível identificar a empresa. Faça login novamente.", Severity.Error);
-        Nav.NavigateTo("/login", forceLoad: true);
-    }
+    //     Snackbar.Add("Não foi possível identificar a empresa. Faça login novamente.", Severity.Error);
+    //     Nav.NavigateTo("/login", forceLoad: true);
+    // }
 
     private async Task HandleSubmit()
     {
         await _form!.Validate();
         if (!_form.IsValid) return;
 
-        if (_model.EnterpriseIdentifier == Guid.Empty)
+        if (!CurrentUser.IsAuthenticated)
         {
-            Snackbar.Add("Empresa não identificada. Recarregue a página ou faça login novamente.", Severity.Error);
+            Snackbar.Add("Usuário não autenticado. Recarregue a página ou faça login novamente.", Severity.Error);
             return;
         }
 
@@ -113,7 +114,7 @@
             if (tok.Success && !string.IsNullOrWhiteSpace(tok.Value))
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tok.Value);
 
-            var enterpriseId = _model.EnterpriseIdentifier;
+            var enterpriseId = CurrentUser.UserTypeId;
             var resp = await client.PostAsJsonAsync($"api/enterprises/{enterpriseId}/vacancies", _model);
 
             if (resp.IsSuccessStatusCode)

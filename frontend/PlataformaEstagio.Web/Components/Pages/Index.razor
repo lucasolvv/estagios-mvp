@@ -6,6 +6,8 @@
 @inject ISnackbar Snackbar
 @inject NavigationManager Nav
 @inject PlataformaEstagio.Web.Components.Services.Auth.IAuthService Auth
+@inject Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage.ProtectedSessionStorage Session;
+
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge">
     <MudGrid Justify="Justify.Center" AlignItems="AlignItems.Center" Class="mt-2">
@@ -48,6 +50,8 @@
 @code {
     private MudForm? _form;
     private bool _isSubmitting;
+    const string TokenKey = "auth.token";
+    const string SessionKey = "auth.session";
     private RequestLoginJson _model = new();
 
     private async Task HandleLogin()

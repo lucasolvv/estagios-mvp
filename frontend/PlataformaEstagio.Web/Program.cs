@@ -16,25 +16,27 @@ builder.Services.AddRazorComponents()
 // MudBlazor (Snackbar, Dialog, etc.)
 builder.Services.AddMudServices();
 
-
-
-
-builder.Services.AddHttpClient("Backend", (sp, client) =>
+// HttpClient nomeado para o backend (ajuste URL)
+builder.Services.AddHttpClient("Backend", (sp, c) =>
 {
     var cfg = sp.GetRequiredService<IConfiguration>();
-    var baseUrl = cfg["Backend:BaseUrl"] ?? "https://localhost:7095/";
-    client.BaseAddress = new Uri(baseUrl);
+    c.BaseAddress = new Uri(cfg["Backend:BaseUrl"] ?? "https://localhost:7095/");
 });
 
-builder.Services.AddScoped<HttpClient>(sp =>
-    sp.GetRequiredService<IHttpClientFactory>().CreateClient("Backend"));
+builder.Services.AddAuthorizationCore(o =>
+{
+    o.AddPolicy("IsEnterprise", p => p.RequireRole("Enterprise"));
+    o.AddPolicy("IsCandidate", p => p.RequireRole("Candidate"));
+});
 
-builder.Services.AddAuthorizationCore();
+builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("Backend"));
+
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<ProtectedLocalStorage>();
 builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthenticationStateProvider>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddHttpClient<IUserServices, UserServices>("Backend");
+builder.Services.AddScoped<IUserContext, UserContext>();
 
 var app = builder.Build();
 

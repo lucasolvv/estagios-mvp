@@ -3,6 +3,7 @@
 @inject AuthenticationStateProvider AuthProvider
 @inject ISnackbar Snackbar
 @inject NavigationManager Nav
+@inject IUserContext CurrentUser
 
 <AuthorizeView Context="auth" Roles="Enterprise">
     <MudContainer MaxWidth="MaxWidth.False" Class="px-6 py-2">
@@ -14,8 +15,8 @@
                     <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Spacing="4" Class="py-4 px-2">
                         <MudStack>
                             <MudText Typo="Typo.h5" Class="font-weight-bold">
-                                Olá, @GetDisplayName(auth.User) 👋
-                                
+                                @* Olá, @GetDisplayName(auth.User) 👋 *@
+                                Olá, @CurrentUser.Nickname 👋
                             </MudText>
                             <MudText Typo="Typo.subtitle2" Color="Color.Secondary">
                                 Veja o resumo das suas vagas, candidatos e entrevistas.
@@ -216,7 +217,43 @@
            ?? user.FindFirst(ClaimTypes.Email)?.Value
            ?? "Empresa";
 
-    // --- Métricas
+    [CascadingParameter] private Task<AuthenticationState> AuthenticationStateTask { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CurrentUser.RefreshAsync();
+
+    }
+
+    private void OnCriarVaga()
+    {
+        Nav.NavigateTo("/empresa/vagas/nova");
+    }
+    private void OnGerenciarVagas() => Snackbar.Add("Gerenciar vagas (TODO)", Severity.Info);
+    private void OnBancoTalentos() => Snackbar.Add("Banco de talentos (TODO)", Severity.Info);
+    private void OnConfigurarEntrevistas() => Snackbar.Add("Configurar entrevistas (TODO)", Severity.Info);
+
+    // --- Ações tabelas
+    private void OnVerInscritos(JobCompanyVm job) => Snackbar.Add($"Ver inscritos de \"{job.Titulo}\" (mock).", Severity.Normal);
+    private void OnEditarVaga(JobCompanyVm job) => Snackbar.Add($"Editar vaga \"{job.Titulo}\" (mock).", Severity.Info);
+    private void OnVerPerfil(CandidateVm c) => Snackbar.Add($"Abrir perfil de {c.Nome} (mock).", Severity.Normal);
+    private void OnAgendarEntrevista(CandidateVm c) => Snackbar.Add($"Agendar entrevista com {c.Nome} (mock).", Severity.Success);
+
+    private Color JobStatusColor(string status) => status switch
+    {
+        "Ativa" => Color.Success,
+        "Encerrada" => Color.Error,
+        _ => Color.Warning
+    };
+
+    // --- VMs
+    private record StatsVm(int VagasAbertas, int Inscricoes, int Entrevistas, double TaxaPreenchimento);
+    private record JobCompanyVm(string Titulo, DateTime DataAbertura, int Inscritos, string Status);
+    private record CandidateVm(string Nome, string Curso, string Vaga, DateTime Data);
+    private record InterviewVm(string Candidato, string Vaga, DateTime Data, string Canal);
+    private record NotificationVm(string Texto, DateTime Data);
+
+        // --- Métricas
     private StatsVm Stats = new(3, 28, 6, 0.65);
 
     // --- Dados mockados
@@ -245,60 +282,4 @@
         new("Novo candidato em 'Frontend (Blazor)': Ana Souza", DateTime.Today.AddHours(-3)),
         new("Bruno Lima confirmou entrevista para amanhã", DateTime.Today.AddHours(-6))
     };
-
-    [CascadingParameter] private Task<AuthenticationState> AuthenticationStateTask { get; set; } = default!;
-
-    protected override async Task OnInitializedAsync()
-    {
-        _ = LoadUserAsync();
-        AuthProvider.AuthenticationStateChanged += OnAuthChanged;
-    }
-
-    private async void OnAuthChanged(Task<AuthenticationState> task)
-    {
-        await LoadUserAsync(task);
-        StateHasChanged();
-    }
-
-    private async Task LoadUserAsync(Task<AuthenticationState>? stateTask = null)
-    {
-        var state = stateTask is null ? await AuthProvider.GetAuthenticationStateAsync()
-                                      : await stateTask;
-        var user = state.User;
-        // aqui você pode popular mais coisas do usuário da empresa via Claims se quiser
-    }
-
-    public void Dispose()
-    {
-        AuthProvider.AuthenticationStateChanged -= OnAuthChanged;
-    }
-
-    // --- Ações header
-    private void OnCriarVaga()
-    {
-        Nav.NavigateTo("/empresa/vagas/nova");
-    }
-    private void OnGerenciarVagas() => Snackbar.Add("Gerenciar vagas (TODO)", Severity.Info);
-    private void OnBancoTalentos() => Snackbar.Add("Banco de talentos (TODO)", Severity.Info);
-    private void OnConfigurarEntrevistas() => Snackbar.Add("Configurar entrevistas (TODO)", Severity.Info);
-
-    // --- Ações tabelas
-    private void OnVerInscritos(JobCompanyVm job) => Snackbar.Add($"Ver inscritos de \"{job.Titulo}\" (mock).", Severity.Normal);
-    private void OnEditarVaga(JobCompanyVm job) => Snackbar.Add($"Editar vaga \"{job.Titulo}\" (mock).", Severity.Info);
-    private void OnVerPerfil(CandidateVm c) => Snackbar.Add($"Abrir perfil de {c.Nome} (mock).", Severity.Normal);
-    private void OnAgendarEntrevista(CandidateVm c) => Snackbar.Add($"Agendar entrevista com {c.Nome} (mock).", Severity.Success);
-
-    private Color JobStatusColor(string status) => status switch
-    {
-        "Ativa" => Color.Success,
-        "Encerrada" => Color.Error,
-        _ => Color.Warning
-    };
-
-    // --- VMs
-    private record StatsVm(int VagasAbertas, int Inscricoes, int Entrevistas, double TaxaPreenchimento);
-    private record JobCompanyVm(string Titulo, DateTime DataAbertura, int Inscritos, string Status);
-    private record CandidateVm(string Nome, string Curso, string Vaga, DateTime Data);
-    private record InterviewVm(string Candidato, string Vaga, DateTime Data, string Canal);
-    private record NotificationVm(string Texto, DateTime Data);
 }
