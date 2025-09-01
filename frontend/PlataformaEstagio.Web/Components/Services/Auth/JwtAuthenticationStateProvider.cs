@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-using PlataformaEstagios.Domain.Entities;
-using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
@@ -14,46 +12,63 @@ namespace PlataformaEstagio.Web.Components.Services.Auth
         private readonly JwtSecurityTokenHandler _handler = new();
 
         private ClaimsPrincipal _user = new(new ClaimsIdentity());
+        private bool _restored; // evita restaurar várias vezes em sequência
+
         public JwtAuthenticationStateProvider(ProtectedLocalStorage storage)
         {
             _storage = storage;
         }
 
-        public override Task<AuthenticationState> GetAuthenticationStateAsync()
-        => Task.FromResult(new AuthenticationState(_user));
+        // 🔧 Agora tenta restaurar automaticamente
+        public override Task<AuthenticationState> GetAuthenticationStateAsync() => Task.FromResult(new AuthenticationState(_user));
+        //{
+        //    if (!_restored)
+        //    {
+        //        _restored = true;
+        //        await RestoreAsync();
+        //    }
+        //    return new AuthenticationState(_user);
+        //}
+
         public async Task RestoreAsync()
         {
             SetAnonymous();
 
-            var tokenEntry = await _storage.GetAsync<string>(TokenKey); // JS interop OK após primeiro render
+            var tokenEntry = await _storage.GetAsync<string>(TokenKey);
             var token = tokenEntry.Success ? tokenEntry.Value : null;
-            if (string.IsNullOrWhiteSpace(token)) { Notify(); return; }
-            
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                Notify();
+                return;
+            }
+
             try
             {
                 var jwt = _handler.ReadJwtToken(token);
-                // validação básica de expiração
+
+                // expiração básica
                 if (jwt.ValidTo.ToUniversalTime() <= DateTime.UtcNow)
                 {
-                    // expirou: mantém anônimo e limpa storage se quiser
+                    // opcional: limpar do storage
+                    await _storage.DeleteAsync(TokenKey);
                     Notify();
                     return;
                 }
-                _user = new ClaimsPrincipal(new ClaimsIdentity(jwt.Claims, "jwt"));
+
+                _user = new ClaimsPrincipal(CreateIdentityFromJwt(jwt));
                 Notify();
             }
             catch
             {
-                // token inválido: fica anônimo
                 SetAnonymous();
                 Notify();
             }
-
         }
+
         public Task NotifyUserAuthenticationAsync(string token)
         {
-            var jwt = new JwtSecurityTokenHandler().ReadJwtToken(token);
-            _user = new ClaimsPrincipal(new ClaimsIdentity(jwt.Claims, "jwt"));
+            var jwt = _handler.ReadJwtToken(token);
+            _user = new ClaimsPrincipal(CreateIdentityFromJwt(jwt));
             Notify();
             return Task.CompletedTask;
         }
@@ -65,23 +80,38 @@ namespace PlataformaEstagio.Web.Components.Services.Auth
             return Task.CompletedTask;
         }
 
-        private static ClaimsIdentity CreateIdentityFromJwt(string token)
+        // 🔧 Normaliza nomes de claims (email/role podem vir mapeados)
+        private static ClaimsIdentity CreateIdentityFromJwt(JwtSecurityToken jwt)
         {
-            var handler = new JwtSecurityTokenHandler();
-            var jwt = handler.ReadJwtToken(token);
+            string? Get(string type) => jwt.Claims.FirstOrDefault(c => c.Type == type)?.Value;
 
-            // Claims típicos emitidos no backend:
-            // sub (UserIdentifier), nickname, email, role (UserType)
-            var claims = new List<Claim>(jwt.Claims);
+            var email = Get("email") ?? Get(ClaimTypes.Email);
+            var role = Get("role") ?? Get(ClaimTypes.Role);
+            var uid = Get("uid") ?? Get(ClaimTypes.NameIdentifier) ?? Get("sub");
+            var name = Get("nickname") ?? Get(ClaimTypes.Name);
+            var userTypeId = Get("userTypeId");
+
+            var claims = new List<Claim>();
+            if (!string.IsNullOrEmpty(uid)) claims.Add(new(ClaimTypes.NameIdentifier, uid));
+            if (!string.IsNullOrEmpty(name)) claims.Add(new(ClaimTypes.Name, name));
+            if (!string.IsNullOrEmpty(email)) claims.Add(new(ClaimTypes.Email, email));
+            if (!string.IsNullOrEmpty(role)) claims.Add(new(ClaimTypes.Role, role));
+            if (!string.IsNullOrEmpty(userTypeId)) claims.Add(new("userTypeId", userTypeId));
+
+            // mantém claims adicionais (ex.: userTypeId)
+            foreach (var c in jwt.Claims)
+            {
+                if (claims.Any(k => k.Type == c.Type)) continue; // evita duplicar os já normalizados
+                claims.Add(c);
+            }
 
             return new ClaimsIdentity(claims, authenticationType: "jwt");
         }
 
         private void Notify() =>
-        NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(_user)));
+            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(_user)));
 
         private void SetAnonymous() =>
-        _user = new ClaimsPrincipal(new ClaimsIdentity());
-
+            _user = new ClaimsPrincipal(new ClaimsIdentity());
     }
 }

@@ -1,0 +1,12 @@
+﻿@inject NavigationManager Nav
+@code {
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var current = new Uri(Nav.Uri).PathAndQuery;
+            var url = $"/?returnUrl={Uri.EscapeDataString(current)}";
+            Nav.NavigateTo(url, replace: true);
+        }
+    }
+}
