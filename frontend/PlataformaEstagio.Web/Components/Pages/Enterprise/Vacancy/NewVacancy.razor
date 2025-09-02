@@ -10,7 +10,7 @@
 @inject Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage.ProtectedLocalStorage Storage
 @inject IUserContext CurrentUser
 
-<AuthorizeView Roles="Enterprise">
+@* <AuthorizeView Roles="Enterprise"> *@
     <MudContainer MaxWidth="MaxWidth.Medium" Class="px-6 py-4">
         <MudPaper Class="px-4 py-4">
 
@@ -32,6 +32,7 @@
                                   Label="Título"
                                   Required="true"
                                   For="@(() => _model.Title)" />
+
                     <MudTextField @bind-Value="_model.Description"
                                   Label="Descrição"
                                   Lines="6" />
@@ -55,19 +56,19 @@
                     </MudSelect>
 
                     <!-- NOVO: Habilidades necessárias (chips) -->
-                    <MudTextField @bind-Value="_skillInput"
-                                  Label="Adicionar habilidade"
-                                  Placeholder="Ex.: C#, Git, SQL"
-                                  OnKeyDown="OnSkillKeyDown"
-                                  OnKeyDownPreventDefault="true" @* <- impede submit com Enter *@
-                                  OnKeyDownStopPropagation="true" /> @* opcional: não propaga o evento *@
+                <MudTextField @bind-Value="_skillInput"
+                              Label="Adicionar habilidade"
+                              Placeholder="Ex.: C#, Git, SQL"
+                              OnKeyDown="OnSkillKeyDown" />
 
-                    <MudChipSet T="string" Class="mb-2">
-                        @foreach (var s in _model.RequiredSkills)
-                        {
-                            <MudChip Closeable="true" OnClose="@((MudChip<string> _) => RemoveSkill(s))">@s</MudChip>
-                        }
-                    </MudChipSet>
+                        <MudChipSet T="string" Class="mb-2">
+                            @foreach (var s in _model.RequiredSkills)
+                            {
+                                    <MudChip T="string"
+                                             Closeable="true"
+                                             OnClose="@( (MudChip<string> _) => RemoveSkill(s) )">@s</MudChip>
+                            }
+                        </MudChipSet>
 
                     <!-- NOVO: Expiração -->
                     <MudDatePicker Label="Expira em"
@@ -75,9 +76,11 @@
                                    Editable="true"
                                    Clearable="true"
                                    DisplayMonths="1"
-                                   DisableToolbar="false"D
+                                   DisableToolbar="false"
                                    PickerMonth="@DateTime.Today"
-                                   MinDate="@DateTime.Today" />
+                                   MinDate="@DateTime.Today" 
+                                   T="DateTime?"
+                                   />
 
                     <!-- Ativa -->
                     <MudSwitch T="bool" @bind-Checked="_model.IsActive" Color="Color.Success">Ativa</MudSwitch>
@@ -98,7 +101,7 @@
             }
         </MudPaper>
     </MudContainer>
-</AuthorizeView>
+@* </AuthorizeView> *@
 
 @code {
     private MudForm? _form;
@@ -128,22 +131,22 @@
 
     private void OnSkillKeyDown(KeyboardEventArgs e)
     {
-        if (e.Key is "Enter" or "," or "Tab")
+        if (e.Key is "Enter")
         {
             AddSkillFromInput();
         }
     }
 
     private void AddSkillFromInput()
-    {
+      {
         var txt = (_skillInput ?? string.Empty).Trim();
         if (string.IsNullOrWhiteSpace(txt)) return;
 
         // evita duplicados (case-insensitive)
-        if (!_model.RequiredSkills.Any(s => string.Equals(s, txt, StringComparison.OrdinalIgnoreCase)))
-            _model.RequiredSkills.Add(txt);
+        
+        _model.RequiredSkills.Add(txt);
 
-        _skillInput = string.Empty;
+        _skillInput = "";
         StateHasChanged();
     }
 

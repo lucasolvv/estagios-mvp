@@ -11,7 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Razor + Blazor interativo no servidor
 builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+     .AddInteractiveServerComponents(options => options.DetailedErrors = true);
+    //.AddInteractiveServerComponents();
 
 // MudBlazor (Snackbar, Dialog, etc.)
 builder.Services.AddMudServices();
