@@ -1,7 +1,8 @@
-﻿using System.Globalization;
-using AutoMapper;
+﻿using AutoMapper;
 using PlataformaEstagios.Communication.Requests;
+using PlataformaEstagios.Communication.Responses;
 using PlataformaEstagios.Domain.Entities;
+using System.Globalization;
 
 namespace PlataformaEstagios.Application.Services.AutoMapper
 {
@@ -17,6 +18,7 @@ namespace PlataformaEstagios.Application.Services.AutoMapper
                 .ConvertUsing(s => string.IsNullOrWhiteSpace(s) ? null : DateOnly.Parse(s!, CultureInfo.InvariantCulture));
 
             RequestToDomain();
+            DomainToResponse();
         }
 
         private void RequestToDomain()
@@ -68,17 +70,38 @@ namespace PlataformaEstagios.Application.Services.AutoMapper
                 .ForMember(d => d.CreatedOn, o => o.Ignore());
 
             //Vacancy
-
             CreateMap<RequestCreateVacancyJson, Vacancy>()
                 .ForMember(d => d.VacancyIdentifier, o => o.Ignore())
                 .ForMember(d => d.EnterpriseIdentifier, o => o.MapFrom(s => s.EnterpriseIdentifier))
                 .ForMember(d => d.Title, o => o.MapFrom(s => s.Title))
                 .ForMember(d => d.Description, o => o.MapFrom(s => s.Description))
+                .ForMember(d => d.Location, o => o.MapFrom(s => s.Location))
+                .ForMember(d => d.JobFunction, o => o.MapFrom(s => s.JobFunction))
+                .ForMember(d => d.RequiredSkillsCsv, o => o.Ignore())   // setado no Use Case
+                .ForMember(d => d.PublishedAtUtc, o => o.Ignore())      // setado no Use Case
+                .ForMember(d => d.ExpiresAtUtc, o => o.MapFrom(s => s.ExpiresAtUtc))
                 .ForMember(d => d.IsActive, o => o.MapFrom(s => s.IsActive))
                 .ForMember(d => d.UpdatedAt, o => o.Ignore())
                 .ForMember(d => d.Applications, o => o.Ignore());
 
 
+        }
+
+        private void DomainToResponse()
+        {
+            CreateMap<Vacancy, ResponseCreateVacancyJson>()
+                .ForMember(d => d.Title, o => o.MapFrom(s => s.Title ?? string.Empty))
+                .ForMember(d => d.Description, o => o.MapFrom(s => s.Description))
+                .ForMember(d => d.Location, o => o.MapFrom(s => s.Location))
+                .ForMember(d => d.JobFunction, o => o.MapFrom(s => s.JobFunction))
+                .ForMember(d => d.RequiredSkills, o => o.MapFrom(s =>
+                    string.IsNullOrWhiteSpace(s.RequiredSkillsCsv)
+                        ? new List<string>()
+                        : s.RequiredSkillsCsv.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList()))
+                .ForMember(d => d.PublishedAtUtc, o => o.MapFrom(s => s.PublishedAtUtc))
+                .ForMember(d => d.ExpiresAtUtc, o => o.MapFrom(s => s.ExpiresAtUtc))
+                .ForMember(d => d.IsActive, o => o.MapFrom(s => s.IsActive))
+                .ForMember(d => d.UpdatedAt, o => o.MapFrom(s => s.UpdatedAt ?? DateTime.UtcNow));
         }
     }
 }

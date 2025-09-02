@@ -2,13 +2,13 @@
 @using System.ComponentModel.DataAnnotations
 @using System.Net.Http.Headers
 @using PlataformaEstagios.Communication.Requests
+@using PlataformaEstagios.Domain.Enums
 @inject ISnackbar Snackbar
 @inject NavigationManager Nav
 @inject IHttpClientFactory HttpFactory
 @inject AuthenticationStateProvider AuthProvider
 @inject Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage.ProtectedLocalStorage Storage
 @inject IUserContext CurrentUser
-
 
 <AuthorizeView Roles="Enterprise">
     <MudContainer MaxWidth="MaxWidth.Medium" Class="px-6 py-4">
@@ -26,12 +26,68 @@
             else
             {
                 <MudForm @ref="_form" Model="_model" OnValidSubmit="HandleSubmit">
-                    <MudTextField @bind-Value="_model.Title" Label="Título" Required="true" For="@(() => _model.Title)" />
-                    <MudTextField @bind-Value="_model.Description" Label="Descrição" Lines="6" />
+
+                    <!-- Título e Descrição (já existiam) -->
+                    <MudTextField @bind-Value="_model.Title"
+                                  Label="Título"
+                                  Required="true"
+                                  For="@(() => _model.Title)" />
+                    <MudTextField @bind-Value="_model.Description"
+                                  Label="Descrição"
+                                  Lines="6" />
+
+                    <!-- NOVO: Localização -->
+                    <MudTextField @bind-Value="_model.Location"
+                                  Label="Localização"
+                                  Required="true"
+                                  Placeholder="Ex.: Remoto - Brasil / São Paulo - SP (Remoto)" />
+
+                    <!-- NOVO: Área/Função (enum) -->
+                    <MudSelect T="JobFunction"
+                               @bind-Value="_model.JobFunction"
+                               Label="Área / Função"
+                               Required="true">
+                        @foreach (var a in Enum.GetValues<JobFunction>())
+                        {
+                            if (a == JobFunction.Unknown) { continue; }
+                            <MudSelectItem Value="a">@a</MudSelectItem>
+                        }
+                    </MudSelect>
+
+                    <!-- NOVO: Habilidades necessárias (chips) -->
+                    <MudTextField @bind-Value="_skillInput"
+                                  Label="Adicionar habilidade"
+                                  Placeholder="Ex.: C#, Git, SQL"
+                                  OnKeyDown="OnSkillKeyDown"
+                                  OnKeyDownPreventDefault="true" @* <- impede submit com Enter *@
+                                  OnKeyDownStopPropagation="true" /> @* opcional: não propaga o evento *@
+
+                    <MudChipSet T="string" Class="mb-2">
+                        @foreach (var s in _model.RequiredSkills)
+                        {
+                            <MudChip Closeable="true" OnClose="@((MudChip<string> _) => RemoveSkill(s))">@s</MudChip>
+                        }
+                    </MudChipSet>
+
+                    <!-- NOVO: Expiração -->
+                    <MudDatePicker Label="Expira em"
+                                   @bind-Date="_expiresDate"
+                                   Editable="true"
+                                   Clearable="true"
+                                   DisplayMonths="1"
+                                   DisableToolbar="false"D
+                                   PickerMonth="@DateTime.Today"
+                                   MinDate="@DateTime.Today" />
+
+                    <!-- Ativa -->
                     <MudSwitch T="bool" @bind-Checked="_model.IsActive" Color="Color.Success">Ativa</MudSwitch>
 
                     <MudStack Row Spacing="2" Class="mt-3">
-                        <MudButton Type="Submit" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Save" Disabled="@_busy" OnClick="HandleSubmit">
+                        <MudButton Type="Submit"
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.Save"
+                                   Disabled="@_busy"
+                                   OnClick="HandleSubmit">
                             Salvar
                         </MudButton>
                         <MudButton Variant="Variant.Text" OnClick="@(() => Nav.NavigateTo("/empresa/home"))">
@@ -49,10 +105,19 @@
     private bool _busy;
     private bool _loaded;
 
-    // Use o DTO direto
+    // input temporário para adicionar chips
+    private string _skillInput = string.Empty;
+
+    // DatePicker trabalha melhor com DateTime? local; converto para UTC no submit
+    private DateTime? _expiresDate;
+
+    // DTO do backend (agora com novos campos)
     private RequestCreateVacancyJson _model = new()
     {
-        IsActive = true
+        IsActive = true,
+        Location = "Remoto - Brasil",
+        JobFunction = JobFunction.Unknown,
+        RequiredSkills = new List<string>()
     };
 
     protected override async Task OnInitializedAsync()
@@ -61,36 +126,32 @@
         _loaded = true;
     }
 
-    // private async Task LoadEnterpriseIdAsync()
-    // {
-    //     // 1) Tenta no storage (ex.: "enterprise.id")
-    //     var s = await Storage.GetAsync<string>("auth.userTypeIdentifier");
-    //     if (s.Success && Guid.TryParse(s.Value, out var idFromStorage))
-    //     {
-    //         _model.EnterpriseIdentifier = idFromStorage;
-    //         return;
-    //     }
+    private void OnSkillKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key is "Enter" or "," or "Tab")
+        {
+            AddSkillFromInput();
+        }
+    }
 
-    //     // 2) Fallback: tenta nas claims
-    //     var state = await AuthProvider.GetAuthenticationStateAsync();
-    //     var user = state.User;
+    private void AddSkillFromInput()
+    {
+        var txt = (_skillInput ?? string.Empty).Trim();
+        if (string.IsNullOrWhiteSpace(txt)) return;
 
-    //     var raw =
-    //         user.FindFirst("enterprise_id")?.Value ??
-    //         user.FindFirst("enterpriseId")?.Value ??
-    //         user.FindFirst("ent_id")?.Value;
+        // evita duplicados (case-insensitive)
+        if (!_model.RequiredSkills.Any(s => string.Equals(s, txt, StringComparison.OrdinalIgnoreCase)))
+            _model.RequiredSkills.Add(txt);
 
-    //     if (Guid.TryParse(raw, out var idFromClaims))
-    //     {
-    //         _model.EnterpriseIdentifier = idFromClaims;
-    //         // opcional: persistir no storage pra próximas vezes
-    //         await Storage.SetAsync("enterprise.id", idFromClaims.ToString());
-    //         return;
-    //     }
+        _skillInput = string.Empty;
+        StateHasChanged();
+    }
 
-    //     Snackbar.Add("Não foi possível identificar a empresa. Faça login novamente.", Severity.Error);
-    //     Nav.NavigateTo("/login", forceLoad: true);
-    // }
+    private void RemoveSkill(string s)
+    {
+        _model.RequiredSkills.Remove(s);
+        StateHasChanged();
+    }
 
     private async Task HandleSubmit()
     {
@@ -106,6 +167,11 @@
         try
         {
             _busy = true;
+
+            // converte Expiração (local) -> UTC para enviar
+            _model.ExpiresAtUtc = _expiresDate.HasValue
+                ? DateTime.SpecifyKind(_expiresDate.Value, DateTimeKind.Local).ToUniversalTime()
+                : null;
 
             var client = HttpFactory.CreateClient("Backend");
 

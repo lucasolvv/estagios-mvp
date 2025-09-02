@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Linq;
+using AutoMapper;
 using FluentValidation;
 using PlataformaEstagios.Communication.Requests;
 using PlataformaEstagios.Communication.Responses;
@@ -38,14 +39,21 @@ namespace PlataformaEstagios.Application.UseCases.Vacancy.Create
                 throw new InvalidOperationException("Empresa inválida ou inexistente.");
 
             var entity = _mapper.Map<Domain.Entities.Vacancy>(request);
+
             entity.VacancyIdentifier = Guid.NewGuid();
             entity.UpdatedAt = DateTime.UtcNow;
+
+            // Publicação e Skills CSV
+            entity.PublishedAtUtc = DateTime.UtcNow;
+            entity.RequiredSkillsCsv = string.Join(", ",
+                (request.RequiredSkills ?? new())
+                .Where(s => !string.IsNullOrWhiteSpace(s))
+                .Select(s => s.Trim()));
 
             await _vacancyRepo.AddAsync(entity, ct);
             await _uow.Commit();
 
             return _mapper.Map<ResponseCreateVacancyJson>(entity);
         }
-
     }
 }
