@@ -2,7 +2,6 @@
 {
     public enum JobFunction
     {
-        Unknown = 0,
         TI = 1,
         Marketing = 2,
         Design = 3,

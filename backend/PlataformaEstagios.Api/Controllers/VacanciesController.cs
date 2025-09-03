@@ -20,21 +20,21 @@ namespace PlataformaEstagios.Api.Controllers
         {
             body.EnterpriseIdentifier = enterpriseId;
             var result = await useCase.ExecuteAsync(body, ct);
-            return CreatedAtAction(nameof(GetByEnterprise), new { enterpriseId }, result);
+            return Created();
         }
 
-        // GET: aberto para leitura (ajuste conforme sua política)
-        [HttpGet]
-        [AllowAnonymous] // ou [Authorize(Roles = "Candidate,Enterprise")]
-        [Route("api/enterprises/{enterpriseId:guid}/vacancies")]
-        public async Task<ActionResult<IReadOnlyList<ResponseCreateVacancyJson>>> GetByEnterprise(
-            Guid enterpriseId,
-            [FromServices] PlataformaEstagios.Domain.Repositories.Vacancy.IVacancyReadOnlyRepository repo,
-            [FromServices] AutoMapper.IMapper mapper,
-            CancellationToken ct)
-        {
-            var items = await repo.ListByEnterpriseAsync(enterpriseId, ct);
-            return Ok(mapper.Map<IReadOnlyList<ResponseCreateVacancyJson>>(items));
-        }
+        //// GET: aberto para leitura (ajuste conforme sua política)
+        //[HttpGet]
+        //[AllowAnonymous] // ou [Authorize(Roles = "Candidate,Enterprise")]
+        //[Route("api/enterprises/{enterpriseId:guid}/vacancies")]
+        //public async Task<ActionResult<IReadOnlyList<ResponseCreateVacancyJson>>> GetByEnterprise(
+        //    Guid enterpriseId,
+        //    [FromServices] PlataformaEstagios.Domain.Repositories.Vacancy.IVacancyReadOnlyRepository repo,
+        //    [FromServices] AutoMapper.IMapper mapper,
+        //    CancellationToken ct)
+        //{
+        //    var items = await repo.ListByEnterpriseAsync(enterpriseId, ct);
+        //    return Ok(mapper.Map<IReadOnlyList<ResponseCreateVacancyJson>>(items));
+        //}
     }
 }

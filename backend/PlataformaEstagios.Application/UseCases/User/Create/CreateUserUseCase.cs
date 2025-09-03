@@ -63,7 +63,7 @@ namespace PlataformaEstagios.Application.UseCases.User.Create
                     break;
 
                 case UserType.Enterprise:
-                    var enterprise = _mapper.Map<Enterprise>(request.Enterprise!);
+                    var enterprise = _mapper.Map<Domain.Entities.Enterprise>(request.Enterprise!);
 
                     if (enterprise.EnterpriseIdentifier == Guid.Empty)
                         enterprise.EnterpriseIdentifier = Guid.NewGuid();

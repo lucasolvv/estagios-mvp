@@ -11,7 +11,7 @@ namespace PlataformaEstagios.Communication.Requests
 
         // NOVOS CAMPOS
         public string Location { get; set; } = "Remoto - Brasil";
-        public JobFunction JobFunction { get; set; } = JobFunction.Unknown;
+        public JobFunction JobFunction { get; set; }
         public List<string> RequiredSkills { get; set; } = new();   // ex.: ["C#", "Git", "SQL"]
         public DateTime? ExpiresAtUtc { get; set; }                 // opcional
     }

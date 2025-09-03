@@ -102,6 +102,15 @@ namespace PlataformaEstagios.Application.Services.AutoMapper
                 .ForMember(d => d.ExpiresAtUtc, o => o.MapFrom(s => s.ExpiresAtUtc))
                 .ForMember(d => d.IsActive, o => o.MapFrom(s => s.IsActive))
                 .ForMember(d => d.UpdatedAt, o => o.MapFrom(s => s.UpdatedAt ?? DateTime.UtcNow));
+
+            // DomainToResponse()
+            CreateMap<Vacancy, ResponseVacancyListItem>()
+                .ForCtorParam("VacancyIdentifier", o => o.MapFrom(s => s.VacancyIdentifier))
+                .ForCtorParam("Title", o => o.MapFrom(s => s.Title ?? string.Empty))
+                .ForCtorParam("OpenedAt", o => o.MapFrom(s => s.PublishedAtUtc ?? s.UpdatedAt ?? DateTime.UtcNow))
+                .ForCtorParam("Applicants", o => o.MapFrom(s => s.Applications != null ? s.Applications.Count : 0))
+                .ForCtorParam("Status", o => o.MapFrom(s => s.IsActive ? "Ativa" : "Encerrada"));
+
         }
     }
 }

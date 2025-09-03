@@ -4,6 +4,7 @@ using MudBlazor.Services;
 using PlataformaEstagio.Web.Components;
 using PlataformaEstagio.Web.Components.Services;
 using PlataformaEstagio.Web.Components.Services.Auth;
+using PlataformaEstagio.Web.Components.Services.Enterprise;
 using PlataformaEstagios.Web.Services.Auth; // onde ficará o IUserServices/UserServices
 
 
@@ -16,13 +17,14 @@ builder.Services.AddRazorComponents()
 
 // MudBlazor (Snackbar, Dialog, etc.)
 builder.Services.AddMudServices();
-
+builder.Services.AddTransient<TokenHandler>();
 // HttpClient nomeado para o backend (ajuste URL)
 builder.Services.AddHttpClient("Backend", (sp, c) =>
 {
     var cfg = sp.GetRequiredService<IConfiguration>();
     c.BaseAddress = new Uri(cfg["Backend:BaseUrl"] ?? "https://localhost:7095/");
-});
+})
+    .AddHttpMessageHandler<TokenHandler>();
 
 builder.Services.AddAuthorizationCore(o =>
 {
@@ -38,6 +40,7 @@ builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthenticationStatePr
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddHttpClient<IUserServices, UserServices>("Backend");
 builder.Services.AddScoped<IUserContext, UserContext>();
+builder.Services.AddScoped<IEnterpriseService, EnterpriseService>();
 
 var app = builder.Build();
 

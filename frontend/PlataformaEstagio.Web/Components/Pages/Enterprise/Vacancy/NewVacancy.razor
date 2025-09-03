@@ -46,11 +46,11 @@
                     <!-- NOVO: Área/Função (enum) -->
                     <MudSelect T="JobFunction"
                                @bind-Value="_model.JobFunction"
-                               Label="Área / Função"
+                               Label="Área de atuação"
                                Required="true">
                         @foreach (var a in Enum.GetValues<JobFunction>())
                         {
-                            if (a == JobFunction.Unknown) { continue; }
+                            if (a == JobFunction.TI) { continue; }
                             <MudSelectItem Value="a">@a</MudSelectItem>
                         }
                     </MudSelect>
@@ -59,7 +59,7 @@
                 <MudTextField @bind-Value="_skillInput"
                               Label="Adicionar habilidade"
                               Placeholder="Ex.: C#, Git, SQL"
-                              OnKeyDown="OnSkillKeyDown" />
+                              OnKeyUp="OnSkillKeyUp" />
 
                         <MudChipSet T="string" Class="mb-2">
                             @foreach (var s in _model.RequiredSkills)
@@ -119,7 +119,6 @@
     {
         IsActive = true,
         Location = "Remoto - Brasil",
-        JobFunction = JobFunction.Unknown,
         RequiredSkills = new List<string>()
     };
 
@@ -129,7 +128,7 @@
         _loaded = true;
     }
 
-    private void OnSkillKeyDown(KeyboardEventArgs e)
+    private void OnSkillKeyUp(KeyboardEventArgs e)
     {
         if (e.Key is "Enter")
         {
