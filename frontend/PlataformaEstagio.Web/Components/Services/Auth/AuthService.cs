@@ -15,6 +15,7 @@ namespace PlataformaEstagios.Web.Services.Auth
         private readonly ProtectedLocalStorage _storage;
         private readonly AuthenticationStateProvider _authProvider;
         private readonly NavigationManager _nav;
+        private readonly IUserContext _userContext;
 
         // cache em memória para o circuito atual (mais rápido que ir no storage toda hora)
         private string? _tokenCache;
@@ -26,12 +27,14 @@ namespace PlataformaEstagios.Web.Services.Auth
             ProtectedLocalStorage storage,
             AuthenticationStateProvider authProvider,
             NavigationManager nav,
-            HttpClient http)
+            HttpClient http,
+            IUserContext userContext)
         {
             _storage = storage;
             _authProvider = authProvider;
             _nav = nav;
             _http = http;
+            _userContext = userContext;
         }
 
         public async Task<bool> LoginAsync(RequestLoginJson request)
@@ -48,7 +51,9 @@ namespace PlataformaEstagios.Web.Services.Auth
             await _storage.SetAsync(TokenKey, login.AccessToken);
             await _storage.SetAsync(SessionKey, login);
 
-            // avisa o AuthenticationStateProvider que mudou
+            // atualiza memória para o handler
+            _userContext.SetToken(login.AccessToken); // <<
+
             if (_authProvider is JwtAuthenticationStateProvider jwtProvider)
                 await jwtProvider.NotifyUserAuthenticationAsync(login.AccessToken);
 
@@ -61,7 +66,7 @@ namespace PlataformaEstagios.Web.Services.Auth
             _sessionCache = null;
             await _storage.DeleteAsync(TokenKey);
             await _storage.DeleteAsync(SessionKey);
-
+            _userContext.SetToken(null); // <<
             if (_authProvider is JwtAuthenticationStateProvider jwtProvider)
                 await jwtProvider.NotifyUserLogoutAsync();
 

@@ -1,0 +1,23 @@
+﻿@inject AuthenticationStateProvider Provider
+@inject Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage.ProtectedLocalStorage Storage
+@inject IUserContext CurrentUser
+
+@code {
+    private const string TokenKey = "auth.token";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        // 1) Restaura as claims a partir do storage (JS interop permitido aqui)
+        if (Provider is PlataformaEstagio.Web.Components.Services.Auth.JwtAuthenticationStateProvider jwt)
+            await jwt.RestoreAsync();
+
+        // 2) Recarrega o token bruto do storage e coloca em memória
+        var tokenEntry = await Storage.GetAsync<string>(TokenKey);
+        CurrentUser.SetToken(tokenEntry.Success ? tokenEntry.Value : null);
+
+        // (opcional) Se quiser forçar re-render de quem dependa do token:
+        StateHasChanged();
+    }
+}

@@ -15,6 +15,8 @@ public interface IUserContext
     string? AccessToken { get; }
 
     Task RefreshAsync(); // chama em OnInitializedAsync()
+
+    void SetToken(string? token); // chama após login/logout
 }
 
 public sealed class UserContext : IUserContext
@@ -29,6 +31,13 @@ public sealed class UserContext : IUserContext
     {
         _provider = provider;
         _storage = storage;
+        
+        _provider.AuthenticationStateChanged += async task =>
+        {
+            var state = await task;
+            _user = state.User;                 // atualiza claims assim que o provider notificar
+                                                // não mexa no storage aqui; token em memória já foi setado por AuthService/AuthInitializer
+        };
     }
 
     public bool IsAuthenticated => _user.Identity?.IsAuthenticated ?? false;
@@ -40,15 +49,18 @@ public sealed class UserContext : IUserContext
 
     public string? AccessToken { get; private set; }
 
+    public void SetToken(string? token) => AccessToken = token;
+
     public async Task RefreshAsync()
     {
-        // 1) Claims do provedor (mantém seu fluxo atual)
+        // 1) Claims do provedor
         var state = await _provider.GetAuthenticationStateAsync();
         _user = state.User;
 
-        // 2) Token bruto do storage (para Authorization: Bearer)
+        // 2) (OK continuar lendo do storage AQUI, mas só chame isso após o primeiro render)
         var stored = await _storage.GetAsync<string>(TokenKey);
         AccessToken = stored.Success ? stored.Value : null;
+
     }
 
     private static Guid? TryGuid(string? s) => Guid.TryParse(s, out var g) ? g : null;

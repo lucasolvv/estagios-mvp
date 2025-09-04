@@ -6,7 +6,6 @@
 @inject NavigationManager Nav
 @inject IUserContext CurrentUser
 
-
 <AuthorizeView Context="auth" Roles="Enterprise">
     <MudContainer MaxWidth="MaxWidth.False" Class="px-6 py-2">
         <MudGrid>
@@ -17,8 +16,7 @@
                     <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Spacing="4" Class="py-4 px-2">
                         <MudStack>
                             <MudText Typo="Typo.h5" Class="font-weight-bold">
-                                @* Olá, @GetDisplayName(auth.User) 👋 *@
-                                Olá, @CurrentUser.Nickname 👋
+                                Olá, @((CurrentUser?.Nickname) ?? GetDisplayName(auth.User)) 👋
                             </MudText>
                             <MudText Typo="Typo.subtitle2" Color="Color.Secondary">
                                 Veja o resumo das suas vagas, candidatos e entrevistas.
@@ -51,38 +49,47 @@
                         <MudText Typo="Typo.h6">Minhas vagas ativas</MudText>
                     </MudCardHeader>
                     <MudCardContent>
-                        <MudTable Items="ActiveJobs" Dense="true" Hover="true">
-                            <HeaderContent>
-                                <MudTh>Título</MudTh>
-                                <MudTh>Abertura</MudTh>
-                                <MudTh>Inscritos</MudTh>
-                                <MudTh>Status</MudTh>
-                                <MudTh></MudTh>
-                            </HeaderContent>
-                            <RowTemplate>
-                                <MudTd>@context.Titulo</MudTd>
-                                <MudTd>@context.DataAbertura.ToString("dd/MM/yyyy")</MudTd>
-                                <MudTd>@context.Inscritos</MudTd>
-                                <MudTd>
-                                    <MudChip T="string" Color="@JobStatusColor(context.Status)" Variant="Variant.Filled" Size="Size.Small">
-                                        @context.Status
-                                    </MudChip>
-                                </MudTd>
-                                <MudTd Class="text-right">
-                                    <MudButton Size="Size.Small" Variant="Variant.Text" StartIcon="@Icons.Material.Filled.Visibility"
-                                               OnClick="@(()=>OnVerInscritos(context))">
-                                        Ver inscritos
-                                    </MudButton>
-                                    <MudButton Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined"
-                                               StartIcon="@Icons.Material.Filled.Edit" OnClick="@(()=>OnEditarVaga(context))">
-                                        Editar
-                                    </MudButton>
-                                </MudTd>
-                            </RowTemplate>
-                            <NoRecordsContent>
-                                <MudText Color="Color.Secondary">Nenhuma vaga ativa.</MudText>
-                            </NoRecordsContent>
-                        </MudTable>
+
+                        @if (_isLoading)
+                        {
+                            <MudProgressLinear Indeterminate="true" Class="mb-2" />
+                            <MudText Color="Color.Secondary">Carregando vagas...</MudText>
+                        }
+                        else
+                        {
+                            <MudTable Items="ActiveJobs" Dense="true" Hover="true">
+                                <HeaderContent>
+                                    <MudTh>Título</MudTh>
+                                    <MudTh>Abertura</MudTh>
+                                    <MudTh>Inscritos</MudTh>
+                                    <MudTh>Status</MudTh>
+                                    <MudTh></MudTh>
+                                </HeaderContent>
+                                <RowTemplate>
+                                    <MudTd>@context.Titulo</MudTd>
+                                    <MudTd>@context.DataAbertura.ToString("dd/MM/yyyy")</MudTd>
+                                    <MudTd>@context.Inscritos</MudTd>
+                                    <MudTd>
+                                        <MudChip T="string" Color="@JobStatusColor(context.Status)" Variant="Variant.Filled" Size="Size.Small">
+                                            @context.Status
+                                        </MudChip>
+                                    </MudTd>
+                                    <MudTd Class="text-right">
+                                        <MudButton Size="Size.Small" Variant="Variant.Text" StartIcon="@Icons.Material.Filled.Visibility"
+                                                   OnClick="@(()=>OnVerInscritos(context))">
+                                            Ver inscritos
+                                        </MudButton>
+                                        <MudButton Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined"
+                                                   StartIcon="@Icons.Material.Filled.Edit" OnClick="@(()=>OnEditarVaga(context))">
+                                            Editar
+                                        </MudButton>
+                                    </MudTd>
+                                </RowTemplate>
+                                <NoRecordsContent>
+                                    <MudText Color="Color.Secondary">Nenhuma vaga ativa.</MudText>
+                                </NoRecordsContent>
+                            </MudTable>
+                        }
                     </MudCardContent>
                 </MudCard>
 
@@ -129,25 +136,25 @@
                 <!-- Métricas rápidas -->
                 <MudGrid Class="mb-4">
                     <MudItem xs="12" sm="6" md="12">
-                    <MudPaper Class="py-2 px-2">
+                        <MudPaper Class="py-2 px-2">
                             <MudText Typo="Typo.overline">Vagas abertas</MudText>
                             <MudText Typo="Typo.h5">@Stats.VagasAbertas</MudText>
                         </MudPaper>
                     </MudItem>
                     <MudItem xs="12" sm="6" md="12">
-                    <MudPaper Class="py-2 px-2">
+                        <MudPaper Class="py-2 px-2">
                             <MudText Typo="Typo.overline">Inscrições recebidas</MudText>
                             <MudText Typo="Typo.h5">@Stats.Inscricoes</MudText>
                         </MudPaper>
                     </MudItem>
                     <MudItem xs="12" sm="6" md="12">
-                    <MudPaper Class="py-2 px-2">
+                        <MudPaper Class="py-2 px-2">
                             <MudText Typo="Typo.overline">Entrevistas marcadas</MudText>
                             <MudText Typo="Typo.h5">@Stats.Entrevistas</MudText>
                         </MudPaper>
                     </MudItem>
                     <MudItem xs="12" sm="6" md="12">
-                    <MudPaper Class="py-2 px-2">
+                        <MudPaper Class="py-2 px-2">
                             <MudText Typo="Typo.overline">Taxa de preenchimento</MudText>
                             <MudText Typo="Typo.h5">@Stats.TaxaPreenchimento.ToString("P0")</MudText>
                             <MudProgressLinear Class="mt-1" Value="@(Stats.TaxaPreenchimento*100)" Color="Color.Info" />
@@ -215,33 +222,85 @@
 @code {
     @inject IEnterpriseService _service
 
+    private bool _isLoading = true;
+    private Guid? _enterpriseId;
+    private List<JobCompanyVm> ActiveJobs { get; set; } = new();
+
+    private bool _hydrated;     // garante que a hidratação rode uma única vez
+    private bool _loadingJobs;  // evita chamadas concorrentes
+
+    [CascadingParameter] private Task<AuthenticationState> AuthenticationStateTask { get; set; } = default!;
+
+    protected override Task OnInitializedAsync()
+    {
+        // ⚠️ Importante: NÃO tocar no ProtectedLocalStorage nem chamar CurrentUser.RefreshAsync aqui.
+        // Vamos carregar tudo no OnAfterRenderAsync(firstRender) quando o Auth já tiver sido restaurado pelo App/AuthInitializer.
+        return Task.CompletedTask;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!_hydrated && firstRender)
+        {
+            _hydrated = true;
+
+            // hidrata token/claims do storage (JS interop permitido aqui)
+            await CurrentUser.RefreshAsync();
+
+            // carrega as vagas
+            await LoadJobsAsync();
+
+            // pede um render final; como _hydrated já é true, não reentra
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadJobsAsync()
+    {
+        if (_loadingJobs) return;   // trava reentrada
+        _loadingJobs = true;
+        _isLoading = true;
+
+        try
+        {
+            if (CurrentUser.UserTypeId is Guid id)
+            {
+                var vagas = await _service.GetActiveAsync(id);
+                ActiveJobs = vagas.Select(v => new JobCompanyVm(
+                    v.Title,
+                    v.OpenedAt.ToLocalTime(),
+                    v.Applicants,
+                    v.Status)).ToList();
+            }
+            else
+            {
+                Snackbar.Add("ID da empresa não encontrado nas claims.", Severity.Warning);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Falha ao carregar vagas: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _isLoading = false;
+            _loadingJobs = false;
+            // segura o render no fim do ciclo atual
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
     private static string GetDisplayName(ClaimsPrincipal user)
         => user.FindFirst("nickname")?.Value
            ?? user.Identity?.Name
            ?? user.FindFirst(ClaimTypes.Email)?.Value
            ?? "Empresa";
 
-    [CascadingParameter] private Task<AuthenticationState> AuthenticationStateTask { get; set; } = default!;
-    private List<JobCompanyVm> ActiveJobs { get; set; } = new();
-
-    protected override async Task OnInitializedAsync()
-    {
-        await CurrentUser.RefreshAsync();
-        var vagas = await _service.GetActiveAsync(CurrentUser.UserTypeId!.Value);
-        ActiveJobs = vagas.Select(v => new JobCompanyVm(
-            v.Title, v.OpenedAt.ToLocalTime(), v.Applicants, v.Status)).ToList();
-
-    }
-
-    private void OnCriarVaga()
-    {
-        Nav.NavigateTo("/empresa/vagas/nova");
-    }
+    private void OnCriarVaga() => Nav.NavigateTo("/empresa/vagas/nova");
     private void OnGerenciarVagas() => Snackbar.Add("Gerenciar vagas (TODO)", Severity.Info);
     private void OnBancoTalentos() => Snackbar.Add("Banco de talentos (TODO)", Severity.Info);
     private void OnConfigurarEntrevistas() => Snackbar.Add("Configurar entrevistas (TODO)", Severity.Info);
 
-    // --- Ações tabelas
     private void OnVerInscritos(JobCompanyVm job) => Snackbar.Add($"Ver inscritos de \"{job.Titulo}\" (mock).", Severity.Normal);
     private void OnEditarVaga(JobCompanyVm job) => Snackbar.Add($"Editar vaga \"{job.Titulo}\" (mock).", Severity.Info);
     private void OnVerPerfil(CandidateVm c) => Snackbar.Add($"Abrir perfil de {c.Nome} (mock).", Severity.Normal);
@@ -254,14 +313,13 @@
         _ => Color.Warning
     };
 
-    // --- VMs
+    // --- VMs (mocks à direita e métricas)
     private record StatsVm(int VagasAbertas, int Inscricoes, int Entrevistas, double TaxaPreenchimento);
     private record JobCompanyVm(string Titulo, DateTime DataAbertura, int Inscritos, string Status);
     private record CandidateVm(string Nome, string Curso, string Vaga, DateTime Data);
     private record InterviewVm(string Candidato, string Vaga, DateTime Data, string Canal);
     private record NotificationVm(string Texto, DateTime Data);
 
-        // --- Métricas
     private StatsVm Stats = new(3, 28, 6, 0.65);
 
     private List<CandidateVm> RecentCandidates = new()

@@ -1,23 +1,29 @@
-﻿using PlataformaEstagios.Communication.Responses;
+﻿using PlataformaEstagios.Communication.Requests;
+using PlataformaEstagios.Communication.Responses;
 
 namespace PlataformaEstagio.Web.Components.Services.Enterprise
 {
-    public class EnterpriseService : IEnterpriseService
+    public class EnterpriseService : BaseApiService, IEnterpriseService
     {
-        private readonly HttpClient _http;
+        public EnterpriseService(HttpClient http, IUserContext user)
+            : base(http, user) { }
 
-        public EnterpriseService(HttpClient http) => _http = http;
+        public Task<List<ResponseVacancyListItem>> GetActiveAsync(Guid enterpriseId)
+            => GetJsonAsync<List<ResponseVacancyListItem>>(
+                $"api/enterprises/{enterpriseId}/vacancies")!;
 
-        public async Task<List<ResponseVacancyListItem>> GetActiveAsync(Guid enterpriseId)
-            => await _http.GetFromJsonAsync<List<ResponseVacancyListItem>>(
-                $"api/enterprises/{enterpriseId}/vacancies") ?? [];
+        public async Task<(bool Success, string? Error)> CreateAsync(Guid enterpriseId, RequestCreateVacancyJson dto, CancellationToken ct = default)
+        {
+            using var req = new HttpRequestMessage(HttpMethod.Post, $"api/enterprises/{enterpriseId}/vacancies")
+            {
+                Content = JsonContent.Create(dto)
+            };
 
-        //public async Task<EnterpriseHomeStatsResponse?> GetStatsAsync()
-        //    => await _http.GetFromJsonAsync<EnterpriseHomeStatsResponse>(
-        //        "api/enterprises/home/stats");
+            var resp = await SendAsync(req, ct);
+            if (resp.IsSuccessStatusCode) return (true, null);
 
-        //public async Task<List<RecentCandidateResponse>> GetRecentCandidatesAsync(int take = 10)
-        //    => await _http.GetFromJsonAsync<List<RecentCandidateResponse>>(
-        //        $"api/enterprises/home/recent-candidates?take={take}") ?? [];
+            var msg = await resp.Content.ReadAsStringAsync(ct);
+            return (false, string.IsNullOrWhiteSpace(msg) ? resp.StatusCode.ToString() : msg);
+        }
     }
 }

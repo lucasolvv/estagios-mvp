@@ -1,14 +1,13 @@
 ﻿@page "/empresa/vagas/nova"
 @using System.ComponentModel.DataAnnotations
 @using System.Net.Http.Headers
+@using PlataformaEstagio.Web.Components.Services.Enterprise
 @using PlataformaEstagios.Communication.Requests
 @using PlataformaEstagios.Domain.Enums
+@inject IEnterpriseService EnterpriseService
+@inject IUserContext CurrentUser
 @inject ISnackbar Snackbar
 @inject NavigationManager Nav
-@inject IHttpClientFactory HttpFactory
-@inject AuthenticationStateProvider AuthProvider
-@inject Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage.ProtectedLocalStorage Storage
-@inject IUserContext CurrentUser
 
 @* <AuthorizeView Roles="Enterprise"> *@
     <MudContainer MaxWidth="MaxWidth.Medium" Class="px-6 py-4">
@@ -170,30 +169,26 @@
         {
             _busy = true;
 
-            // converte Expiração (local) -> UTC para enviar
             _model.ExpiresAtUtc = _expiresDate.HasValue
                 ? DateTime.SpecifyKind(_expiresDate.Value, DateTimeKind.Local).ToUniversalTime()
                 : null;
 
-            var client = HttpFactory.CreateClient("Backend");
-
-            // (opcional) Se usa JWT armazenado:
-            var tok = await Storage.GetAsync<string>("auth.token");
-            if (tok.Success && !string.IsNullOrWhiteSpace(tok.Value))
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tok.Value);
-
             var enterpriseId = CurrentUser.UserTypeId;
-            var resp = await client.PostAsJsonAsync($"api/enterprises/{enterpriseId}/vacancies", _model);
+            if (enterpriseId is null)
+            {
+                Snackbar.Add("Empresa não identificada nas claims.", Severity.Warning);
+                return;
+            }
 
-            if (resp.IsSuccessStatusCode)
+            var result = await EnterpriseService.CreateAsync(enterpriseId.Value, _model);
+            if (result.Success)
             {
                 Snackbar.Add("Vaga criada com sucesso!", Severity.Success);
                 Nav.NavigateTo("/empresa/home");
             }
             else
             {
-                var msg = await resp.Content.ReadAsStringAsync();
-                Snackbar.Add($"Falha ao criar vaga: {msg}", Severity.Error);
+                Snackbar.Add($"Falha ao criar vaga: {result.Error}", Severity.Error);
             }
         }
         finally

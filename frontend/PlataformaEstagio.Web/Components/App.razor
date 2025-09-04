@@ -1,7 +1,4 @@
-﻿@using PlataformaEstagio.Web.Components.Services.Auth
-@inject JwtAuthenticationStateProvider AuthProvider
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="utf-8" />
@@ -29,17 +26,3 @@
     <script src="_content/MudBlazor/MudBlazor.min.js?v=@(MudBlazor.Metadata.Version)"></script>
 </body>
 </html>
-
-@code {
-    private bool _restored;
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender && !_restored)
-        {
-            _restored = true;
-            await AuthProvider.RestoreAsync();   // <- agora pode usar ProtectedLocalStorage
-            StateHasChanged();                   // dispara re-render com usuário restaurado
-        }
-    }
-}
