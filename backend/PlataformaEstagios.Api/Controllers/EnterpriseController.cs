@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PlataformaEstagios.Application.UseCases.Enterprise.GetVacancies;
+using PlataformaEstagios.Application.UseCases.Enterprise.UpdateVacancies;
 using PlataformaEstagios.Application.UseCases.Vacancy.Create;
+using PlataformaEstagios.Communication.Requests;
 using PlataformaEstagios.Communication.Responses;
 
 namespace PlataformaEstagios.Api.Controllers
@@ -17,6 +19,24 @@ namespace PlataformaEstagios.Api.Controllers
         {
             var data = await useCase.ExecuteAsync(enterpriseId, ct);
             return Ok(data);
+        }
+
+        [Authorize(Roles = "Enterprise")]
+        [HttpGet("{enterpriseId:guid}/vacancies/{vacancyId:guid}")]
+        public async Task<ActionResult<ResponseGetVacancyJson>> GetByIdAsync(Guid enterpriseId, Guid vacancyId,
+            [FromServices] IGetVacanciesUseCase useCase, CancellationToken ct = default)
+        {
+            var data = await useCase.GetByIdAsync(enterpriseId, vacancyId, ct);
+            return Ok(data);
+        }
+
+        [Authorize(Roles = "Enterprise")]
+        [HttpPut("{enterpriseId:guid}/vacancies/{vacancyId:guid}")]
+        public async Task<ActionResult> UpdateAsync(Guid enterpriseId, Guid vacancyId,
+            [FromBody] RequestUpdateVacancyJson request, [FromServices] IUpdateVacancyUseCase useCase, CancellationToken ct = default)
+        {
+            var result = await useCase.ExecuteAsync(enterpriseId, vacancyId, request, ct);
+            return Ok("Vaga alterada com sucesso.");
         }
 
         //[HttpGet("stats")]

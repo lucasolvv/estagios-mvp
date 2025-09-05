@@ -267,6 +267,7 @@
             {
                 var vagas = await _service.GetActiveAsync(id);
                 ActiveJobs = vagas.Select(v => new JobCompanyVm(
+                    v.VacancyIdentifier,
                     v.Title,
                     v.OpenedAt.ToLocalTime(),
                     v.Applicants,
@@ -302,7 +303,7 @@
     private void OnConfigurarEntrevistas() => Snackbar.Add("Configurar entrevistas (TODO)", Severity.Info);
 
     private void OnVerInscritos(JobCompanyVm job) => Snackbar.Add($"Ver inscritos de \"{job.Titulo}\" (mock).", Severity.Normal);
-    private void OnEditarVaga(JobCompanyVm job) => Snackbar.Add($"Editar vaga \"{job.Titulo}\" (mock).", Severity.Info);
+    private void OnEditarVaga(JobCompanyVm job) => Nav.NavigateTo($"/empresa/vagas/{job.JobId}/editar");
     private void OnVerPerfil(CandidateVm c) => Snackbar.Add($"Abrir perfil de {c.Nome} (mock).", Severity.Normal);
     private void OnAgendarEntrevista(CandidateVm c) => Snackbar.Add($"Agendar entrevista com {c.Nome} (mock).", Severity.Success);
 
@@ -315,7 +316,7 @@
 
     // --- VMs (mocks à direita e métricas)
     private record StatsVm(int VagasAbertas, int Inscricoes, int Entrevistas, double TaxaPreenchimento);
-    private record JobCompanyVm(string Titulo, DateTime DataAbertura, int Inscritos, string Status);
+    private record JobCompanyVm(Guid JobId, string Titulo, DateTime DataAbertura, int Inscritos, string Status);
     private record CandidateVm(string Nome, string Curso, string Vaga, DateTime Data);
     private record InterviewVm(string Candidato, string Vaga, DateTime Data, string Canal);
     private record NotificationVm(string Texto, DateTime Data);

@@ -18,8 +18,4 @@
     <ProjectReference Include="..\..\shared\PlataformaEstagios.Exceptions\PlataformaEstagios.Exceptions.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Components\Dtos\" />
-  </ItemGroup>
-
 </Project>

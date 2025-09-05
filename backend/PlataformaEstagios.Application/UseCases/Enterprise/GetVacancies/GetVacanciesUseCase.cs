@@ -17,5 +17,11 @@ namespace PlataformaEstagios.Application.UseCases.Enterprise.GetVacancies
             var jobs = await _repo.GetActiveForEnterpriseAsync(enterpriseId, ct);
             return _mapper.Map<IReadOnlyList<Communication.Responses.ResponseVacancyListItem>>(jobs);
         }
+
+        public async Task<Communication.Responses.ResponseGetVacancyJson> GetByIdAsync(Guid enterpriseId, Guid vacancyId, CancellationToken ct)
+        {
+            var job = await _repo.GetByIdForEnterpriseAsync(enterpriseId, vacancyId, ct);
+            return _mapper.Map<Communication.Responses.ResponseGetVacancyJson>(job);
+        }
     }
 }

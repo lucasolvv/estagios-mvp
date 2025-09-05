@@ -1,0 +1,260 @@
+﻿@page "/empresa/vagas/{id:guid}/editar"
+@using System.ComponentModel.DataAnnotations
+@using System.Net.Http.Headers
+@using Microsoft.AspNetCore.Components.Web
+@using PlataformaEstagio.Web.Components.Services.Enterprise
+@using PlataformaEstagio.Web.Components.Services.Auth
+@using PlataformaEstagios.Communication.Requests
+@using PlataformaEstagios.Domain.Enums
+@inject IEnterpriseService EnterpriseService
+@inject IUserContext CurrentUser
+@inject ISnackbar Snackbar
+@inject NavigationManager Nav
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="px-6 py-4">
+    <MudPaper Class="px-4 py-4">
+
+        <MudText Typo="Typo.h5" Color="Color.Secondary" Class="mb-2">Editar vaga</MudText>
+
+        @if (!_loaded)
+        {
+            <MudStack AlignItems="AlignItems.Center" Class="py-6">
+                <MudProgressCircular Indeterminate="true" />
+                <MudText Color="Color.Secondary">Carregando dados da vaga...</MudText>
+            </MudStack>
+        }
+        else if (_notFound)
+        {
+            <MudAlert Severity="Severity.Warning" Variant="Variant.Filled" Class="mb-2">
+                Vaga não encontrada.
+            </MudAlert>
+            <MudButton Variant="Variant.Outlined" OnClick="@(() => Nav.NavigateTo("/empresa/home"))">
+                Voltar
+            </MudButton>
+        }
+        else
+        {
+            <MudForm @ref="_form" Model="_model">
+                <!-- Título -->
+                <MudTextField @bind-Value="_model.Title"
+                              Label="Título"
+                              Required="true"
+                              For="@(() => _model.Title)" />
+
+                <!-- Descrição -->
+                <MudTextField @bind-Value="_model.Description"
+                              Label="Descrição"
+                              Lines="6" />
+
+                <!-- Localização -->
+                <MudTextField @bind-Value="_model.Location"
+                              Label="Localização"
+                              Required="true"
+                              Placeholder="Ex.: Remoto - Brasil / São Paulo - SP (Remoto)" />
+
+                <!-- Área/Função -->
+                <MudSelect T="JobFunction"
+                           @bind-Value="_model.JobFunction"
+                           Label="Área de atuação"
+                           Required="true">
+                    @foreach (var a in Enum.GetValues<JobFunction>())
+                    {
+                        if (a == JobFunction.TI) { continue; }
+                        <MudSelectItem Value="a">@a</MudSelectItem>
+                    }
+                </MudSelect>
+
+                <!-- Habilidades -->
+                <MudTextField @bind-Value="_skillInput"
+                              Label="Adicionar habilidade"
+                              Placeholder="Ex.: C#, Git, SQL"
+                              OnKeyUp="OnSkillKeyUp" />
+
+                <MudChipSet T="string" Class="mb-2">
+                    @foreach (var s in _model.RequiredSkills)
+                    {
+                        <MudChip T="string"
+                                 Closeable="true"
+                                 OnClose="@( (MudChip<string> _) => RemoveSkill(s) )">@s</MudChip>
+                    }
+                </MudChipSet>
+
+                <!-- Expiração -->
+                <MudDatePicker Label="Expira em"
+                               @bind-Date="_expiresDate"
+                               Editable="true"
+                               Clearable="true"
+                               DisplayMonths="1"
+                               DisableToolbar="false"
+                               PickerMonth="@DateTime.Today"
+                               MinDate="@DateTime.Today"
+                               T="DateTime?" />
+
+                <!-- Ativa -->
+                <MudSwitch T="bool" @bind-Checked="_model.IsActive" Color="Color.Success">Ativa</MudSwitch>
+
+                <MudStack Row Spacing="2" Class="mt-3">
+                    <MudButton ButtonType="ButtonType.Button"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.Save"
+                               Disabled="@_busy"
+                               OnClick="HandleSubmit">
+                        Salvar alterações
+                    </MudButton>
+
+                    <MudButton Variant="Variant.Text" Disabled="@_busy" OnClick="@(() => Nav.NavigateTo("/empresa/home"))">
+                        Cancelar
+                    </MudButton>
+                </MudStack>
+            </MudForm>
+        }
+    </MudPaper>
+</MudContainer>
+
+@code {
+    [Parameter] public Guid id { get; set; }
+
+    private MudForm? _form;
+    private bool _busy;
+    private bool _loaded;
+    private bool _hydrated;
+    private bool _notFound;
+
+    private string _skillInput = string.Empty;
+    private DateTime? _expiresDate;
+
+    // Use o DTO de update do seu backend; se ainda não existir, pode reaproveitar o de create provisoriamente
+    private RequestUpdateVacancyJson _model = new()
+    {
+        RequiredSkills = new List<string>(),
+        IsActive = true
+    };
+
+    protected override Task OnInitializedAsync() => Task.CompletedTask;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!_hydrated && firstRender)
+        {
+            _hydrated = true;
+            await CurrentUser.RefreshAsync();
+
+            // carrega dados da vaga
+            await LoadAsync();
+
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadAsync()
+    {
+        try
+        {
+            var enterpriseId = CurrentUser.UserTypeId;
+            if (enterpriseId is null)
+            {
+                Snackbar.Add("Empresa não identificada nas claims.", Severity.Warning);
+                _notFound = true;
+                _loaded = true;
+                return;
+            }
+
+            // ajuste o nome do método/retorno conforme seu service
+            var resp = await EnterpriseService.GetByIdAsync(enterpriseId.Value, id);
+            if (resp == null)
+            {
+                _notFound = true;
+                _loaded = true;
+                return;
+            }
+
+            // mapeia a resposta para o model de edição
+            _model.VacancyIdentifier = resp.VacancyIdentifier; // se o DTO de update exigir
+            _model.Title = resp.Title ?? "";
+            _model.Description = resp.Description;
+            _model.Location = resp.Location ?? "Remoto - Brasil";
+            _model.JobFunction = resp.JobFunction;
+            _model.RequiredSkills = resp.RequiredSkills?.ToList() ?? new List<string>();
+            _model.IsActive = resp.IsActive;
+
+            _model.ExpiresAtUtc = resp.ExpiresAtUtc; // UTC vindo do backend
+            _expiresDate = _model.ExpiresAtUtc?.ToLocalTime(); // para o DatePicker
+
+            _loaded = true;
+        }
+        catch
+        {
+            _notFound = true;
+            _loaded = true;
+        }
+    }
+
+    private void OnSkillKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key is "Enter") AddSkillFromInput();
+    }
+
+    private void AddSkillFromInput()
+    {
+        var txt = (_skillInput ?? string.Empty).Trim();
+        if (string.IsNullOrWhiteSpace(txt)) return;
+
+        if (!_model.RequiredSkills.Any(s => string.Equals(s, txt, StringComparison.OrdinalIgnoreCase)))
+            _model.RequiredSkills.Add(txt);
+
+        _skillInput = "";
+        StateHasChanged();
+    }
+
+    private void RemoveSkill(string s)
+    {
+        _model.RequiredSkills.Remove(s);
+        StateHasChanged();
+    }
+
+    private async Task HandleSubmit()
+    {
+        await _form!.Validate();
+        if (!_form.IsValid) return;
+
+        if (!CurrentUser.IsAuthenticated)
+        {
+            Snackbar.Add("Usuário não autenticado. Recarregue a página ou faça login novamente.", Severity.Error);
+            return;
+        }
+
+        try
+        {
+            _busy = true;
+
+            // normaliza expiração para UTC
+            _model.ExpiresAtUtc = _expiresDate.HasValue
+                ? DateTime.SpecifyKind(_expiresDate.Value, DateTimeKind.Local).ToUniversalTime()
+                : null;
+
+            var enterpriseId = CurrentUser.UserTypeId;
+            if (enterpriseId is null)
+            {
+                Snackbar.Add("Empresa não identificada nas claims.", Severity.Warning);
+                return;
+            }
+
+            // update
+            var result = await EnterpriseService.UpdateAsync(enterpriseId.Value, id, _model);
+
+            if (result.Success)
+            {
+                Snackbar.Add("Vaga atualizada com sucesso!", Severity.Success);
+                Nav.NavigateTo("/empresa/home");
+            }
+            else
+            {
+                Snackbar.Add($"Falha ao atualizar vaga: {result.Error}", Severity.Error);
+            }
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+}
