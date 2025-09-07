@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PlataformaEstagios.Application.UseCases.Enterprise.GetVacancies;
 using PlataformaEstagios.Application.UseCases.Enterprise.UpdateVacancies;
 using PlataformaEstagios.Application.UseCases.Vacancy.Create;
+using PlataformaEstagios.Application.UseCases.Vacancy.GetVacancies;
 using PlataformaEstagios.Communication.Requests;
 using PlataformaEstagios.Communication.Responses;
 
@@ -23,6 +23,8 @@ namespace PlataformaEstagios.Api.Controllers
 
         [Authorize(Roles = "Enterprise")]
         [HttpGet("{enterpriseId:guid}/vacancies/{vacancyId:guid}")]
+        [ProducesResponseType(typeof(ResponseGetVacancyJson), 200)]
+        [ProducesResponseType(404)]
         public async Task<ActionResult<ResponseGetVacancyJson>> GetByIdAsync(Guid enterpriseId, Guid vacancyId,
             [FromServices] IGetVacanciesUseCase useCase, CancellationToken ct = default)
         {

@@ -138,7 +138,7 @@
                     <MudItem xs="12" sm="6" md="12">
                         <MudPaper Class="py-2 px-2">
                             <MudText Typo="Typo.overline">Vagas abertas</MudText>
-                            <MudText Typo="Typo.h5">@Stats.VagasAbertas</MudText>
+                            <MudText Typo="Typo.h5">@ActiveJobs.Count</MudText>
                         </MudPaper>
                     </MudItem>
                     <MudItem xs="12" sm="6" md="12">
@@ -226,15 +226,11 @@
     private Guid? _enterpriseId;
     private List<JobCompanyVm> ActiveJobs { get; set; } = new();
 
-    private bool _hydrated;     // garante que a hidratação rode uma única vez
-    private bool _loadingJobs;  // evita chamadas concorrentes
-
-    [CascadingParameter] private Task<AuthenticationState> AuthenticationStateTask { get; set; } = default!;
+    private bool _hydrated;     
+    private bool _loadingJobs; 
 
     protected override Task OnInitializedAsync()
     {
-        // ⚠️ Importante: NÃO tocar no ProtectedLocalStorage nem chamar CurrentUser.RefreshAsync aqui.
-        // Vamos carregar tudo no OnAfterRenderAsync(firstRender) quando o Auth já tiver sido restaurado pelo App/AuthInitializer.
         return Task.CompletedTask;
     }
 
@@ -243,14 +239,8 @@
         if (!_hydrated && firstRender)
         {
             _hydrated = true;
-
-            // hidrata token/claims do storage (JS interop permitido aqui)
             await CurrentUser.RefreshAsync();
-
-            // carrega as vagas
             await LoadJobsAsync();
-
-            // pede um render final; como _hydrated já é true, não reentra
             StateHasChanged();
         }
     }

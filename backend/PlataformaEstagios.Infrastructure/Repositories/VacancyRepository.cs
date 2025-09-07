@@ -15,13 +15,20 @@ namespace PlataformaEstagios.Infrastructure.Repositories
             await _context.Vacancies.AddAsync(entity, ct);
         }
 
-        // Infrastructure/Repositories/VacancyRepository.cs (exemplo LINQ)
         public async Task<IReadOnlyList<Domain.Entities.Vacancy>> GetActiveForEnterpriseAsync(
             Guid enterpriseId, CancellationToken ct = default)
         {
             return await _context.Vacancies
                 .Where(v => v.EnterpriseIdentifier == enterpriseId && v.IsActive)
-                .OrderByDescending(v => v.UpdatedAt) // ajuste seu critério
+                .OrderByDescending(v => v.UpdatedAt) 
+                .ToListAsync(ct);
+        }
+
+        public async Task<IReadOnlyList<Domain.Entities.Vacancy>> GetActiveForCandidateAsync(CancellationToken ct = default)
+        {
+            return await _context.Vacancies
+                .Where(v => v.IsActive)
+                .OrderByDescending(v => v.UpdatedAt) 
                 .ToListAsync(ct);
         }
 

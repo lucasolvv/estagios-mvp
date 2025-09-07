@@ -16,6 +16,14 @@ namespace PlataformaEstagios.Infrastructure.Repositories
         {
             await _dbcontext.Enterprises.AddAsync(enterprise);
         }
+
+        public async Task<string> GetEnterpriseNameByIdAsync(Guid enterpriseId)
+        {
+            return (await _dbcontext.Enterprises
+                .AsNoTracking()
+                .FirstOrDefaultAsync(e => e.EnterpriseIdentifier == enterpriseId)).EnterpriseName;
+        }
+
         public async Task<bool> ExistsAsync(Guid enterpriseId, CancellationToken ct)
         {
             return await _dbcontext.Enterprises

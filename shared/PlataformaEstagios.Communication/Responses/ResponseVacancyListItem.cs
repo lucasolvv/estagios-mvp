@@ -1,9 +1,12 @@
 ﻿namespace PlataformaEstagios.Communication.Responses
 {
-    public sealed record ResponseVacancyListItem(
-     Guid VacancyIdentifier,
-     string Title,
-     DateTime OpenedAt,
-     int Applicants,
-     string Status);
+    public class ResponseVacancyListItem
+    {
+        public Guid VacancyIdentifier { get; set; }
+        public string Title {get; set;}
+        public DateTime OpenedAt {get; set;}
+        public int Applicants {get; set;}
+        public string Status {get; set;}
+        public string? EnterpriseName {get; set;}
+    }
 }

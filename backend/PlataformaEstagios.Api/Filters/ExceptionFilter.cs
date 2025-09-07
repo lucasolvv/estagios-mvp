@@ -24,7 +24,7 @@ namespace PlataformaEstagios.Api.Filters
         private static void ThrowUnknowException(ExceptionContext context)
         {
             context.HttpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
-            context.Result = new ObjectResult(new ResponseErrorJson(context.Exception.InnerException.Message));
+            context.Result = new ObjectResult(new ResponseErrorJson(context.Exception.Message));
         }
 
     }

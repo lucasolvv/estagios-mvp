@@ -8,8 +8,8 @@ namespace PlataformaEstagio.Web.Components.Services.Enterprise
         public EnterpriseService(HttpClient http, IUserContext user)
             : base(http, user) { }
 
-        public Task<List<ResponseVacancyListItem>> GetActiveAsync(Guid enterpriseId)
-            => GetJsonAsync<List<ResponseVacancyListItem>>(
+        public async Task<List<ResponseVacancyListItem>> GetActiveAsync(Guid enterpriseId)
+            => await GetJsonAsync<List<ResponseVacancyListItem>>(
                 $"api/enterprises/{enterpriseId}/vacancies")!;
 
         public async Task<(bool Success, string? Error)> CreateAsync(Guid enterpriseId, RequestCreateVacancyJson dto, CancellationToken ct = default)

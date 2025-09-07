@@ -25,6 +25,7 @@ namespace PlataformaEstagios.Application.UseCases.Enterprise.UpdateVacancies
             if (vacancy == null) return false;
 
             _mapper.Map(request, vacancy);
+            vacancy.UpdatedAt = DateTime.UtcNow;
             await _repo.UpdateAsync(vacancy, ct);
             await _uow.Commit();
             return true;

@@ -59,7 +59,6 @@
                            Required="true">
                     @foreach (var a in Enum.GetValues<JobFunction>())
                     {
-                        if (a == JobFunction.TI) { continue; }
                         <MudSelectItem Value="a">@a</MudSelectItem>
                     }
                 </MudSelect>
@@ -91,7 +90,7 @@
                                T="DateTime?" />
 
                 <!-- Ativa -->
-                <MudSwitch T="bool" @bind-Checked="_model.IsActive" Color="Color.Success">Ativa</MudSwitch>
+                <MudSwitch T="bool" @bind-Value="_model.IsActive" Color="Color.Success">Ativa</MudSwitch>
 
                 <MudStack Row Spacing="2" Class="mt-3">
                     <MudButton ButtonType="ButtonType.Button"

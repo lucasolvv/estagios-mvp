@@ -1,7 +1,10 @@
 ﻿@page "/candidato/home"
 @using System.Security.Claims
+@using PlataformaEstagio.Web.Components.Services.Candidate
 @inject AuthenticationStateProvider AuthProvider
 @inject ISnackbar Snackbar
+@inject NavigationManager Nav
+@inject IUserContext CurrentUser
 
 <AuthorizeView Context="auth" Roles="Candidate">
     <MudContainer MaxWidth="MaxWidth.False" Class="px-6 py-4">
@@ -41,22 +44,22 @@
             <!-- Vagas recomendadas -->
             <MudCard Class="mb-4">
                 <MudCardHeader>
-                    <MudText Typo="Typo.h6">Vagas recomendadas</MudText>
+                    <MudText Typo="Typo.h6">Vagas recentes</MudText>
                 </MudCardHeader>
                 <MudCardContent>
-                    <MudTable Items="RecommendedJobs" Hover="true" Dense="true">
+                        <MudTable Items="ActiveJobs" Hover="true" Dense="true">
                         <HeaderContent>
                             <MudTh>Vaga</MudTh>
                             <MudTh>Empresa</MudTh>
-                            <MudTh>Carga</MudTh>
-                            <MudTh>Bolsa</MudTh>
+                            <MudTh>Data de publicação</MudTh>
+                            <MudTh>Status</MudTh>
                             <MudTh></MudTh>
                         </HeaderContent>
                         <RowTemplate >
                             <MudTd>@context.Titulo</MudTd>
-                            <MudTd>@context.Empresa</MudTd>
-                            <MudTd>@context.CargaHoraria</MudTd>
-                            <MudTd>@(context.Bolsa is null ? "-" : context.Bolsa.Value.ToString("C"))</MudTd>
+                            <MudTd>@context.EnterpriseName</MudTd>
+                            <MudTd>@context.DataAbertura</MudTd>
+                            <MudTd>@context.Status</MudTd>
                             <MudTd Class="text-right">
                                 <MudButton Size="Size.Small" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Send" OnClick="@(()=>Apply(context))">
                                     Candidatar-se
@@ -178,6 +181,102 @@
 
 
 @code {
+    @inject ICandidateService _service
+    
+    private bool _isLoading = true;
+    private Guid? _enterpriseId;
+    private List<RecentJobsVm> ActiveJobs { get; set; } = new();
+
+    private bool _hydrated;
+    private bool _loadingJobs;
+
+    protected override Task OnInitializedAsync()
+    {
+        return Task.CompletedTask;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!_hydrated && firstRender)
+        {
+            _hydrated = true;
+            await CurrentUser.RefreshAsync();
+            await LoadCandidateInfoAsync();
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadCandidateInfoAsync()
+    {
+        if (_loadingJobs) return;   // trava reentrada
+        _loadingJobs = true;
+        _isLoading = true;
+
+        try
+        {
+            if (CurrentUser.UserTypeId is Guid id)
+            {
+                var vagasRecentes = await _service.GetOpenVacanciesAsync();
+                ActiveJobs = vagasRecentes.Select(v => new RecentJobsVm(
+                    
+                    v.VacancyIdentifier,
+                    v.Title,
+                    v.OpenedAt.ToLocalTime(),
+                    v.Applicants,
+                    v.Status,
+                    v.EnterpriseName)).ToList();
+            }
+            else
+            {
+                Snackbar.Add("ID do candidato não encontrado nas claims.", Severity.Warning);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Falha ao carregar vagas: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _isLoading = false;
+            _loadingJobs = false;
+            // segura o render no fim do ciclo atual
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void OnIrParaPerfil()
+    {
+        Snackbar.Add("Ir para perfil (TODO)", Severity.Info);
+    }
+    private void OnBuscarvagas()
+    {
+        Snackbar.Add("Ir para perfil (TODO)", Severity.Info);
+    }
+    private void OnConfigurarAlertas()
+    {
+        Snackbar.Add("Ir para perfil (TODO)", Severity.Info);
+    }
+
+    private void Apply(RecentJobsVm job)
+    {
+        Snackbar.Add($"Inscrição enviada para \"{job.Titulo}\" (mock).", Severity.Success);
+        // TODO: chamar serviço real de candidatura
+    }
+
+    private Color StatusColor(string status) => status switch
+    {
+        "Aprovado" => Color.Success,
+        "Entrevista marcada" => Color.Info,
+        "Reprovado" => Color.Error,
+        _ => Color.Warning
+    };
+
+    // --- VMs simples (poderiam virar DTOs no projeto)
+    private record RecentJobsVm(Guid JobId, string Titulo, DateTime DataAbertura, int Inscritos, string Status, string EnterpriseName);
+    private record ApplicationVm(string Vaga, string Empresa, DateTime Data, string Status);
+    private record AppointmentVm(string Titulo, DateTime Data, string Local);
+    private record NotificationVm(string Texto, DateTime Data);
+
     private static string GetDisplayName(ClaimsPrincipal user)
         => user.FindFirst("nickname")?.Value
            ?? user.Identity?.Name
@@ -193,13 +292,13 @@
     private int CompletedHours = 48;
     private double HoursPercent => RequiredHours == 0 ? 0 : (CompletedHours * 100.0 / RequiredHours);
 
-    // --- dados mockados (substituir por serviços/repo)
-    private List<JobVm> RecommendedJobs = new()
-    {
-        new("Estágio Frontend (Blazor)", "Tech Corp", "20h/sem", 1200m),
-        new("Estágio QA", "Quality Labs", "30h/sem", 1500m),
-        new("Estágio Suporte TI", "HelpDesk BR", "30h/sem", null),
-    };
+    //--- dados mockados (substituir por serviços/repo)
+    // private List<JobVm> RecommendedJobs = new()
+    // {
+    //     new("Estágio Frontend (Blazor)", "Tech Corp", "20h/sem", 1200m),
+    //     new("Estágio QA", "Quality Labs", "30h/sem", 1500m),
+    //     new("Estágio Suporte TI", "HelpDesk BR", "30h/sem", null),
+    // };
 
     private List<ApplicationVm> RecentApplications = new()
     {
@@ -217,70 +316,4 @@
         new("Sua inscrição na Tech Corp mudou para 'Em análise'", DateTime.Today.AddHours(-5)),
         new("Nova vaga de Blazor publicada pela DevHouse", DateTime.Today.AddDays(-1))
     };
-
-    [CascadingParameter] private Task<AuthenticationState> AuthenticationStateTask { get; set; } = default!;
-
-    protected override async Task OnInitializedAsync()
-    {
-        _ = LoadUserAsync();
-
-        AuthProvider.AuthenticationStateChanged += OnAuthChanged;
-    }
-
-    private async void OnAuthChanged(Task<AuthenticationState> task)
-    {
-        await LoadUserAsync(task);
-        StateHasChanged();
-    }
-    private async Task LoadUserAsync(Task<AuthenticationState>? stateTask = null)
-    {
-        var state = stateTask is null ? await AuthProvider.GetAuthenticationStateAsync()
-                                      : await stateTask;
-        var user = state.User;
-
-        var name = user.FindFirst(ClaimTypes.Name)?.Value
-               ?? user.FindFirst("name")?.Value
-               ?? user.Identity?.Name;
-
-        if (!string.IsNullOrWhiteSpace(name))
-            FirstName = name.Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? name;
-    }
-
-    public void Dispose()
-    {
-        AuthProvider.AuthenticationStateChanged -= OnAuthChanged;
-    }
-
-    private void OnIrParaPerfil()
-    {
-        Snackbar.Add("Ir para perfil (TODO)", Severity.Info);
-    }
-    private void OnBuscarvagas()
-    {
-        Snackbar.Add("Ir para perfil (TODO)", Severity.Info);
-    }
-    private void OnConfigurarAlertas()
-    {
-        Snackbar.Add("Ir para perfil (TODO)", Severity.Info);
-    }
-
-    private void Apply(JobVm job)
-    {
-        Snackbar.Add($"Inscrição enviada para \"{job.Titulo}\" (mock).", Severity.Success);
-        // TODO: chamar serviço real de candidatura
-    }
-
-    private Color StatusColor(string status) => status switch
-    {
-        "Aprovado" => Color.Success,
-        "Entrevista marcada" => Color.Info,
-        "Reprovado" => Color.Error,
-        _ => Color.Warning
-    };
-
-    // --- VMs simples (poderiam virar DTOs no projeto)
-    private record JobVm(string Titulo, string Empresa, string CargaHoraria, decimal? Bolsa);
-    private record ApplicationVm(string Vaga, string Empresa, DateTime Data, string Status);
-    private record AppointmentVm(string Titulo, DateTime Data, string Local);
-    private record NotificationVm(string Texto, DateTime Data);
 }

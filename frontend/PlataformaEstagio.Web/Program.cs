@@ -4,6 +4,7 @@ using MudBlazor.Services;
 using PlataformaEstagio.Web.Components;
 using PlataformaEstagio.Web.Components.Services;
 using PlataformaEstagio.Web.Components.Services.Auth;
+using PlataformaEstagio.Web.Components.Services.Candidate;
 using PlataformaEstagio.Web.Components.Services.Enterprise;
 using PlataformaEstagios.Web.Services.Auth; // onde ficará o IUserServices/UserServices
 
@@ -54,6 +55,7 @@ builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthenticationStatePr
 builder.Services.AddHttpClient<IAuthService, AuthService>("BackendRaw");
 builder.Services.AddHttpClient<IUserServices, UserServices>("Backend");
 builder.Services.AddHttpClient<IEnterpriseService, EnterpriseService>("Backend");
+builder.Services.AddHttpClient<ICandidateService, CandidateService>("Backend");
 
 
 var app = builder.Build();
