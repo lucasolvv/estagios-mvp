@@ -16,34 +16,36 @@ namespace PlataformaEstagios.Application.UseCases.Vacancy.GetVacancies
             _mapper = mapper;
             _enterpriseRepo = enterpriseReadOnlyRepository;
         }
-        public async Task<IReadOnlyList<Communication.Responses.ResponseVacancyListItem>> ExecuteAsync(Guid enterpriseId, CancellationToken ct)
+        public async Task<IReadOnlyList<ResponseVacancyListItem>> ExecuteAsync(Guid enterpriseId, CancellationToken ct)
         {
             var jobs = await _repo.GetActiveForEnterpriseAsync(enterpriseId, ct);
-            return _mapper.Map<IReadOnlyList<Communication.Responses.ResponseVacancyListItem>>(jobs);
+            return _mapper.Map<IReadOnlyList<ResponseVacancyListItem>>(jobs);
         }
 
-        public async Task<IReadOnlyList<Communication.Responses.ResponseVacancyListItem>> ExecuteAsync(CancellationToken ct)
+        public async Task<IReadOnlyList<ResponseVacancyListItem>> ExecuteAsync(CancellationToken ct)
         {
             var jobs = await _repo.GetActiveForCandidateAsync(ct);
 
-            var enterpriseIds = jobs.Select(j => j.EnterpriseIdentifier).Distinct().ToList();
-            var enterprises = await _enterpriseRepo.GetNamesByIdsAsync(enterpriseIds, ct);
-            // retorne algo como IEnumerable<(Guid Id, string Name)>
+            var mappedJobs = _mapper.Map<List<ResponseVacancyListItem>>(jobs);
 
-            var nameById = enterprises.ToDictionary(e => e.Id, e => e.Name);
+            // índice por Id para achar em O(1) em vez de varrer toda a lista
+            var idx = mappedJobs.ToDictionary(x => x.VacancyIdentifier);
 
-            var mapped = _mapper.Map<List<ResponseVacancyListItem>>(jobs);
-            foreach (var item in mapped)
-                if (nameById.TryGetValue(item.EnterpriseIdentifier, out var name))
-                    item.EnterpriseName = name;
+            foreach (var job in jobs)
+            {
+                var enterprise = await _enterpriseRepo.GetEnterpriseNameByIdAsync(job.EnterpriseIdentifier /*, ct?*/);
+                if (enterprise != null && idx.TryGetValue(job.VacancyIdentifier, out var dto))
+                    dto.EnterpriseName = enterprise;
+            }
 
-            return mapped;
+            return mappedJobs;
         }
 
-        public async Task<Communication.Responses.ResponseGetVacancyJson> GetByIdAsync(Guid enterpriseId, Guid vacancyId, CancellationToken ct)
+
+        public async Task<ResponseGetVacancyJson> GetByIdAsync(Guid enterpriseId, Guid vacancyId, CancellationToken ct)
         {
             var job = await _repo.GetByIdForEnterpriseAsync(enterpriseId, vacancyId, ct);
-            return _mapper.Map<Communication.Responses.ResponseGetVacancyJson>(job);
+            return _mapper.Map<ResponseGetVacancyJson>(job);
         }
     }
 }

@@ -6,7 +6,7 @@ using PlataformaEstagio.Web.Components.Services;
 using PlataformaEstagio.Web.Components.Services.Auth;
 using PlataformaEstagio.Web.Components.Services.Candidate;
 using PlataformaEstagio.Web.Components.Services.Enterprise;
-using PlataformaEstagios.Web.Services.Auth; // onde ficará o IUserServices/UserServices
+using PlataformaEstagios.Web.Services.Auth;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,7 +14,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Razor + Blazor interativo no servidor
 builder.Services.AddRazorComponents()
      .AddInteractiveServerComponents(options => options.DetailedErrors = true);
-    //.AddInteractiveServerComponents();
 
 // MudBlazor (Snackbar, Dialog, etc.)
 builder.Services.AddMudServices();
@@ -28,7 +27,6 @@ builder.Services.AddHttpClient("Backend", (sp, c) =>
     var cfg = sp.GetRequiredService<IConfiguration>();
     c.BaseAddress = new Uri(cfg["Backend:BaseUrl"] ?? "https://localhost:7095/");
 });
-//.AddHttpMessageHandler(sp => new TokenHandler(sp.GetRequiredService<IUserContext>()));
 
 
 builder.Services.AddHttpClient("BackendRaw", (sp, c) =>
@@ -42,8 +40,6 @@ builder.Services.AddAuthorizationCore(o =>
     o.AddPolicy("IsEnterprise", p => p.RequireRole("Enterprise"));
     o.AddPolicy("IsCandidate", p => p.RequireRole("Candidate"));
 });
-
-//builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("Backend"));
 
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<ProtectedLocalStorage>();
@@ -68,9 +64,8 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-//app.UseStatusCodePagesWithReExecute("/not-found"); // middleware de reexecução para 404
 app.UseAntiforgery();
-app.MapRazorComponents<App>()          // seu componente raiz
-   .AddInteractiveServerRenderMode();   // interativo no servidor
+app.MapRazorComponents<App>()  
+   .AddInteractiveServerRenderMode();
 
 app.Run();

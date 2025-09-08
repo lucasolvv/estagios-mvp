@@ -46,31 +46,40 @@
                 <MudCardHeader>
                     <MudText Typo="Typo.h6">Vagas recentes</MudText>
                 </MudCardHeader>
-                <MudCardContent>
-                        <MudTable Items="ActiveJobs" Hover="true" Dense="true">
-                        <HeaderContent>
-                            <MudTh>Vaga</MudTh>
-                            <MudTh>Empresa</MudTh>
-                            <MudTh>Data de publicação</MudTh>
-                            <MudTh>Status</MudTh>
-                            <MudTh></MudTh>
-                        </HeaderContent>
-                        <RowTemplate >
-                            <MudTd>@context.Titulo</MudTd>
-                            <MudTd>@context.EnterpriseName</MudTd>
-                            <MudTd>@context.DataAbertura</MudTd>
-                            <MudTd>@context.Status</MudTd>
-                            <MudTd Class="text-right">
-                                <MudButton Size="Size.Small" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Send" OnClick="@(()=>Apply(context))">
-                                    Candidatar-se
-                                </MudButton>
-                            </MudTd>
-                        </RowTemplate>
-                        <NoRecordsContent>
-                            <MudText Nenhum registro encontrado.></MudText>
-                        </NoRecordsContent>
-                    </MudTable>
-                </MudCardContent>
+                    @if (_isLoading)
+                    {
+                        <MudProgressLinear Indeterminate="true" Class="mb-2" />
+                        <MudText Color="Color.Secondary">Carregando vagas...</MudText>
+                    }
+                    else
+                    {
+                        <MudCardContent>
+                            <MudTable Items="ActiveJobs" Hover="true" Dense="true">
+                                <HeaderContent>
+                                    <MudTh>Vaga</MudTh>
+                                    <MudTh>Empresa</MudTh>
+                                    <MudTh>Data de publicação</MudTh>
+                                    <MudTh>Status</MudTh>
+                                    <MudTh></MudTh>
+                                </HeaderContent>
+                                <RowTemplate>
+                                    <MudTd>@context.Titulo</MudTd>
+                                    <MudTd>@context.EnterpriseName</MudTd>
+                                    <MudTd>@context.DataAbertura</MudTd>
+                                    <MudTd>@context.Status</MudTd>
+                                    <MudTd Class="text-right">
+                                        <MudButton Size="Size.Small" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Send" OnClick="@(() => Apply(context))">
+                                            Candidatar-se
+                                        </MudButton>
+                                    </MudTd>
+                                </RowTemplate>
+                                <NoRecordsContent>
+                                    <MudText Nenhum registro encontrado.></MudText>
+                                </NoRecordsContent>
+                            </MudTable>
+                        </MudCardContent>
+                    }
+                   
             </MudCard>
 
             <!-- Minhas inscrições recentes -->
@@ -259,8 +268,7 @@
 
     private void Apply(RecentJobsVm job)
     {
-        Snackbar.Add($"Inscrição enviada para \"{job.Titulo}\" (mock).", Severity.Success);
-        // TODO: chamar serviço real de candidatura
+        Nav.NavigateTo($"/candidato/vagas/{job.JobId}/aplicar");
     }
 
     private Color StatusColor(string status) => status switch

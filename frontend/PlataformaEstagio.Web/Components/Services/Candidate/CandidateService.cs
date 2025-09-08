@@ -1,4 +1,5 @@
-﻿using PlataformaEstagios.Communication.Responses;
+﻿using PlataformaEstagios.Communication.Requests;
+using PlataformaEstagios.Communication.Responses;
 
 namespace PlataformaEstagio.Web.Components.Services.Candidate
 {
@@ -10,7 +11,19 @@ namespace PlataformaEstagio.Web.Components.Services.Candidate
         public async Task<IReadOnlyList<ResponseVacancyListItem>> GetOpenVacanciesAsync() => await GetJsonAsync<List<ResponseVacancyListItem>>(
             "api/candidate/open-vacancies")!;
 
-        //public async Task<ResponseGetVacancyJson> GetVacancyByIdAsync(Guid vacancyId, CancellationToken ct) => await GetJsonAsync<ResponseGetVacancyJson>(
+        public async Task<ResponseGetVacancyToApplicationJson> GetVacancyByIdAsync(Guid vacancyId, CancellationToken ct = default)
+            => await GetJsonAsync<ResponseGetVacancyToApplicationJson>($"api/candidate/vacancies/{vacancyId}", ct)!;
+
+        public async Task ApplyToVacancyAsync(RequestCreateApplicationJson request, CancellationToken ct = default)
+        {
+            using var req = new HttpRequestMessage(HttpMethod.Post, "api/candidate/applications")
+            {
+                Content = JsonContent.Create(request)
+            };
+
+            var resp = await SendAsync(req, ct);
+            resp.EnsureSuccessStatusCode();
+        }
 
     }
 }

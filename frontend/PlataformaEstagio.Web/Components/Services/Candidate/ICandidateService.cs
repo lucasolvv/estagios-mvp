@@ -1,8 +1,12 @@
-﻿namespace PlataformaEstagio.Web.Components.Services.Candidate
+﻿using PlataformaEstagios.Communication.Requests;
+using PlataformaEstagios.Communication.Responses;
+
+namespace PlataformaEstagio.Web.Components.Services.Candidate
 {
     public interface ICandidateService
     {
-        Task<IReadOnlyList<PlataformaEstagios.Communication.Responses.ResponseVacancyListItem>> GetOpenVacanciesAsync();
-        //Task<PlataformaEstagios.Communication.Responses.ResponseGetVacancyJson> GetVacancyByIdAsync(Guid vacancyId, CancellationToken ct);
+        Task<IReadOnlyList<ResponseVacancyListItem>> GetOpenVacanciesAsync();
+        Task<ResponseGetVacancyToApplicationJson> GetVacancyByIdAsync(Guid vacancyId, CancellationToken ct = default);
+        Task ApplyToVacancyAsync(RequestCreateApplicationJson request, CancellationToken ct = default);
     }
 }

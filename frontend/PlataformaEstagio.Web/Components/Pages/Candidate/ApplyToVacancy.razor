@@ -1,0 +1,201 @@
+﻿@page "/candidato/vagas/{VacancyId:guid}/aplicar"
+@using PlataformaEstagio.Web.Components.Services.Candidate
+@using PlataformaEstagios.Communication.Requests
+@using PlataformaEstagios.Communication.Responses
+@using PlataformaEstagios.Domain.Enums
+@inject ICandidateService CandidateService
+@inject IUserContext CurrentUser
+@inject ISnackbar Snackbar
+@inject NavigationManager Nav
+@inject IDialogService DialogService
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="px-6 py-4">
+    <MudPaper Class="px-4 py-4">
+
+        <MudText Typo="Typo.h5" Color="Color.Secondary" Class="mb-3">
+            Detalhes da vaga
+        </MudText>
+
+        @if (!_loaded)
+        {
+            <MudStack AlignItems="AlignItems.Center" Class="py-6">
+                <MudProgressCircular Indeterminate="true" />
+                <MudText Color="Color.Secondary">Carregando vaga...</MudText>
+            </MudStack>
+        }
+        else if (_vacancy is null)
+        {
+            <MudAlert Severity="Severity.Error">Vaga não encontrada.</MudAlert>
+        }
+        else
+        {
+            <MudCard Class="mb-3">
+                <MudCardContent>
+                    <MudStack Spacing="1">
+                        <MudText Typo="Typo.h6">@_vacancy.Title</MudText>
+                        <MudText Typo="Typo.subtitle2" Color="Color.Secondary">
+                            @(_vacancy.EnterpriseName ?? "Empresa não informada")
+                        </MudText>
+
+                        <MudDivider Class="my-2" />
+
+                        <MudStack Row="true" Spacing="2">
+                            <MudChip Variant="Variant.Outlined" T="string">
+                                @( _vacancy.JobFunction.ToString() ?? "Função não informada" )
+                            </MudChip>
+                            <MudChip Variant="Variant.Outlined" T="string">
+                                @(_vacancy.Location ?? "Local não informado")
+                            </MudChip>
+                        </MudStack>
+
+
+                        @if (!string.IsNullOrWhiteSpace(_vacancy.Description))
+                        {
+                            <MudText Class="mt-3">@_vacancy.Description</MudText>
+                        }
+
+                        @if (_vacancy.RequiredSkills is { Count: > 0 })
+                        {
+                            <MudText Class="mt-3" Typo="Typo.subtitle2">Habilidades desejadas</MudText>
+                            <MudChipSet T="string" Class="mb-2">
+                                @foreach (var s in _vacancy.RequiredSkills)
+                                {
+                                    <MudChip T="string" Variant="Variant.Outlined">@s</MudChip>
+                                }
+                            </MudChipSet>
+                        }
+
+                        <MudStack Row="true" Spacing="2" Class="mt-2">
+                            <MudText Typo="Typo.caption">
+                                <b>Abertura:</b> @_vacancy.OpenedAt.ToLocalTime().ToString("dd/MM/yyyy")
+                            </MudText>
+                            @if (_vacancy.ExpiresAtUtc is DateTime exp)
+                            {
+                                <MudText Typo="Typo.caption">
+                                    <b>Expira:</b> @exp.ToLocalTime().ToString("dd/MM/yyyy")
+                                </MudText>
+                            }
+                            <MudText Typo="Typo.caption">
+                                <b>Candidatos:</b> @_vacancy.ApplicantsCount
+                            </MudText>
+                        </MudStack>
+                    </MudStack>
+                </MudCardContent>
+            </MudCard>
+
+            <MudStack Row Spacing="2">
+                <MudButton Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.HowToReg"
+                           Disabled="@_busy"
+                           OnClick="ConfirmAndApplyAsync">
+                    @(_busy ? "Enviando..." : "Inscrever-se")
+                </MudButton>
+
+                <MudButton Variant="Variant.Text" Disabled="@_busy" OnClick="@(() => Nav.NavigateTo("/candidato"))">
+                    Voltar
+                </MudButton>
+            </MudStack>
+        }
+    </MudPaper>
+</MudContainer>
+
+@code {
+    [Parameter] public Guid VacancyId { get; set; }
+
+    private bool _busy;
+    private bool _loaded;
+    private bool _hydrated;
+
+    private ResponseGetVacancyToApplicationJson? _vacancy; // DTO de leitura com detalhes da vaga
+    private readonly RequestCreateApplicationJson _model = new(); // DTO de criação da inscrição
+
+    protected override Task OnInitializedAsync() => Task.CompletedTask;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!_hydrated && firstRender)
+        {
+            _hydrated = true;
+
+            await CurrentUser.RefreshAsync(); // hidrata JWT/claims
+
+            if (!CurrentUser.IsAuthenticated)
+            {
+                Snackbar.Add("Usuário não autenticado. Faça login novamente.", Severity.Error);
+                Nav.NavigateTo("/login", forceLoad: true);
+                return;
+            }
+
+            await LoadVacancyAsync();
+            _loaded = true;
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadVacancyAsync()
+    {
+        try
+        {
+            _vacancy = await CandidateService.GetVacancyByIdAsync(VacancyId);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Falha ao carregar vaga: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task ConfirmAndApplyAsync()
+    {
+        // Dialog de confirmação (MudBlazor)
+        bool? confirmed = await DialogService.ShowMessageBox(
+            title: "Confirmar inscrição",
+            markupMessage: (MarkupString)$"Deseja se inscrever na vaga <b>{_vacancy?.Title}</b>?",
+            yesText: "Confirmar",
+            cancelText: "Cancelar",
+            options: new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.ExtraSmall });
+
+        if (confirmed is true)
+        {
+            await ApplyAsync();
+        }
+    }
+
+    private async Task ApplyAsync()
+    {
+        if (_busy) return;
+
+        if (CurrentUser.UserTypeId is not Guid candidateId)
+        {
+            Snackbar.Add("ID do candidato não encontrado nas claims.", Severity.Warning);
+            return;
+        }
+
+        if (VacancyId == Guid.Empty)
+        {
+            Snackbar.Add("Vaga inválida.", Severity.Warning);
+            return;
+        }
+
+        try
+        {
+            _busy = true;
+
+            _model.CandidateIdentifier = candidateId;
+            _model.VacancyId = VacancyId;
+
+            await CandidateService.ApplyToVacancyAsync(_model);
+
+            Snackbar.Add("Inscrição realizada com sucesso!", Severity.Success);
+            Nav.NavigateTo("/candidato");
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Falha ao enviar inscrição: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+}
