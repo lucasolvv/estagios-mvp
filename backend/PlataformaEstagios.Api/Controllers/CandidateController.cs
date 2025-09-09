@@ -17,5 +17,16 @@ namespace PlataformaEstagios.Api.Controllers
             var data = await useCase.ExecuteAsync(ct);
             return Ok(data);
         }
+
+        [Authorize(Roles = "Candidate")]
+        [HttpGet("vacancies/{vacancyId:guid}")]
+        [ProducesResponseType(typeof(ResponseGetVacancyJson), 200)]
+        [ProducesResponseType(404)]
+        public async Task<ActionResult<ResponseGetVacancyJson>> GetByIdAsync(Guid vacancyId,
+    [FromServices] IGetVacanciesUseCase useCase, CancellationToken ct = default)
+        {
+            var data = await useCase.GetByIdForCandidateAsync(vacancyId, ct);
+            return Ok(data);
+        }
     }
 }

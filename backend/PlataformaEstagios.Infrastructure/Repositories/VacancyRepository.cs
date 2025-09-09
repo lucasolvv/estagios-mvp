@@ -40,6 +40,13 @@ namespace PlataformaEstagios.Infrastructure.Repositories
                                        && v.VacancyIdentifier == vacancyId, ct);
         }
 
+        public async Task<Domain.Entities.Vacancy?> GetByIdForCandidateAsync(
+            Guid vacancyId, CancellationToken ct = default)
+        {
+            return await _context.Vacancies
+                .FirstOrDefaultAsync(v => v.VacancyIdentifier == vacancyId && v.IsActive, ct);
+        }
+
         public async Task UpdateAsync(Domain.Entities.Vacancy entity, CancellationToken ct)
         {
             _context.Vacancies.Update(entity);

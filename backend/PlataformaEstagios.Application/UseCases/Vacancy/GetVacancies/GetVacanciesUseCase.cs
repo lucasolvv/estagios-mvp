@@ -42,10 +42,24 @@ namespace PlataformaEstagios.Application.UseCases.Vacancy.GetVacancies
         }
 
 
-        public async Task<ResponseGetVacancyJson> GetByIdAsync(Guid enterpriseId, Guid vacancyId, CancellationToken ct)
+        public async Task<ResponseGetVacancyJson> GetByIdForEnterpriseAsync(Guid enterpriseId, Guid vacancyId, CancellationToken ct)
         {
             var job = await _repo.GetByIdForEnterpriseAsync(enterpriseId, vacancyId, ct);
             return _mapper.Map<ResponseGetVacancyJson>(job);
+        }
+
+        public async Task<ResponseGetVacancyToApplicationJson> GetByIdForCandidateAsync(Guid vacancyId, CancellationToken ct)
+        {
+            var job = await _repo.GetByIdForCandidateAsync(vacancyId, ct);
+            var mappedJob = _mapper.Map<ResponseGetVacancyToApplicationJson>(job);
+
+            if (job != null)
+            {
+                var enterprise = await _enterpriseRepo.GetEnterpriseNameByIdAsync(job.EnterpriseIdentifier);
+                mappedJob.EnterpriseName = enterprise;
+            }
+
+            return mappedJob;
         }
     }
 }

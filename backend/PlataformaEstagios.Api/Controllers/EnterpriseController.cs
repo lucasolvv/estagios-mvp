@@ -28,7 +28,7 @@ namespace PlataformaEstagios.Api.Controllers
         public async Task<ActionResult<ResponseGetVacancyJson>> GetByIdAsync(Guid enterpriseId, Guid vacancyId,
             [FromServices] IGetVacanciesUseCase useCase, CancellationToken ct = default)
         {
-            var data = await useCase.GetByIdAsync(enterpriseId, vacancyId, ct);
+            var data = await useCase.GetByIdForEnterpriseAsync(enterpriseId, vacancyId, ct);
             return Ok(data);
         }
 

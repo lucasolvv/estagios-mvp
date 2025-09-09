@@ -140,6 +140,20 @@ namespace PlataformaEstagios.Application.Services.AutoMapper
                 .ForMember(d => d.ExpiresAtUtc, o => o.MapFrom(s => s.ExpiresAtUtc))
                 .ForMember(d => d.IsActive, o => o.MapFrom(s => s.IsActive));
 
+            CreateMap<Vacancy, ResponseGetVacancyToApplicationJson>()
+                .ForMember(destinationMember => destinationMember.VacancyIdentifier, opt => opt.MapFrom(src => src.VacancyIdentifier))
+                .ForMember(destinationMember => destinationMember.Title, opt => opt.MapFrom(src => src.Title ?? string.Empty))
+                .ForMember(destinationMember => destinationMember.Description, opt => opt.MapFrom(src => src.Description))
+                .ForMember(destinationMember => destinationMember.Location, opt => opt.MapFrom(src => src.Location))
+                .ForMember(destinationMember => destinationMember.JobFunction, opt => opt.MapFrom(src => src.JobFunction))
+                .ForMember(destinationMember => destinationMember.RequiredSkills, opt => opt.MapFrom(src =>
+                    string.IsNullOrWhiteSpace(src.RequiredSkillsCsv)
+                        ? new List<string>()
+                        : src.RequiredSkillsCsv.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList()))
+                .ForMember(destinationMember => destinationMember.OpenedAt, opt => opt.MapFrom(src => src.PublishedAtUtc))
+                .ForMember(destinationMember => destinationMember.ExpiresAtUtc, opt => opt.MapFrom(src => src.ExpiresAtUtc));
+
+
         }
     }
 }
