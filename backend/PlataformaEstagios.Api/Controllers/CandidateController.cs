@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PlataformaEstagios.Application.UseCases.Vacancy.GetVacancies;
+using PlataformaEstagios.Application.UseCases.Vacancy.Get;
 using PlataformaEstagios.Communication.Responses;
 
 namespace PlataformaEstagios.Api.Controllers
@@ -11,21 +11,21 @@ namespace PlataformaEstagios.Api.Controllers
     {
         [Authorize(Roles = "Candidate")]
         [HttpGet("open-vacancies")]
-        public async Task<ActionResult<IReadOnlyList<ResponseVacancyListItem>>> GetActive([FromServices] IGetVacanciesUseCase useCase,
+        public async Task<ActionResult<IReadOnlyList<ResponseVacancyListItem>>> GetAllActiveVacancies([FromServices] IGetVacanciesUseCase useCase,
      CancellationToken ct = default)
         {
-            var data = await useCase.ExecuteAsync(ct);
+            var data = await useCase.GetAllActiveVacanciesForCandidateAsync(ct);
             return Ok(data);
         }
 
         [Authorize(Roles = "Candidate")]
         [HttpGet("vacancies/{vacancyId:guid}")]
-        [ProducesResponseType(typeof(ResponseGetVacancyJson), 200)]
+        [ProducesResponseType(typeof(ResponseGetVacancyToApplicationJson), 200)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult<ResponseGetVacancyJson>> GetByIdAsync(Guid vacancyId,
+        public async Task<ActionResult<ResponseGetVacancyToApplicationJson>> GetVacancyById(Guid vacancyId,
     [FromServices] IGetVacanciesUseCase useCase, CancellationToken ct = default)
         {
-            var data = await useCase.GetByIdForCandidateAsync(vacancyId, ct);
+            var data = await useCase.GetVacancyByIdForCandidateAsync(vacancyId, ct);
             return Ok(data);
         }
     }

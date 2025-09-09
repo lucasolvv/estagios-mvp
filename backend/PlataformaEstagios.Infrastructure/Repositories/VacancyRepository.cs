@@ -10,12 +10,12 @@ namespace PlataformaEstagios.Infrastructure.Repositories
         {
             _context = context;
         }
-        public async Task AddAsync(Domain.Entities.Vacancy entity, CancellationToken ct)
+        public async Task AddVacancyAsync(Domain.Entities.Vacancy entity, CancellationToken ct)
         {
             await _context.Vacancies.AddAsync(entity, ct);
         }
 
-        public async Task<IReadOnlyList<Domain.Entities.Vacancy>> GetActiveForEnterpriseAsync(
+        public async Task<IReadOnlyList<Domain.Entities.Vacancy>> GetActiveVacanciesForEnterpriseAsync(
             Guid enterpriseId, CancellationToken ct = default)
         {
             return await _context.Vacancies
@@ -24,7 +24,7 @@ namespace PlataformaEstagios.Infrastructure.Repositories
                 .ToListAsync(ct);
         }
 
-        public async Task<IReadOnlyList<Domain.Entities.Vacancy>> GetActiveForCandidateAsync(CancellationToken ct = default)
+        public async Task<IReadOnlyList<Domain.Entities.Vacancy>> GetActiveVacanciesForCandidateAsync(CancellationToken ct = default)
         {
             return await _context.Vacancies
                 .Where(v => v.IsActive)
@@ -32,7 +32,7 @@ namespace PlataformaEstagios.Infrastructure.Repositories
                 .ToListAsync(ct);
         }
 
-        public async Task<Domain.Entities.Vacancy?> GetByIdForEnterpriseAsync(
+        public async Task<Domain.Entities.Vacancy?> GetVacancyByIdForEnterpriseAsync(
             Guid enterpriseId, Guid vacancyId, CancellationToken ct = default)
         {
             return await _context.Vacancies
@@ -40,14 +40,14 @@ namespace PlataformaEstagios.Infrastructure.Repositories
                                        && v.VacancyIdentifier == vacancyId, ct);
         }
 
-        public async Task<Domain.Entities.Vacancy?> GetByIdForCandidateAsync(
+        public async Task<Domain.Entities.Vacancy?> GetVacancyByIdForCandidateAsync(
             Guid vacancyId, CancellationToken ct = default)
         {
             return await _context.Vacancies
                 .FirstOrDefaultAsync(v => v.VacancyIdentifier == vacancyId && v.IsActive, ct);
         }
 
-        public async Task UpdateAsync(Domain.Entities.Vacancy entity, CancellationToken ct)
+        public async Task UpdateVacancyAsync(Domain.Entities.Vacancy entity, CancellationToken ct)
         {
             _context.Vacancies.Update(entity);
             await Task.CompletedTask;

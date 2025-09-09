@@ -3,7 +3,7 @@ using PlataformaEstagios.Communication.Responses;
 using PlataformaEstagios.Domain.Repositories.Enterprise;
 using PlataformaEstagios.Domain.Repositories.Vacancy;
 
-namespace PlataformaEstagios.Application.UseCases.Vacancy.GetVacancies
+namespace PlataformaEstagios.Application.UseCases.Vacancy.Get
 {
     public class GetVacanciesUseCase : IGetVacanciesUseCase
     {
@@ -16,15 +16,15 @@ namespace PlataformaEstagios.Application.UseCases.Vacancy.GetVacancies
             _mapper = mapper;
             _enterpriseRepo = enterpriseReadOnlyRepository;
         }
-        public async Task<IReadOnlyList<ResponseVacancyListItem>> ExecuteAsync(Guid enterpriseId, CancellationToken ct)
+        public async Task<IReadOnlyList<ResponseVacancyListItem>> GetAllActiveVacanciesForEnterpriseAsync(Guid enterpriseId, CancellationToken ct)
         {
-            var jobs = await _repo.GetActiveForEnterpriseAsync(enterpriseId, ct);
+            var jobs = await _repo.GetActiveVacanciesForEnterpriseAsync(enterpriseId, ct);
             return _mapper.Map<IReadOnlyList<ResponseVacancyListItem>>(jobs);
         }
 
-        public async Task<IReadOnlyList<ResponseVacancyListItem>> ExecuteAsync(CancellationToken ct)
+        public async Task<IReadOnlyList<ResponseVacancyListItem>> GetAllActiveVacanciesForCandidateAsync(CancellationToken ct)
         {
-            var jobs = await _repo.GetActiveForCandidateAsync(ct);
+            var jobs = await _repo.GetActiveVacanciesForCandidateAsync(ct);
 
             var mappedJobs = _mapper.Map<List<ResponseVacancyListItem>>(jobs);
 
@@ -41,16 +41,15 @@ namespace PlataformaEstagios.Application.UseCases.Vacancy.GetVacancies
             return mappedJobs;
         }
 
-
-        public async Task<ResponseGetVacancyJson> GetByIdForEnterpriseAsync(Guid enterpriseId, Guid vacancyId, CancellationToken ct)
+        public async Task<ResponseGetVacancyJson> GetVacancyByIdForEnterpriseAsync(Guid enterpriseId, Guid vacancyId, CancellationToken ct)
         {
-            var job = await _repo.GetByIdForEnterpriseAsync(enterpriseId, vacancyId, ct);
+            var job = await _repo.GetVacancyByIdForEnterpriseAsync(enterpriseId, vacancyId, ct);
             return _mapper.Map<ResponseGetVacancyJson>(job);
         }
 
-        public async Task<ResponseGetVacancyToApplicationJson> GetByIdForCandidateAsync(Guid vacancyId, CancellationToken ct)
+        public async Task<ResponseGetVacancyToApplicationJson> GetVacancyByIdForCandidateAsync(Guid vacancyId, CancellationToken ct)
         {
-            var job = await _repo.GetByIdForCandidateAsync(vacancyId, ct);
+            var job = await _repo.GetVacancyByIdForCandidateAsync(vacancyId, ct);
             var mappedJob = _mapper.Map<ResponseGetVacancyToApplicationJson>(job);
 
             if (job != null)

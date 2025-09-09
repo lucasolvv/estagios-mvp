@@ -50,7 +50,7 @@ namespace PlataformaEstagios.Application.UseCases.Vacancy.Create
                 .Where(s => !string.IsNullOrWhiteSpace(s))
                 .Select(s => s.Trim()));
 
-            await _vacancyRepo.AddAsync(entity, ct);
+            await _vacancyRepo.AddVacancyAsync(entity, ct);
             await _uow.Commit();
 
             return _mapper.Map<ResponseCreateVacancyJson>(entity);

@@ -2,7 +2,7 @@
 using PlataformaEstagios.Domain.Repositories;
 using PlataformaEstagios.Domain.Repositories.Vacancy;
 
-namespace PlataformaEstagios.Application.UseCases.Enterprise.UpdateVacancies
+namespace PlataformaEstagios.Application.UseCases.Vacancy.Update 
 {
     public class UpdateVacancyUseCase : IUpdateVacancyUseCase
     {
@@ -19,14 +19,14 @@ namespace PlataformaEstagios.Application.UseCases.Enterprise.UpdateVacancies
             _uow = unitOfWork;
         }
 
-        public async Task<bool> ExecuteAsync(Guid enterpriseId, Guid vacancyId, Communication.Requests.RequestUpdateVacancyJson request, CancellationToken ct)
+        public async Task<bool> UpdateVacancyAsync(Guid enterpriseId, Guid vacancyId, Communication.Requests.RequestUpdateVacancyJson request, CancellationToken ct)
         {
-            var vacancy = await _readRepo.GetByIdForEnterpriseAsync(enterpriseId, vacancyId, ct);
+            var vacancy = await _readRepo.GetVacancyByIdForEnterpriseAsync(enterpriseId, vacancyId, ct);
             if (vacancy == null) return false;
 
             _mapper.Map(request, vacancy);
             vacancy.UpdatedAt = DateTime.UtcNow;
-            await _repo.UpdateAsync(vacancy, ct);
+            await _repo.UpdateVacancyAsync(vacancy, ct);
             await _uow.Commit();
             return true;
         }

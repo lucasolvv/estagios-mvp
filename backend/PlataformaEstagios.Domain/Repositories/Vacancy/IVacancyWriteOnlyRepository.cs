@@ -2,7 +2,7 @@
 {
     public interface IVacancyWriteOnlyRepository
     {
-        Task AddAsync(Entities.Vacancy entity, CancellationToken ct);
-        Task UpdateAsync(Entities.Vacancy entity, CancellationToken ct);
+        Task AddVacancyAsync(Entities.Vacancy entity, CancellationToken ct);
+        Task UpdateVacancyAsync(Entities.Vacancy entity, CancellationToken ct);
     }
 }
