@@ -6,6 +6,7 @@ using PlataformaEstagios.Communication.Responses;
 using PlataformaEstagios.Domain.Repositories;
 using PlataformaEstagios.Domain.Repositories.Enterprise;
 using PlataformaEstagios.Domain.Repositories.Vacancy;
+using PlataformaEstagios.Exceptions.ExceptionBase;
 
 namespace PlataformaEstagios.Application.UseCases.Vacancy.Create
 {
@@ -36,7 +37,7 @@ namespace PlataformaEstagios.Application.UseCases.Vacancy.Create
             await _validator.ValidateAndThrowAsync(request, ct);
 
             if (!await _enterpriseRepo.ExistsAsync(request.EnterpriseIdentifier, ct))
-                throw new InvalidOperationException("Empresa inválida ou inexistente.");
+                throw new ErrorOnValidationException(new List<string> { "Empresa inválida ou inexistente." });
 
             var entity = _mapper.Map<Domain.Entities.Vacancy>(request);
 

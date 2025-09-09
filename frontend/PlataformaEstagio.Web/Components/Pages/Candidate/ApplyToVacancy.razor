@@ -186,7 +186,7 @@
             await CandidateService.ApplyToVacancyAsync(_model);
 
             Snackbar.Add("Inscrição realizada com sucesso!", Severity.Success);
-            Nav.NavigateTo("/candidato");
+            Nav.NavigateTo("/candidato/home");
         }
         catch (Exception ex)
         {

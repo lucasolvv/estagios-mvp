@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using PlataformaEstagios.Application.Services.Auth;
 using PlataformaEstagios.Application.Services.AutoMapper;
+using PlataformaEstagios.Application.UseCases.Application.Create;
 using PlataformaEstagios.Application.UseCases.Auth.Login;
 using PlataformaEstagios.Application.UseCases.User.Create;
 using PlataformaEstagios.Application.UseCases.Vacancy.Create;
@@ -32,6 +33,7 @@ namespace PlataformaEstagios.Application
             services.AddScoped<ICreateVacancyUseCase, CreateVacancyUseCase>();
             services.AddScoped<IGetVacanciesUseCase, GetVacanciesUseCase>();
             services.AddScoped<IUpdateVacancyUseCase, UpdateVacancyUseCase>();
+            services.AddScoped<ICreateApplicationUseCase, CreateApplicationUseCase>();
         }
 
         private static void AddValidators(IServiceCollection services)

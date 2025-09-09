@@ -9,6 +9,7 @@ namespace PlataformaEstagios.Infrastructure.DataAccess {
         public DbSet<Enterprise> Enterprises => Set<Enterprise>();
         public DbSet<Address> Addresses => Set<Address>();
         public DbSet<Vacancy> Vacancies => Set<Vacancy>();
+        public DbSet<Application> Applications => Set<Application>();
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
             // --- Candidate ---
             modelBuilder.Entity<Candidate>(e => {
@@ -103,12 +104,42 @@ namespace PlataformaEstagios.Infrastructure.DataAccess {
                 //se houver entidade Enterprise mapeada
                  e.HasOne<Enterprise>()
                   .WithMany(e => e.Vacancies)
-                  .HasForeignKey(x => x.EnterpriseIdentifier);
+                  .HasForeignKey(x => x.EnterpriseIdentifier)
+                  .HasPrincipalKey(nameof(Enterprise.EnterpriseIdentifier));
             });
             
-            modelBuilder.Entity<Candidate>().Ignore(c => c.Applications);
-            modelBuilder.Ignore<Application>();
-            modelBuilder.Entity<Enterprise>().Ignore(e => e.Vacancies);
+            modelBuilder.Entity<Application>(e =>
+            {
+                e.ToTable("Applications");
+
+                e.HasKey(x => x.ApplicationIdentifier);
+                e.Property(x => x.ApplicationIdentifier).ValueGeneratedNever();
+
+                e.Property(x => x.VacancyId).IsRequired();
+                e.Property(x => x.CandidateIdentifier).IsRequired();
+                e.Property(x => x.ApplicationDate).IsRequired();
+                e.Property(x => x.Status).IsRequired();
+
+                // FK Application.VacancyId -> Vacancy.VacancyIdentifier (PK Guid) - ok
+                e.HasOne(x => x.Vacancy)
+                 .WithMany(v => v.Applications!)
+                 .HasForeignKey(x => x.VacancyId)
+                 .OnDelete(DeleteBehavior.Cascade);
+
+                // FK Application.CandidateIdentifier (Guid) -> Candidate.CandidateIdentifier (Alternate Key Guid)
+                e.HasOne(x => x.Candidate)
+                 .WithMany() // ou .WithMany(c => c.Applications) se existir a coleção
+                 .HasForeignKey(x => x.CandidateIdentifier)
+                 .HasPrincipalKey(nameof(Candidate.CandidateIdentifier)) // <- ESSA LINHA É O PULO DO GATO
+                 .OnDelete(DeleteBehavior.Restrict);
+
+                // Evitar duplicidade: um candidato por vaga
+                e.HasIndex(x => new { x.VacancyId, x.CandidateIdentifier }).IsUnique();
+            });
+            
+            
+            //modelBuilder.Entity<Candidate>().Ignore(c => c.Applications);
+            //modelBuilder.Entity<Enterprise>().Ignore(e => e.Vacancies);
             //modelBuilder.Ignore<Vacancy>();
             } 
     } 

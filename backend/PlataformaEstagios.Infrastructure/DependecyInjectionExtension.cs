@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PlataformaEstagios.Domain.Repositories;
+using PlataformaEstagios.Domain.Repositories.Application;
 using PlataformaEstagios.Domain.Repositories.Candidate;
 using PlataformaEstagios.Domain.Repositories.Enterprise;
 using PlataformaEstagios.Domain.Repositories.User;
@@ -30,6 +31,8 @@ namespace PlataformaEstagios.Infrastructure
             services.AddScoped<IEnterpriseReadOnlyRepository, EnterpriseRepository>();
             services.AddScoped<IVacancyReadOnlyRepository, VacancyRepository>();
             services.AddScoped<IVacancyWriteOnlyRepository, VacancyRepository>();
+            services.AddScoped<IApplicationWriteOnlyRepository, ApplicationRepository>();
+            services.AddScoped<IApplicationReadOnlyRepository, ApplicationRepository>();
 
         }
 
