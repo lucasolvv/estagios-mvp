@@ -35,5 +35,11 @@ namespace PlataformaEstagio.Web.Components.Services.Candidate
             return (false, await resp.Content.ReadAsStringAsync());
         }
 
+        public async Task<IReadOnlyList<ResponseGetApplicationJson>> GetRecentApplicationsAsync(Guid candidateId)
+        {
+            return await GetJsonAsync<List<ResponseGetApplicationJson>>(
+                $"api/candidate/applications/{candidateId}")!;
+        }
+
     }
 }

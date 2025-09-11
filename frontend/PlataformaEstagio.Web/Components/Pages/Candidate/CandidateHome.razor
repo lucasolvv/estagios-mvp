@@ -54,7 +54,7 @@
                     else
                     {
                         <MudCardContent>
-                            <MudTable Items="ActiveJobs" Hover="true" Dense="true">
+                            <MudTable Items="RecentVacancies" Hover="true" Dense="true">
                                 <HeaderContent>
                                     <MudTh>Vaga</MudTh>
                                     <MudTh>Empresa</MudTh>
@@ -74,7 +74,7 @@
                                     </MudTd>
                                 </RowTemplate>
                                 <NoRecordsContent>
-                                    <MudText Nenhum registro encontrado.></MudText>
+                                    <MudText Nenhuma vaga disponível.></MudText>
                                 </NoRecordsContent>
                             </MudTable>
                         </MudCardContent>
@@ -87,26 +87,37 @@
                 <MudCardHeader>
                     <MudText Typo="Typo.h6">Minhas inscrições recentes</MudText>
                 </MudCardHeader>
-                <MudCardContent>
-                    <MudTable Items="RecentApplications" Dense="true" Hover="true">
-                        <HeaderContent>
-                            <MudTh>Vaga</MudTh>
-                            <MudTh>Empresa</MudTh>
-                            <MudTh>Data</MudTh>
-                            <MudTh>Status</MudTh>
-                        </HeaderContent>
-                        <RowTemplate>
-                            <MudTd>@context.Vaga</MudTd>
-                            <MudTd>@context.Empresa</MudTd>
-                            <MudTd>@context.Data.ToString("dd/MM/yyyy")</MudTd>
-                            <MudTd>
-                                <MudChip T="string" Color="@StatusColor(context.Status)" Variant="Variant.Filled" Size="Size.Small">
-                                    @context.Status
-                                </MudChip>
-                            </MudTd>
-                        </RowTemplate>
-                    </MudTable>
-                </MudCardContent>
+                 @if (_isLoading)
+                    {
+                        <MudProgressLinear Indeterminate="true" Class="mb-2" />
+                        <MudText Color="Color.Secondary">Carregando candidaturas...</MudText>
+                    }
+                    else
+                    {
+                        <MudCardContent>
+                            <MudTable Items="RecentApplications" Dense="true" Hover="true">
+                                <HeaderContent>
+                                    <MudTh>Vaga</MudTh>
+                                    <MudTh>Empresa</MudTh>
+                                    <MudTh>Data</MudTh>
+                                    <MudTh>Status</MudTh>
+                                </HeaderContent>
+                                <RowTemplate>
+                                    <MudTd>@context.Vaga</MudTd>
+                                    <MudTd>@context.Empresa</MudTd>
+                                    <MudTd>@context.Data.ToString("dd/MM/yyyy")</MudTd>
+                                    <MudTd>
+                                        <MudChip T="string" Color="@StatusColor(context.Status)" Variant="Variant.Filled" Size="Size.Small">
+                                            @context.Status
+                                        </MudChip>
+                                    </MudTd>
+                                </RowTemplate>
+                                <NoRecordsContent>
+                                    <MudText Nenhuma candidatura até o momento.></MudText>
+                                </NoRecordsContent>
+                            </MudTable>
+                        </MudCardContent>
+                    }
             </MudCard>
         </MudItem>
 
@@ -194,7 +205,8 @@
     
     private bool _isLoading = true;
     private Guid? _enterpriseId;
-    private List<RecentJobsVm> ActiveJobs { get; set; } = new();
+    private List<RecentVacanciesVm> RecentVacancies { get; set; } = new();
+    private List<RecentApplicationsVm> RecentApplications { get; set; } = new();
 
     private bool _hydrated;
     private bool _loadingJobs;
@@ -226,7 +238,7 @@
             if (CurrentUser.UserTypeId is Guid id)
             {
                 var vagasRecentes = await _service.GetOpenVacanciesAsync();
-                ActiveJobs = vagasRecentes.Select(v => new RecentJobsVm(
+                RecentVacancies = vagasRecentes.Select(v => new RecentVacanciesVm(
                     
                     v.VacancyIdentifier,
                     v.Title,
@@ -234,6 +246,13 @@
                     v.Applicants,
                     v.Status,
                     v.EnterpriseName)).ToList();
+
+                var inscricoesRecentes = await _service.GetRecentApplicationsAsync(id);
+                RecentApplications = inscricoesRecentes.Select(a => new RecentApplicationsVm(
+                    a.TituloVaga,
+                    a.NomeEmpresa,
+                    a.DataCandidatura.ToLocalTime(),
+                    a.Status)).ToList();
             }
             else
             {
@@ -266,7 +285,7 @@
         Snackbar.Add("Ir para perfil (TODO)", Severity.Info);
     }
 
-    private void Apply(RecentJobsVm job)
+    private void Apply(RecentVacanciesVm job)
     {
         Nav.NavigateTo($"/candidato/vagas/{job.JobId}/aplicar");
     }
@@ -280,8 +299,8 @@
     };
 
     // --- VMs simples (poderiam virar DTOs no projeto)
-    private record RecentJobsVm(Guid JobId, string Titulo, DateTime DataAbertura, int Inscritos, string Status, string EnterpriseName);
-    private record ApplicationVm(string Vaga, string Empresa, DateTime Data, string Status);
+    private record RecentVacanciesVm(Guid JobId, string Titulo, DateTime DataAbertura, int Inscritos, string Status, string EnterpriseName);
+    private record RecentApplicationsVm(string Vaga, string Empresa, DateTime Data, string Status);
     private record AppointmentVm(string Titulo, DateTime Data, string Local);
     private record NotificationVm(string Texto, DateTime Data);
 
@@ -308,11 +327,11 @@
     //     new("Estágio Suporte TI", "HelpDesk BR", "30h/sem", null),
     // };
 
-    private List<ApplicationVm> RecentApplications = new()
-    {
-        new("Estágio Frontend (Blazor)", "Tech Corp", DateTime.Today.AddDays(-2), "Aguardando triagem"),
-        new("Estágio QA", "Quality Labs", DateTime.Today.AddDays(-5), "Entrevista marcada")
-    };
+    // private List<RecentApplicationsVm> RecentApplications = new()
+    // {
+    //     new("Estágio Frontend (Blazor)", "Tech Corp", DateTime.Today.AddDays(-2), "Aguardando triagem"),
+    //     new("Estágio QA", "Quality Labs", DateTime.Today.AddDays(-5), "Entrevista marcada")
+    // };
 
     private List<AppointmentVm> Appointments = new()
     {

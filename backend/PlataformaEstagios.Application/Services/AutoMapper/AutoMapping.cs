@@ -153,6 +153,14 @@ namespace PlataformaEstagios.Application.Services.AutoMapper
                 .ForMember(destinationMember => destinationMember.OpenedAt, opt => opt.MapFrom(src => src.PublishedAtUtc))
                 .ForMember(destinationMember => destinationMember.ExpiresAtUtc, opt => opt.MapFrom(src => src.ExpiresAtUtc));
 
+            CreateMap<Domain.Entities.Application, ResponseGetApplicationJson>()
+                .ForMember(destinationMember => destinationMember.TituloVaga, opt => opt.MapFrom(src => src.Vacancy != null ? src.Vacancy.Title ?? string.Empty : string.Empty))
+                .ForMember(destinationMember => destinationMember.NomeEmpresa, opt => opt.Ignore())
+                .ForMember(destinationMember => destinationMember.DataCandidatura, opt => opt.MapFrom(src => src.ApplicationDate))
+                .ForMember(destinationMember => destinationMember.Status, opt => opt.MapFrom(src => src.Status.ToString()))
+                .ForMember(destinationMember => destinationMember.ApplicationIdentifier, opt => opt.MapFrom(src => src.ApplicationIdentifier))
+                .ForMember(destinationMember => destinationMember.VacancyIdentifier, opt => opt.MapFrom(src => src.VacancyId));
+
 
         }
     }

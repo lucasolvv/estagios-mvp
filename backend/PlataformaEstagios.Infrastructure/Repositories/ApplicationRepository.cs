@@ -23,5 +23,16 @@ namespace PlataformaEstagios.Infrastructure.Repositories
             return await _dbcontext.Applications
                 .AnyAsync(a => a.VacancyId == vacancyId && a.CandidateIdentifier == candidateId);
         }
+
+        public async Task<IReadOnlyList<Domain.Entities.Application>> GetRecentApplicationsByCandidateIdAsync(Guid candidateId)
+        {
+            return await _dbcontext.Applications
+                .AsNoTracking() // leitura pura
+                .Where(a => a.CandidateIdentifier == candidateId)
+                .Include(a => a.Vacancy)                // carrega a vaga
+                .Include(a => a.Candidate)              // se o DTO usar dados do candidato
+                .OrderByDescending(a => a.ApplicationDate)
+                .ToListAsync();
+        }
     }
 }

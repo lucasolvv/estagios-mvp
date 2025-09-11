@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using PlataformaEstagios.Application.UseCases.Application.Create;
+using PlataformaEstagios.Application.UseCases.Application.Get;
 using PlataformaEstagios.Application.UseCases.Vacancy.Get;
 using PlataformaEstagios.Communication.Requests;
 using PlataformaEstagios.Communication.Responses;
@@ -34,13 +36,21 @@ namespace PlataformaEstagios.Api.Controllers
         [Authorize(Roles = "Candidate")]
         [HttpPost("application")]
         [ProducesResponseType(201, Type = typeof(CreatedResult))]
-        public async Task<ActionResult> ApplyToVacancyAsync([FromBody] RequestCreateApplicationJson request, CancellationToken ct,
+        public async Task<ActionResult> ApplyToVacancy([FromBody] RequestCreateApplicationJson request, CancellationToken ct,
             [FromServices] ICreateApplicationUseCase useCase)
         {
             await useCase.CreateNewCandidateApplication(request.VacancyId, request.CandidateIdentifier, ct);
             return Created();
         }
 
-
+        [Authorize(Roles = "Candidate")]
+        [HttpGet("applications/{candidateId:guid}")]
+        [ProducesResponseType(200, Type = typeof(Ok))]
+        public async Task<ActionResult<IReadOnlyList<ResponseGetApplicationJson>>> GetRecentApplications([FromRoute] Guid candidateId,
+            [FromServices] IGetApplicationUseCase useCase)
+        {
+            var data = await useCase.GetRecentApplicationsByCandidateIdAsync(candidateId);
+            return Ok(data);
+        }
     }
 }
