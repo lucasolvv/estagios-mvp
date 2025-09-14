@@ -14,5 +14,11 @@
 
         public Address? Address { get; set; }
         public ICollection<Application>? Applications { get; set; }
+
+        public string? ProfilePicturePath { get; private set; }
+        public string? ResumePath { get; private set; }
+
+        public void SetProfilePicture(string? relativePath) => ProfilePicturePath = relativePath;
+        public void SetResume(string? privatePath) => ResumePath = privatePath;
     }
 }

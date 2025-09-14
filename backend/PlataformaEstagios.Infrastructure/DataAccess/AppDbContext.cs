@@ -30,6 +30,13 @@ namespace PlataformaEstagios.Infrastructure.DataAccess {
                 .OnDelete(DeleteBehavior.Restrict);
                 e.Property(c => c.Active).HasDefaultValue(true);
                 e.Property(c => c.CreatedOn).HasDefaultValueSql("CURRENT_TIMESTAMP AT TIME ZONE 'UTC'");
+                e.Property(x => x.ProfilePicturePath)
+               .HasMaxLength(260) // caminhos curtos/Windows-friendly
+               .IsRequired(false);
+
+                        e.Property(x => x.ResumePath)
+                            .HasMaxLength(260)
+                            .IsRequired(false);
             });
 
             // --- Enterprise ---

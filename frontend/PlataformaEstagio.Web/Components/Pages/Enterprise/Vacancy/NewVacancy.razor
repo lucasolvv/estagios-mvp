@@ -49,7 +49,7 @@
                                Required="true">
                         @foreach (var a in Enum.GetValues<JobFunction>())
                         {
-                            if (a == JobFunction.TI) { continue; }
+                            
                             <MudSelectItem Value="a">@a</MudSelectItem>
                         }
                     </MudSelect>
@@ -119,7 +119,8 @@
     {
         IsActive = true,
         Location = "Remoto - Brasil",
-        RequiredSkills = new List<string>()
+        RequiredSkills = new List<string>(),
+        JobFunction = JobFunction.TI
     };
 
     protected override Task OnInitializedAsync()
