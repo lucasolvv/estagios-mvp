@@ -49,7 +49,7 @@ namespace PlataformaEstagios.Application.UseCases.User.Create
             switch (request.UserType)
             {
                 case UserType.Candidate:
-                    var candidate = _mapper.Map<Candidate>(request.Candidate!);
+                    var candidate = _mapper.Map<Domain.Entities.Candidate>(request.Candidate!);
 
                     // Garanta que o Id exista agora (normalmente já existe; se não, force):
                     if (candidate.CandidateIdentifier == Guid.Empty)

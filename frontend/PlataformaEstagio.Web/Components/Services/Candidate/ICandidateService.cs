@@ -9,5 +9,12 @@ namespace PlataformaEstagio.Web.Components.Services.Candidate
         Task<ResponseGetVacancyToApplicationJson> GetVacancyByIdAsync(Guid vacancyId, CancellationToken ct = default);
         Task<(bool success, string? error)> ApplyToVacancyAsync(RequestCreateApplicationJson request, CancellationToken ct = default);
         Task<IReadOnlyList<ResponseGetApplicationJson>> GetRecentApplicationsAsync(Guid candidateId);
+        Task<CandidateDto> GetByIdAsync(Guid candidateId, CancellationToken ct = default);
+
+        // Segui seu padrão de "ação → (bool success, string? error)"
+        Task<(bool success, string? error)> UpdateProfileAsync(
+            Guid candidateId,
+            RequestUpdateCandidateProfileJson dto,
+            CancellationToken ct = default);
     }
 }

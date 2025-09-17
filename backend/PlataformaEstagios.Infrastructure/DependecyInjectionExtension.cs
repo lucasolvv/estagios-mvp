@@ -9,6 +9,7 @@ using PlataformaEstagios.Domain.Repositories.User;
 using PlataformaEstagios.Domain.Repositories.Vacancy;
 using PlataformaEstagios.Infrastructure.DataAccess;
 using PlataformaEstagios.Infrastructure.Repositories;
+using PlataformaEstagios.Infrastructure.Storage;
 
 namespace PlataformaEstagios.Infrastructure
 {
@@ -27,12 +28,14 @@ namespace PlataformaEstagios.Infrastructure
             services.AddScoped<IUserWriteOnlyRepository, UserRepository>();
             services.AddScoped<IUserReadOnlyRepository, UserRepository>();
             services.AddScoped<ICandidateWriteOnlyRepository, CandidateRepository>();
+            services.AddScoped<ICandidateReadOnlyRepository, CandidateRepository>();
             services.AddScoped<IEnterpriseWriteOnlyRepository, EnterpriseRepository>();
             services.AddScoped<IEnterpriseReadOnlyRepository, EnterpriseRepository>();
             services.AddScoped<IVacancyReadOnlyRepository, VacancyRepository>();
             services.AddScoped<IVacancyWriteOnlyRepository, VacancyRepository>();
             services.AddScoped<IApplicationWriteOnlyRepository, ApplicationRepository>();
             services.AddScoped<IApplicationReadOnlyRepository, ApplicationRepository>();
+            services.AddScoped<IFileStorage, LocalFileStorage>();
 
         }
 

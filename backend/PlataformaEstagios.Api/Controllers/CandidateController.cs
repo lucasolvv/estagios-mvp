@@ -3,9 +3,12 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using PlataformaEstagios.Application.UseCases.Application.Create;
 using PlataformaEstagios.Application.UseCases.Application.Get;
+using PlataformaEstagios.Application.UseCases.Candidate.Get;
+using PlataformaEstagios.Application.UseCases.Candidate.UpdateProfile;
 using PlataformaEstagios.Application.UseCases.Vacancy.Get;
 using PlataformaEstagios.Communication.Requests;
 using PlataformaEstagios.Communication.Responses;
+using PlataformaEstagios.Domain.Repositories.Candidate;
 
 namespace PlataformaEstagios.Api.Controllers
 {
@@ -52,5 +55,32 @@ namespace PlataformaEstagios.Api.Controllers
             var data = await useCase.GetRecentApplicationsByCandidateIdAsync(candidateId);
             return Ok(data);
         }
+
+        [Authorize(Roles = "Candidate")]
+        [HttpPut("{candidateId:guid}/profile")]
+        [ProducesResponseType(204)]
+        public async Task<IActionResult> UpdateProfile(
+            [FromRoute] Guid candidateId,
+            [FromBody] RequestUpdateCandidateProfileJson request,
+            [FromServices] IUpdateCandidateProfileUseCase useCase,
+            CancellationToken ct = default)
+        {
+            await useCase.ExecuteAsync(candidateId, request, ct);
+            return NoContent();
+        }
+
+        [Authorize(Roles = "Candidate")]
+        [HttpGet("{candidateId:guid}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        public async Task<ActionResult<ResponseGetCandidateProfileJson>> GetCandidateById(
+        [FromRoute] Guid candidateId,
+        [FromServices] IGetCandidateUseCase useCase,
+        CancellationToken ct = default)
+            {
+                var candidate = await useCase.GetCandidateByIdAsync(candidateId);
+                if (candidate is null) return NotFound();
+                return Ok(candidate);
+            }
     }
 }

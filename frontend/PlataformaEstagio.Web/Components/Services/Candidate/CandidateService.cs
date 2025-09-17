@@ -41,5 +41,29 @@ namespace PlataformaEstagio.Web.Components.Services.Candidate
                 $"api/candidate/applications/{candidateId}")!;
         }
 
+        public async Task<CandidateDto> GetByIdAsync(Guid candidateId, CancellationToken ct = default)
+        {
+            // GET /api/candidate/{candidateId}
+            return await GetJsonAsync<CandidateDto>($"api/candidate/{candidateId}", ct)
+                   ?? throw new InvalidOperationException("Não foi possível carregar os dados do candidato.");
+        }
+
+        public async Task<(bool success, string? error)> UpdateProfileAsync(
+            Guid candidateId,
+            RequestUpdateCandidateProfileJson dto,
+            CancellationToken ct = default)
+        {
+            // PUT /api/candidate/{candidateId}/profile
+            using var req = new HttpRequestMessage(HttpMethod.Put, $"api/candidate/{candidateId}/profile")
+            {
+                Content = JsonContent.Create(dto)
+            };
+
+            var resp = await SendAsync(req, ct);
+            if (resp.IsSuccessStatusCode) return (true, null);
+
+            return (false, await resp.Content.ReadAsStringAsync(ct));
+        }
+
     }
 }

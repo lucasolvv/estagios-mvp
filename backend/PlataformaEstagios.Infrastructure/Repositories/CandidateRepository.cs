@@ -18,7 +18,12 @@ namespace PlataformaEstagios.Infrastructure.Repositories
 
         public async Task<Domain.Entities.Candidate> GetCandidateByIdAsync(Guid id)
         {
-            return await _dbcontext.Candidates.FirstOrDefaultAsync(c => c.CandidateIdentifier == id);
+            return await _dbcontext.Candidates
+             .AsNoTracking()
+             .Include(c => c.Address)
+             .Include(c => c.Applications)
+                 .ThenInclude(a => a.Vacancy) // se precisar
+             .FirstOrDefaultAsync(c => c.CandidateIdentifier == id);
         }
     }
 }

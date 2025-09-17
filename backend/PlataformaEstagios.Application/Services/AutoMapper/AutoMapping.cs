@@ -34,7 +34,8 @@ namespace PlataformaEstagios.Application.Services.AutoMapper
                 .ForMember(d => d.Email, o => o.MapFrom(s => s.Email))
                 .ForMember(d => d.UserType, o => o.MapFrom(s => s.UserType))
                 .ForMember(d => d.UserTypeId, o => o.Ignore()); // setado no use case
-                                                               
+
+
 
             // Candidate: BirthDate (DateTime? -> DateOnly?) usa o converter acima automaticamente
             CreateMap<RequestCandidateJson, Candidate>()
@@ -47,7 +48,9 @@ namespace PlataformaEstagios.Application.Services.AutoMapper
                 .ForMember(d => d.BirthDate, o => o.MapFrom(s => s.BirthDate)) // DateTime? -> DateOnly?
                 .ForMember(d => d.CourseName, o => o.MapFrom(s => s.CourseName))
                 .ForMember(d => d.Address, o => o.MapFrom(s => s.Address))
-                .ForMember(d => d.Applications, o => o.Ignore());
+                .ForMember(d => d.Applications, o => o.Ignore())
+                .ForMember(d => d.ProfilePicturePath, o => o.Ignore())
+                .ForMember(d => d.ResumePath, o => o.Ignore());
 
             // Enterprise
             CreateMap<RequestEnterpriseJson, Enterprise>()
@@ -97,6 +100,19 @@ namespace PlataformaEstagios.Application.Services.AutoMapper
                 .ForMember(d => d.IsActive, o => o.MapFrom(s => s.IsActive))
                 .ForMember(d => d.UpdatedAt, o => o.Ignore())           // setado no Use Case
                 .ForMember(d => d.Applications, o => o.Ignore());
+
+            CreateMap<RequestUpdateCandidateProfileJson, Candidate>()
+               //.ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null))
+               .ForMember(d => d.Name, o => o.MapFrom(s => s.FullName))
+               .ForMember(d => d.BirthDate, o => o.MapFrom(s => s.BirthDate)) // DateOnly? já está no DTO
+               .ForMember(d => d.CourseName, o => o.MapFrom(s => s.Course))
+               // Não mapeie arquivos aqui; use case já trata
+               .ForMember(d => d.ProfilePicturePath, o => o.Ignore())
+               .ForMember(d => d.ResumePath, o => o.Ignore())
+               .ForMember(d => d.Applications, o => o.Ignore());
+            
+            CreateMap<RequestUpdateAddressJson, Address>()
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
 
 
         }

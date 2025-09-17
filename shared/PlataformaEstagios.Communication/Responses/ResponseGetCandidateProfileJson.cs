@@ -1,6 +1,6 @@
 ﻿namespace PlataformaEstagios.Communication.Responses
 {
-    public sealed class ResponseCandidateProfile
+    public sealed class ResponseGetCandidateProfileJson
     {
         public Guid CandidateId { get; init; }
         public string? FullName { get; init; }
