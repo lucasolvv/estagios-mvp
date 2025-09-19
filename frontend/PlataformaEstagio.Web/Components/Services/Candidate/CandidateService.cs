@@ -41,10 +41,10 @@ namespace PlataformaEstagio.Web.Components.Services.Candidate
                 $"api/candidate/applications/{candidateId}")!;
         }
 
-        public async Task<CandidateDto> GetByIdAsync(Guid candidateId, CancellationToken ct = default)
+        public async Task<ResponseGetCandidateProfileJson> GetByIdAsync(Guid candidateId, CancellationToken ct = default)
         {
             // GET /api/candidate/{candidateId}
-            return await GetJsonAsync<CandidateDto>($"api/candidate/{candidateId}", ct)
+            return await GetJsonAsync<ResponseGetCandidateProfileJson>($"api/candidate/{candidateId}", ct)
                    ?? throw new InvalidOperationException("Não foi possível carregar os dados do candidato.");
         }
 

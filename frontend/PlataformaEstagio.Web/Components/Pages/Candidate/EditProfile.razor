@@ -3,6 +3,7 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using MudBlazor
 @using PlataformaEstagio.Web.Components.Services.Candidate
+@using PlataformaEstagios.Communication
 @inject ICandidateService CandidateService
 @inject IUserContext CurrentUser
 @inject ISnackbar Snackbar
@@ -42,7 +43,9 @@
                                        DateFormat="dd/MM/yyyy"
                                        Clearable="true" />
                     </MudItem>
-
+                    <MudItem xs="12" md="12">
+                        <MudTextField @bind-Value="_vm.BioResume" Label="Resumo" />
+                    </MudItem>
                     <MudItem xs="12" md="6">
                         <MudTextField @bind-Value="_vm.Course" Label="Curso" />
                     </MudItem>
@@ -181,8 +184,12 @@
             var dto = await CandidateService.GetByIdAsync(_candidateId);
             _vm.FullName = dto.FullName;
             _vm.BirthDate = dto.BirthDate;
-            _vm.Course = dto.Course;
+            _vm.Course = dto.CourseName;
             _vm.Address = dto.Address ?? new AddressDto();
+            _vm.BioResume = dto.BioResume;
+            _vm.ProfilePictureBase64 = dto.ProfilePicturePath;
+            _vm.ResumeBase64 = dto.ResumePath;
+            
             _currentPublicPhoto = dto.ProfilePicturePath;
         }
         catch (Exception ex)
@@ -283,6 +290,7 @@
                 FullName = _vm.FullName,
                 BirthDate = _vm.BirthDate,
                 Course = _vm.Course,
+                BioResume = _vm.BioResume,
                 Address = _vm.Address,
                 ProfilePictureBase64 = _vm.ProfilePictureBase64, // null se não trocou
                 ResumeBase64 = _vm.ResumeBase64                  // null se não anexou
@@ -315,6 +323,7 @@
     {
         public string? FullName { get; set; }
         public DateTime? BirthDate { get; set; }
+        public string? BioResume { get; set;  }
         public string? Course { get; set; }
         public AddressDto Address { get; set; } = new();
         public string? ProfilePictureBase64 { get; set; }

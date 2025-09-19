@@ -9,7 +9,7 @@
         public string Name { get; set; }
 
         public DateOnly? BirthDate { get; set; }
-
+        public string? BioResume { get; set; }
         public string? CourseName { get; set; }
 
         public Address? Address { get; set; }

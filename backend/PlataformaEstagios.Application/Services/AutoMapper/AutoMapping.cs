@@ -17,6 +17,10 @@ namespace PlataformaEstagios.Application.Services.AutoMapper
             CreateMap<string?, DateOnly?>()
                 .ConvertUsing(s => string.IsNullOrWhiteSpace(s) ? null : DateOnly.Parse(s!, CultureInfo.InvariantCulture));
 
+            CreateMap<DateOnly?, DateTime?>()
+                .ConvertUsing(src => src.HasValue ? src.Value.ToDateTime(TimeOnly.MinValue) : (DateTime?)null);
+            CreateMap<Address, Communication.AddressDto>();
+
             RequestToDomain();
             DomainToResponse();
         }
@@ -176,6 +180,17 @@ namespace PlataformaEstagios.Application.Services.AutoMapper
                 .ForMember(destinationMember => destinationMember.Status, opt => opt.MapFrom(src => src.Status.ToString()))
                 .ForMember(destinationMember => destinationMember.ApplicationIdentifier, opt => opt.MapFrom(src => src.ApplicationIdentifier))
                 .ForMember(destinationMember => destinationMember.VacancyIdentifier, opt => opt.MapFrom(src => src.VacancyId));
+
+
+            CreateMap<Domain.Entities.Candidate, ResponseGetCandidateProfileJson>()
+                .ForMember(destinationMember => destinationMember.CandidateId, opt => opt.MapFrom(src => src.CandidateIdentifier))
+                .ForMember(destinationMember => destinationMember.FullName, opt => opt.MapFrom(src => src.Name))
+                .ForMember(destinationMember => destinationMember.BirthDate, opt => opt.MapFrom(src => src.BirthDate))
+                .ForMember(destinationMember => destinationMember.BioResume, opt => opt.MapFrom(src => src.BioResume))
+                .ForMember(destinationMember => destinationMember.Address, opt => opt.MapFrom(src => src.Address))
+                .ForMember(destinationMember => destinationMember.ProfilePicturePath, opt => opt.MapFrom(src => src.ProfilePicturePath))
+                .ForMember(destinationMember => destinationMember.ResumePath, opt => opt.MapFrom(src => src.ResumePath));
+                
 
 
         }
