@@ -5,7 +5,7 @@ namespace PlataformaEstagios.Communication.Requests
     {
         // Dados básicos (opcionais)
         public string? FullName { get; set; }
-        public DateOnly? BirthDate { get; set; }
+        public DateTime? BirthDate { get; set; }
         public string? Course { get; set; }
         public RequestUpdateAddressJson? Address { get; set; }
 

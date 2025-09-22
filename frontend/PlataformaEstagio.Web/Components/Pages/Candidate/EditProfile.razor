@@ -38,13 +38,15 @@
                     </MudItem>
 
                     <MudItem xs="12" md="3">
-                        <MudDatePicker Label="Data de Nascimento"
+                        @* <MudDatePicker Label="Data de Nascimento"
                                        @bind-Date="_vm.BirthDate"
                                        DateFormat="dd/MM/yyyy"
-                                       Clearable="true" />
+                                       Clearable="true" /> *@
+
+                        <MudDatePicker @bind-Date="_vm.BirthDate" Label="Data de Nascimento" />
                     </MudItem>
                     <MudItem xs="12" md="12">
-                        <MudTextField @bind-Value="_vm.BioResume" Label="Resumo" />
+                        <MudTextField @bind-Value="_vm.BioResume" Lines="5" Variant="Variant.Text" Label="Resumo" />
                     </MudItem>
                     <MudItem xs="12" md="6">
                         <MudTextField @bind-Value="_vm.Course" Label="Curso" />
@@ -66,7 +68,10 @@
                         <MudTextField @bind-Value="_vm.Address.Uf" Label="UF" MaxLength="2" />
                     </MudItem>
                     <MudItem xs="12" md="3">
-                        <MudTextField @bind-Value="_vm.Address.Cep" Label="CEP (8 dígitos)" MaxLength="8" />
+                        <MudTextField @bind-Value="_vm.Address.Cep" Label="CEP"
+                                      Mask="@(new PatternMask("00000-000"))"
+                                      MaskChar="_"
+                                      InputMode="InputMode.text" />
                     </MudItem>
 
                     <!-- Foto -->
@@ -277,7 +282,7 @@
         {
             Snackbar.Add("UF deve ter 2 letras.", Severity.Warning); return;
         }
-        if (!string.IsNullOrWhiteSpace(_vm.Address?.Cep) && _vm.Address!.Cep!.Length != 8)
+        if (!string.IsNullOrWhiteSpace(_vm.Address?.Cep) && _vm.Address!.Cep!.Length != 9)
         {
             Snackbar.Add("CEP deve ter 8 dígitos (apenas números).", Severity.Warning); return;
         }

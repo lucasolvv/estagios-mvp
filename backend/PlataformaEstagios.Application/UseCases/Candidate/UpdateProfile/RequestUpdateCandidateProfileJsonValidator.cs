@@ -17,9 +17,9 @@ namespace PlataformaEstagios.Application.UseCases.Candidate.UpdateProfile
             When(x => x.BirthDate.HasValue, () =>
             {
                 RuleFor(x => x.BirthDate!.Value)
-                    .LessThan(DateOnly.FromDateTime(DateTime.UtcNow))
+                    .LessThan(DateTime.UtcNow)
                     .WithMessage("BirthDate deve ser no passado.")
-                    .GreaterThan(new DateOnly(1900, 1, 1));
+                    .GreaterThan(new DateTime(1900, 1, 1));
             });
 
             When(x => !string.IsNullOrWhiteSpace(x.Course), () =>
