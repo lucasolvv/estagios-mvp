@@ -16,14 +16,14 @@ namespace PlataformaEstagios.Infrastructure.Repositories
             await _dbcontext.Candidates.AddAsync(candidate);
         }
 
-        public async Task<Domain.Entities.Candidate> GetCandidateByIdAsync(Guid id)
+        public async Task<Domain.Entities.Candidate?> GetCandidateByIdAsync(Guid id, bool track, CancellationToken ct = default)
         {
-            return await _dbcontext.Candidates
-             .AsNoTracking()
-             .Include(c => c.Address)
-             .Include(c => c.Applications)
-                 .ThenInclude(a => a.Vacancy) // se precisar
-             .FirstOrDefaultAsync(c => c.CandidateIdentifier == id);
+            var q = _dbcontext.Candidates
+        .Include(c => c.Address)    // se precisar
+        .Include(c => c.Applications);
+            if (!track) q = (Microsoft.EntityFrameworkCore.Query.IIncludableQueryable<Domain.Entities.Candidate, 
+                ICollection<Domain.Entities.Application>?>)q.AsNoTracking();
+            return await q.FirstOrDefaultAsync(c => c.CandidateIdentifier == id, ct);
         }
     }
 }

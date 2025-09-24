@@ -2,6 +2,6 @@
 {
     public interface ICandidateReadOnlyRepository
     {
-        Task<Entities.Candidate> GetCandidateByIdAsync(Guid id); 
+        Task<Domain.Entities.Candidate> GetCandidateByIdAsync(Guid id, bool track, CancellationToken ct = default);
     }
 }

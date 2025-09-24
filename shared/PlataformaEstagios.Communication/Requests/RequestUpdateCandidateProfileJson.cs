@@ -8,6 +8,7 @@ namespace PlataformaEstagios.Communication.Requests
         public DateTime? BirthDate { get; set; }
         public string? Course { get; set; }
         public RequestUpdateAddressJson? Address { get; set; }
+        public string? BioResume { get; set; }
 
         // Arquivos (Base64) — sem FileName
         public string? ProfilePictureBase64 { get; set; }

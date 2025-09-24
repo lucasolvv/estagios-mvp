@@ -19,7 +19,7 @@ namespace PlataformaEstagios.Application.UseCases.Candidate.Get
         {
             if (candidateId == Guid.Empty) throw new ArgumentNullException(nameof(candidateId));
 
-            var candidate = await _repo.GetCandidateByIdAsync(candidateId);
+            var candidate = await _repo.GetCandidateByIdAsync(candidateId, track: true);
 
             var mappedCandidate = _mapper.Map<ResponseGetCandidateProfileJson>(candidate);
 

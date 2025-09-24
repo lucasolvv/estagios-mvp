@@ -110,6 +110,7 @@ namespace PlataformaEstagios.Application.Services.AutoMapper
                .ForMember(d => d.Name, o => o.MapFrom(s => s.FullName))
                .ForMember(d => d.BirthDate, o => o.MapFrom(s => s.BirthDate)) // DateOnly? já está no DTO
                .ForMember(d => d.CourseName, o => o.MapFrom(s => s.Course))
+               .ForMember(d => d.BioResume, o => o.MapFrom(s => s.BioResume))
                // Não mapeie arquivos aqui; use case já trata
                .ForMember(d => d.ProfilePicturePath, o => o.Ignore())
                .ForMember(d => d.ResumePath, o => o.Ignore())

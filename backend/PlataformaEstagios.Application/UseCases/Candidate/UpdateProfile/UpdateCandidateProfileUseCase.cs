@@ -36,7 +36,8 @@ namespace PlataformaEstagios.Application.UseCases.Candidate.UpdateProfile
         {
             await ValidateOrThrowAsync(_validator, request);
 
-            var candidate = await _candidateReadOnlyRepository.GetCandidateByIdAsync(candidateId);
+            var candidate = await _candidateReadOnlyRepository.GetCandidateByIdAsync(candidateId, track: true, ct);
+            _mapper.Map(request, candidate);
             if (candidate is null)
                 throw new ErrorOnValidationException(new List<string> { "Candidato não encontrado." });
 

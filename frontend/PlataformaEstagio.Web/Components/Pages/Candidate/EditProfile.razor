@@ -150,6 +150,13 @@
     private string? _currentPublicPhoto;  // ProfilePicturePath do GET
 
     protected override Task OnInitializedAsync() => Task.CompletedTask;
+    private const string ApiPublicBase = "https://localhost:7095"; // ajuste p/ seu ambiente
+
+    private static string? ToAbsolute(string? path) =>
+        string.IsNullOrWhiteSpace(path) ? null :
+        (path.StartsWith("http", StringComparison.OrdinalIgnoreCase)
+            ? path
+            : $"{ApiPublicBase.TrimEnd('/')}{path}");
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -192,10 +199,11 @@
             _vm.Course = dto.CourseName;
             _vm.Address = dto.Address ?? new AddressDto();
             _vm.BioResume = dto.BioResume;
-            _vm.ProfilePictureBase64 = dto.ProfilePicturePath;
-            _vm.ResumeBase64 = dto.ResumePath;
-            
-            _currentPublicPhoto = dto.ProfilePicturePath;
+            _currentPublicPhoto = ToAbsolute(dto.ProfilePicturePath); // só para exibir
+            _imagePreview = null;       // limpa preview local
+            _resumeSelectedName = null;       // limpa label do PDF
+            _vm.ProfilePictureBase64 = null;    // NÃO reenvia caminho como se fosse base64
+            _vm.ResumeBase64 = null;
         }
         catch (Exception ex)
         {
@@ -307,10 +315,15 @@
                 Snackbar.Add(string.IsNullOrWhiteSpace(err) ? "Falha ao atualizar o perfil." : err, Severity.Error);
                 return;
             }
-
             Snackbar.Add("Perfil atualizado com sucesso!", Severity.Success);
 
-            // Recarrega para pegar ProfilePicturePath atualizado do backend
+            // evita reenvio desnecessário no próximo PUT
+            _vm.ProfilePictureBase64 = null;
+            _vm.ResumeBase64 = null;
+            _imagePreview = null;
+            _resumeSelectedName = null;
+
+            // reload para pegar caminho público novo
             await LoadAsync();
             StateHasChanged();
         }
