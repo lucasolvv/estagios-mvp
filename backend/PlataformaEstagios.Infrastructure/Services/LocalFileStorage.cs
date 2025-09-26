@@ -35,24 +35,25 @@ namespace PlataformaEstagios.Infrastructure.Storage
             return "/" + relFile; // caminho web relativo
         }
 
-        public async Task<string> SavePrivateResumeBase64Async(
+        public async Task<string> SavePublicResumeBase64Async(
             Guid candidateId, string base64, string fileBaseName, CancellationToken ct)
         {
             var bytes = FromBase64(base64);
             if (!IsPdf(bytes)) throw new InvalidOperationException("Apenas PDF é aceito para o currículo.");
 
-            var relDir = Path.Combine("Storage", "Candidates", candidateId.ToString());
-            var absDir = Path.Combine(_contentRootPath, relDir);
+            var relDir = Path.Combine("uploads", "candidates", candidateId.ToString());
+            var absDir = Path.Combine(_webRootPath, relDir);
             Directory.CreateDirectory(absDir);
 
             var safeBase = SafeFileBase(fileBaseName);
             var relFile = Path.Combine(relDir, $"{safeBase}_resume.pdf").Replace('\\', '/');
-            var absFile = Path.Combine(_contentRootPath, relFile.Replace('/', Path.DirectorySeparatorChar));
+            var absFile = Path.Combine(_webRootPath, relFile.Replace('/', Path.DirectorySeparatorChar));
 
             await SaveBytesAsync(bytes, absFile, ct);
 
-            return relFile; // caminho privado relativo
+            return "/" + relFile; // caminho web relativo (começando com /)
         }
+
 
         public Task<Stream> OpenPrivateAsync(string privatePath, CancellationToken ct)
         {

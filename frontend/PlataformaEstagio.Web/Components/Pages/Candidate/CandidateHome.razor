@@ -319,20 +319,6 @@
     private int CompletedHours = 48;
     private double HoursPercent => RequiredHours == 0 ? 0 : (CompletedHours * 100.0 / RequiredHours);
 
-    //--- dados mockados (substituir por serviços/repo)
-    // private List<JobVm> RecommendedJobs = new()
-    // {
-    //     new("Estágio Frontend (Blazor)", "Tech Corp", "20h/sem", 1200m),
-    //     new("Estágio QA", "Quality Labs", "30h/sem", 1500m),
-    //     new("Estágio Suporte TI", "HelpDesk BR", "30h/sem", null),
-    // };
-
-    // private List<RecentApplicationsVm> RecentApplications = new()
-    // {
-    //     new("Estágio Frontend (Blazor)", "Tech Corp", DateTime.Today.AddDays(-2), "Aguardando triagem"),
-    //     new("Estágio QA", "Quality Labs", DateTime.Today.AddDays(-5), "Entrevista marcada")
-    // };
-
     private List<AppointmentVm> Appointments = new()
     {
         new("Entrevista • Tech Corp", DateTime.Today.AddDays(1).AddHours(14), "Google Meet")

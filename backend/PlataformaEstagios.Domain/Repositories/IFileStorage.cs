@@ -7,7 +7,7 @@ namespace PlataformaEstagios.Domain.Repositories
         Task<string> SavePublicProfilePictureBase64Async(
             Guid candidateId, string base64, string fileBaseName, CancellationToken ct);
 
-        Task<string> SavePrivateResumeBase64Async(
+        Task<string> SavePublicResumeBase64Async(
             Guid candidateId, string base64, string fileBaseName, CancellationToken ct);
 
         Task<Stream> OpenPrivateAsync(string privatePath, CancellationToken ct);

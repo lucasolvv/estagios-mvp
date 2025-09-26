@@ -106,6 +106,17 @@
                                 PDF anexado: @_resumeSelectedName
                             </MudAlert>
                         }
+                        @* link para o currículo atual *@
+                        @if (!string.IsNullOrWhiteSpace(_currentPublicResume))
+                        {
+                            <MudStack Row Spacing="1" AlignItems="AlignItems.Center" Class="mt-2">
+                                <MudIcon Icon="@Icons.Material.Filled.PictureAsPdf" />
+                                <MudLink Href="@_currentPublicResume" Target="_blank" Rel="noopener">
+                                    Ver currículo (PDF)
+                                </MudLink>
+                            </MudStack>
+                        }
+
                     </MudItem>
 
                     <MudItem xs="12" Class="mt-6">
@@ -148,15 +159,19 @@
     private string? _imagePreview;        // data URI
     private string? _resumeSelectedName;  // exibição
     private string? _currentPublicPhoto;  // ProfilePicturePath do GET
+    private string? _currentPublicResume;  // ProfilePicturePath do GET
 
     protected override Task OnInitializedAsync() => Task.CompletedTask;
     private const string ApiPublicBase = "https://localhost:7095"; // ajuste p/ seu ambiente
 
-    private static string? ToAbsolute(string? path) =>
-        string.IsNullOrWhiteSpace(path) ? null :
-        (path.StartsWith("http", StringComparison.OrdinalIgnoreCase)
-            ? path
-            : $"{ApiPublicBase.TrimEnd('/')}{path}");
+    private static string? ToAbsolute(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path)) return null;
+        if (path.StartsWith("http", StringComparison.OrdinalIgnoreCase)) return path;
+        var p = path.StartsWith("/") ? path : "/" + path;
+        return $"{ApiPublicBase.TrimEnd('/')}{p}";
+    }
+
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -200,6 +215,7 @@
             _vm.Address = dto.Address ?? new AddressDto();
             _vm.BioResume = dto.BioResume;
             _currentPublicPhoto = ToAbsolute(dto.ProfilePicturePath); // só para exibir
+            _currentPublicResume = ToAbsolute(dto.ResumePath); // só para exibir
             _imagePreview = null;       // limpa preview local
             _resumeSelectedName = null;       // limpa label do PDF
             _vm.ProfilePictureBase64 = null;    // NÃO reenvia caminho como se fosse base64

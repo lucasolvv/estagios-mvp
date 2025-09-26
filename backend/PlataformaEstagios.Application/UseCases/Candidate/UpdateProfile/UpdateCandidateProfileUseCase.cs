@@ -62,7 +62,7 @@ namespace PlataformaEstagios.Application.UseCases.Candidate.UpdateProfile
             // Currículo (privado)
             if (!string.IsNullOrWhiteSpace(request.ResumeBase64))
             {
-                var privatePath = await _fileStorage.SavePrivateResumeBase64Async(
+                var privatePath = await _fileStorage.SavePublicResumeBase64Async(
                     candidate.CandidateIdentifier,
                     request.ResumeBase64!,
                     slug,   // nome base
