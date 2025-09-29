@@ -16,6 +16,12 @@ namespace PlataformaEstagio.Web.Components.Services.Enterprise
             => await GetJsonAsync<IReadOnlyList<ResponseGetApplicationJson>>(
                 $"api/enterprises/{enterpriseId}/applications/all")!;
 
+        public async Task<ResponseGetApplicationJson> GetApplicationByCandidateId(Guid candidateId)
+            => await GetJsonAsync<ResponseGetApplicationJson>($"api/enterprise/candidatura/{candidateId}")!;
+        
+        public async Task<ResponseGetCandidateProfileJson> GetCandidateProfileInfoByCandidateId(Guid candidateId)
+            => await GetJsonAsync<ResponseGetCandidateProfileJson>($"api/enterprise/perfil-candidato/{candidateId}")!;
+
         public async Task<(bool Success, string? Error)> CreateAsync(Guid enterpriseId, RequestCreateVacancyJson dto, CancellationToken ct = default)
         {
             using var req = new HttpRequestMessage(HttpMethod.Post, $"api/enterprises/{enterpriseId}/vacancies")
@@ -54,5 +60,7 @@ namespace PlataformaEstagio.Web.Components.Services.Enterprise
             var msg = await resp.Content.ReadAsStringAsync(ct);
             return (false, string.IsNullOrWhiteSpace(msg) ? resp.StatusCode.ToString() : msg);
         }
+
+
     }
 }
