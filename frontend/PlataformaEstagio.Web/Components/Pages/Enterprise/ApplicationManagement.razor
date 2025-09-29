@@ -1,0 +1,451 @@
+﻿@page "/empresa/candidatura/gerenciar/{id:guid}"
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Web
+@using PlataformaEstagio.Web.Components.Services.Enterprise
+@using PlataformaEstagio.Web.Components.Services.Auth
+@using PlataformaEstagios.Domain.Enums
+@inject IEnterpriseService EnterpriseService
+@inject IUserContext CurrentUser
+@inject ISnackbar Snackbar
+@inject NavigationManager Nav
+@inject IDialogService DialogService
+
+<MudContainer MaxWidth="MaxWidth.False" Class="px-6 py-4">
+    <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+        <MudStack>
+            <MudText Typo="Typo.h5" Class="font-weight-bold">Gerenciar candidatura</MudText>
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                Visualize o perfil do candidato, atualize o status e agende entrevistas.
+            </MudText>
+        </MudStack>
+        <MudButton Variant="Variant.Outlined" OnClick="@(()=> Nav.NavigateTo("/empresa/home"))">
+            <MudIcon Icon="@Icons.Material.Filled.ArrowBack" Class="mr-2" /> Voltar
+        </MudButton>
+    </MudStack>
+
+    <MudDivider Class="my-4" />
+
+    @if (!_loaded)
+    {
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="320px" />
+    }
+    else if (_notFound)
+    {
+        <MudAlert Severity="Severity.Warning" Variant="Variant.Filled" Dense>
+            Candidatura não encontrada ou você não tem acesso.
+        </MudAlert>
+    }
+    else
+    {
+        <MudGrid>
+            <!-- Coluna esquerda: Candidato -->
+            <MudItem xs="12" md="4">
+                <MudPaper Class="pa-4">
+                    <MudStack Spacing="2">
+                        <MudStack Row AlignItems="AlignItems.Center" Spacing="2">
+                            <MudAvatar Size="Size.Large" Image="@_vm.Candidate.ProfilePictureUrl" Color="Color.Primary">
+                                @(_vm.Candidate.Initials)
+                            </MudAvatar>
+                            <MudStack>
+                                <MudText Typo="Typo.h6">@_vm.Candidate.FullName</MudText>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                    @_vm.Candidate.Course @(_vm.Candidate.Semester is null ? "" : $" • {_vm.Candidate.Semester}º período")
+                                </MudText>
+                            </MudStack>
+                        </MudStack>
+
+                        <MudList Dense="true" T="string">
+                            <MudListItem>
+                                <MudIcon Icon="@Icons.Material.Filled.LocationOn" Class="mr-2" />
+                                @_vm.Candidate.City - @_vm.Candidate.UF
+                            </MudListItem>
+                            <MudListItem>
+                                <MudIcon Icon="@Icons.Material.Filled.Email" Class="mr-2" />
+                                @_vm.Candidate.Email
+                            </MudListItem>
+                            <MudListItem>
+                                <MudIcon Icon="@Icons.Material.Filled.Phone" Class="mr-2" />
+                                @_vm.Candidate.Phone
+                            </MudListItem>
+                        </MudList>
+
+                        <MudStack Row Spacing="2">
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@OpenCandidateInlineDialog">
+                                <MudIcon Icon="@Icons.Material.Filled.PersonSearch" Class="mr-2" />
+                                Ver mais
+                            </MudButton>
+                            <MudButton Variant="Variant.Outlined" Disabled="@(!_vm.Candidate.HasResume)" OnClick="@OpenResume">
+                                <MudIcon Icon="@Icons.Material.Filled.Description" Class="mr-2" />
+                                Ver currículo
+                            </MudButton>
+                        </MudStack>
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
+
+            <!-- Coluna direita: Vaga + Status + Entrevista -->
+            <MudItem xs="12" md="8">
+                <MudGrid>
+                    <!-- Card Vaga & Status -->
+                    <MudItem xs="12">
+                        <MudPaper Class="pa-4">
+                            <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                                <MudStack>
+                                    <MudText Typo="Typo.subtitle1" Class="font-weight-bold">@_vm.Vacancy.Title</MudText>
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                        Aberta em @(_vm.Vacancy.OpeningDate?.ToString("dd/MM/yyyy") ?? "-") •
+                                        Candidatou-se em @_vm.AppliedAt.ToString("dd/MM/yyyy")
+                                    </MudText>
+                                </MudStack>
+
+                                <MudChip T="string" Color="@StatusColor(_vm.Status)" Variant="Variant.Filled" Style="font-weight:600">
+                                    @DisplayStatus(_vm.Status)
+                                </MudChip>
+                            </MudStack>
+
+                            <MudDivider Class="my-3" />
+
+                            <MudStack Row Spacing="2">
+                                <MudButton Color="Color.Success" Disabled="@(_busy || _vm.Status == ApplicationStatus.Approved)" OnClick="@(()=>UpdateStatusAsync(ApplicationStatus.Approved))">
+                                    <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Class="mr-2" />
+                                    Aprovar
+                                </MudButton>
+                                <MudButton Color="Color.Error" Variant="Variant.Outlined" Disabled="@(_busy || _vm.Status == ApplicationStatus.Rejected)" OnClick="@(()=>UpdateStatusAsync(ApplicationStatus.Rejected))">
+                                    <MudIcon Icon="@Icons.Material.Filled.Cancel" Class="mr-2" />
+                                    Rejeitar
+                                </MudButton>
+                            </MudStack>
+                        </MudPaper>
+                    </MudItem>
+
+                    <!-- Card Agendar Entrevista -->
+                    <MudItem xs="12">
+                        <MudPaper Class="pa-4">
+                            <MudText Typo="Typo.subtitle1" Class="font-weight-bold mb-2">Agendar entrevista</MudText>
+
+                            <MudForm @ref="_form" Disabled="_busy">
+                                <MudGrid>
+                                    <MudItem xs="12" md="4">
+                                        <MudDatePicker Label="Data" @bind-Date="_interview.StartDate" Required="true" />
+                                    </MudItem>
+                                    <MudItem xs="12" md="4">
+                                        <MudTimePicker Label="Hora" @bind-Time="_interview.StartTime" Required="true" />
+                                    </MudItem>
+                                    <MudItem xs="12" md="4">
+                                        <MudSelect T="int" Label="Duração (min)" @bind-Value="_interview.DurationMinutes" Required="true">
+                                            @foreach (var d in new[] {30,45,60,90})
+                                            {
+                                                <MudSelectItem Value="@(d)">@d</MudSelectItem>
+                                            }
+                                        </MudSelect>
+                                    </MudItem>
+
+                                    <MudItem xs="12" md="6">
+                                        <MudTextField Label="Local (presencial)" @bind-Value="_interview.Location" />
+                                    </MudItem>
+                                    <MudItem xs="12" md="6">
+                                        <MudTextField Label="Link (Meet/Teams)" @bind-Value="_interview.MeetingLink" />
+                                    </MudItem>
+
+                                    <MudItem xs="12">
+                                        <MudTextField Label="Observações" @bind-Value="_interview.Notes" Lines="3" />
+                                    </MudItem>
+
+                                    <MudItem xs="12">
+                                        <MudButton Color="Color.Primary" OnClick="ScheduleInterviewAsync" Disabled="_busy">
+                                            <MudIcon Icon="@Icons.Material.Filled.EventAvailable" Class="mr-2" />
+                                            Agendar
+                                        </MudButton>
+                                    </MudItem>
+                                </MudGrid>
+                            </MudForm>
+
+                            @if (_vm.Interviews.Any())
+                            {
+                                <MudDivider Class="my-3" />
+                                <MudText Typo="Typo.subtitle2" Class="font-weight-bold mb-2">Entrevistas marcadas</MudText>
+                                <MudList Dense="true" T="string">
+                                    @foreach (var it in _vm.Interviews.OrderByDescending(i => i.StartAt))
+                                    {
+                                        <MudListItem>
+                                            <MudIcon Icon="@Icons.Material.Filled.Event" Class="mr-2" />
+                                            @it.StartAt.LocalDateTime.ToString("dd/MM/yyyy HH:mm") —
+                                            @($"{it.DurationMinutes} min")
+                                            @if (!string.IsNullOrWhiteSpace(it.Location))
+                                            { <span class="ml-2">• @it.Location</span> }
+                                            @if (!string.IsNullOrWhiteSpace(it.MeetingLink))
+                                            { <span class="ml-2">• @it.MeetingLink</span> }
+                                        </MudListItem>
+                                    }
+                                </MudList>
+                            }
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+            </MudItem>
+        </MudGrid>
+    }
+</MudContainer>
+
+@if (_showDetails)
+{
+    <MudOverlay Visible="true" OnClick="@CloseCandidateInlineDialog" DarkBackground="true" Class="d-flex align-center justify-center">
+        <MudPaper Class="pa-4" Style="width: 720px; max-width: 95vw;" Elevation="8" @onclick:stopPropagation="true">
+            <MudStack Spacing="2">
+                <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+                    <MudStack Row AlignItems="AlignItems.Center" Spacing="2">
+                        <MudAvatar Size="Size.Large" Image="@_vm.Candidate.ProfilePictureUrl">@_vm.Candidate.Initials</MudAvatar>
+                        <MudText Typo="Typo.h6">@_vm.Candidate.FullName</MudText>
+                    </MudStack>
+                    <MudIconButton Icon="@Icons.Material.Filled.Close" Color="Color.Default" OnClick="@CloseCandidateInlineDialog" />
+                </MudStack>
+
+                <MudDivider Class="my-2" />
+
+                <MudSimpleTable Dense="true">
+                    <thead>
+                        <tr><th>Campo</th><th>Valor</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Curso</td><td>@_vm.Candidate.Course</td></tr>
+                        <tr><td>Período</td><td>@_vm.Candidate.Semester</td></tr>
+                        <tr><td>Cidade/UF</td><td>@_vm.Candidate.City - @_vm.Candidate.UF</td></tr>
+                        <tr><td>E-mail</td><td>@_vm.Candidate.Email</td></tr>
+                        <tr><td>Telefone</td><td>@_vm.Candidate.Phone</td></tr>
+                    </tbody>
+                </MudSimpleTable>
+
+                <MudStack Row Spacing="2" Class="mt-2">
+                    <MudButton Variant="Variant.Outlined" Disabled="@(!_vm.Candidate.HasResume)" OnClick="@OpenResume">
+                        <MudIcon Icon="@Icons.Material.Filled.Description" Class="mr-2" /> Ver currículo
+                    </MudButton>
+                    <MudSpacer />
+                    <MudButton Color="Color.Primary" OnClick="@CloseCandidateInlineDialog">Fechar</MudButton>
+                </MudStack>
+            </MudStack>
+        </MudPaper>
+    </MudOverlay>
+}
+
+
+@code {
+    [Parameter] public Guid id { get; set; }
+
+    private MudForm? _form;
+    private bool _busy;
+    private bool _loaded;
+    private bool _hydrated;
+    private bool _notFound;
+
+    // --------- VM (apenas para UI; ligue com seu serviço depois) ----------
+    private ApplicationManageVm _vm = new();
+    private InterviewForm _interview = new();
+
+    protected override Task OnInitializedAsync() => Task.CompletedTask;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!_hydrated && firstRender)
+        {
+            _hydrated = true;
+            await CurrentUser.RefreshAsync();
+            await LoadAsync();
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadAsync()
+    {
+        try
+        {
+            // TODO: amarrar com EnterpriseService.GetManageApplicationAsync(id)
+            // abaixo: placeholders para demonstrar o layout
+            _vm = new ApplicationManageVm
+            {
+                ApplicationIdentifier = id,
+                Status = ApplicationStatus.Pending,
+                AppliedAt = DateTime.Now.AddDays(-2),
+                Vacancy = new VacancyVm { Title = "Estagiário(a) Frontend (Blazor)", OpeningDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-20)) },
+                Candidate = new CandidateVm
+                {
+                    FullName = "Ana Souza",
+                    Course = "Engenharia de Software",
+                    Semester = "5",
+                    City = "Volta Redonda",
+                    UF = "RJ",
+                    Email = "ana.souza@email.com",
+                    Phone = "(24) 99999-0000",
+                    ProfilePictureUrl = null, // se houver
+                    HasResume = true
+                },
+                Interviews = new List<InterviewVm>()
+            };
+
+            _loaded = true;
+        }
+        catch
+        {
+            _notFound = true;
+            _loaded = true;
+        }
+    }
+
+    private async Task UpdateStatusAsync(ApplicationStatus newStatus)
+    {
+        _busy = true;
+        try
+        {
+            // TODO: EnterpriseService.UpdateApplicationStatus(id, newStatus, notes)
+            _vm.Status = newStatus;
+            Snackbar.Add($"Status atualizado para {DisplayStatus(newStatus)}.", Severity.Success);
+        }
+        catch
+        {
+            Snackbar.Add("Não foi possível atualizar o status.", Severity.Error);
+        }
+        finally { _busy = false; }
+    }
+
+    private async Task ScheduleInterviewAsync()
+    {
+        await _form!.Validate();
+        if (!_form.IsValid)
+        {
+            Snackbar.Add("Preencha data, hora e duração.", Severity.Warning);
+            return;
+        }
+
+        if (_interview.StartDate is null || _interview.StartTime is null)
+        {
+            Snackbar.Add("Informe data e hora válidas.", Severity.Warning);
+            return;
+        }
+
+        // Pelo menos um dos campos de local precisa existir
+        if (string.IsNullOrWhiteSpace(_interview.Location) && string.IsNullOrWhiteSpace(_interview.MeetingLink))
+        {
+            Snackbar.Add("Informe um local presencial ou um link de reunião.", Severity.Info);
+            return;
+        }
+
+        _busy = true;
+        try
+        {
+            var start = _interview.StartDate.Value.Add(_interview.StartTime.Value);
+            var dtoStart = new DateTimeOffset(start, TimeZoneInfo.Local.GetUtcOffset(start));
+
+            // TODO: EnterpriseService.ScheduleInterview(id, dtoStart, _interview.DurationMinutes, _interview.Location, _interview.MeetingLink, _interview.Notes)
+
+            _vm.Interviews.Add(new InterviewVm
+            {
+                InterviewIdentifier = Guid.NewGuid(),
+                StartAt = dtoStart,
+                DurationMinutes = _interview.DurationMinutes,
+                Location = _interview.Location,
+                MeetingLink = _interview.MeetingLink,
+                Notes = _interview.Notes
+            });
+
+            Snackbar.Add("Entrevista agendada!", Severity.Success);
+            _interview = new InterviewForm(); // limpa
+        }
+        catch
+        {
+            Snackbar.Add("Não foi possível agendar a entrevista.", Severity.Error);
+        }
+        finally { _busy = false; }
+    }
+
+    private void OpenResume()
+    {
+        // TODO: Navegar para endpoint de download/visualização do currículo
+        Snackbar.Add("Abrindo currículo…", Severity.Normal);
+    }
+
+    // private async Task OpenCandidateDialog()
+    // {
+    //     var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
+    //     var parameters = new DialogParameters
+    //     {
+    //         ["vm"] = _vm.Candidate
+    //     };
+    //     DialogService.Show<CandidateDetailsDialog>("Perfil do candidato", parameters, options);
+    // }
+
+    private bool _showDetails;
+
+    private void OpenCandidateInlineDialog() => _showDetails = true;
+    private void CloseCandidateInlineDialog() => _showDetails = false;
+
+
+    // -------- helpers de UI --------
+    private static string DisplayStatus(ApplicationStatus s) => s switch
+    {
+        ApplicationStatus.Pending => "Pendente",
+        ApplicationStatus.Approved => "Aprovado",
+        ApplicationStatus.Rejected => "Rejeitado",
+        _ => s.ToString()
+    };
+
+    private static Color StatusColor(ApplicationStatus s) => s switch
+    {
+        ApplicationStatus.Pending => Color.Warning,
+        ApplicationStatus.Approved => Color.Success,
+        ApplicationStatus.Rejected => Color.Error,
+        _ => Color.Default
+    };
+
+    // -------- View Models (UI) --------
+    private sealed class ApplicationManageVm
+    {
+        public Guid ApplicationIdentifier { get; set; }
+        public ApplicationStatus Status { get; set; }
+        public DateTime AppliedAt { get; set; }
+        public VacancyVm Vacancy { get; set; } = new();
+        public CandidateVm Candidate { get; set; } = new();
+        public List<InterviewVm> Interviews { get; set; } = new();
+    }
+
+    private sealed class VacancyVm
+    {
+        public string Title { get; set; } = string.Empty;
+        public DateOnly? OpeningDate { get; set; }
+    }
+
+    private sealed class CandidateVm
+    {
+        public string FullName { get; set; } = string.Empty;
+        public string? Course { get; set; }
+        public string? Semester { get; set; }
+        public string? City { get; set; }
+        public string? UF { get; set; }
+        public string? Email { get; set; }
+        public string? Phone { get; set; }
+        public string? ProfilePictureUrl { get; set; }
+        public bool HasResume { get; set; }
+
+        public string Initials =>
+            string.Join("", (FullName ?? "").Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                .Take(2).Select(n => n[0])).ToUpperInvariant();
+    }
+
+    private sealed class InterviewVm
+    {
+        public Guid InterviewIdentifier { get; set; }
+        public DateTimeOffset StartAt { get; set; }
+        public int DurationMinutes { get; set; }
+        public string? Location { get; set; }
+        public string? MeetingLink { get; set; }
+        public string? Notes { get; set; }
+    }
+
+    private sealed class InterviewForm
+    {
+        [Required] public DateTime? StartDate { get; set; }
+        [Required] public TimeSpan? StartTime { get; set; }
+        [Range(15, 300)] public int DurationMinutes { get; set; } = 30;
+        public string? Location { get; set; }
+        public string? MeetingLink { get; set; }
+        public string? Notes { get; set; }
+    }
+}
