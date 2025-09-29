@@ -12,6 +12,10 @@ namespace PlataformaEstagio.Web.Components.Services.Enterprise
             => await GetJsonAsync<List<ResponseVacancyListItem>>(
                 $"api/enterprises/{enterpriseId}/vacancies")!;
 
+        public async Task<IReadOnlyList<ResponseGetApplicationJson>> GetAllApplicationsByEnterpriseIdAsync(Guid enterpriseId)
+            => await GetJsonAsync<IReadOnlyList<ResponseGetApplicationJson>>(
+                $"api/enterprises/{enterpriseId}/applications/all")!;
+
         public async Task<(bool Success, string? Error)> CreateAsync(Guid enterpriseId, RequestCreateVacancyJson dto, CancellationToken ct = default)
         {
             using var req = new HttpRequestMessage(HttpMethod.Post, $"api/enterprises/{enterpriseId}/vacancies")

@@ -9,6 +9,7 @@ namespace PlataformaEstagio.Web.Components.Services.Enterprise
         Task<ResponseGetVacancyJson> GetByIdAsync(Guid enterpriseId, Guid vacancyId);
         Task<(bool Success, string? Error)> CreateAsync(Guid enterpriseId, RequestCreateVacancyJson dto, CancellationToken ct = default);
         Task<(bool Success, string? Error)> UpdateAsync(Guid enterpriseId, Guid vacancyId, RequestUpdateVacancyJson dto, CancellationToken ct = default);
+        Task<IReadOnlyList<ResponseGetApplicationJson>> GetAllApplicationsByEnterpriseIdAsync(Guid enterpriseId);
         
     }
 }

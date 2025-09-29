@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PlataformaEstagios.Application.UseCases.Application.Get;
 using PlataformaEstagios.Application.UseCases.Vacancy.Create;
 using PlataformaEstagios.Application.UseCases.Vacancy.Get;
 using PlataformaEstagios.Application.UseCases.Vacancy.Update;
@@ -50,6 +51,16 @@ namespace PlataformaEstagios.Api.Controllers
         {
             var result = await useCase.UpdateVacancyAsync(enterpriseId, vacancyId, request, ct);
             return Ok("Vaga alterada com sucesso.");
+        }
+
+        [Authorize(Roles = "Enterprise")]
+        [HttpGet("{enterpriseId:guid}/applications/all")]
+        [ProducesResponseType(typeof(ResponseGetVacancyJson), 200)]
+        public async Task<ActionResult<IReadOnlyList<ResponseGetApplicationJson>>> GetAllApplicationsByEnterpriseIdAsync(Guid enterpriseId,
+            [FromServices] IGetApplicationUseCase useCase, CancellationToken ct = default)
+        {
+            var data = await useCase.GetRecentApplicationsByEnterpriseIdAsync(enterpriseId);
+            return Ok(data);
         }
 
         //[HttpGet("stats")]

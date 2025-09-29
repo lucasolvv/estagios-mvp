@@ -108,18 +108,14 @@
                                 <MudTh></MudTh>
                             </HeaderContent>
                             <RowTemplate>
-                                <MudTd>@context.Nome</MudTd>
-                                <MudTd>@context.Curso</MudTd>
-                                <MudTd>@context.Vaga</MudTd>
-                                <MudTd>@context.Data.ToString("dd/MM/yyyy")</MudTd>
+                                <MudTd>@context.NomeCandidato</MudTd>
+                                <MudTd>@context.NomeCursoCandidato</MudTd>
+                                <MudTd>@context.TituloVaga</MudTd>
+                                <MudTd>@context.DataCandidatura.ToString("dd/MM/yyyy")</MudTd>
                                 <MudTd Class="text-right">
                                     <MudButton Size="Size.Small" Color="Color.Primary" StartIcon="@Icons.Material.Filled.PersonSearch"
-                                               OnClick="@(()=>OnVerPerfil(context))">
-                                        Ver perfil
-                                    </MudButton>
-                                    <MudButton Size="Size.Small" Variant="Variant.Text" StartIcon="@Icons.Material.Filled.CalendarMonth"
-                                               OnClick="@(()=>OnAgendarEntrevista(context))">
-                                        Agendar entrevista
+                                               OnClick="@(()=>OnGerenciarCandidatura(context.idCandidato))">
+                                        Gerenciar candidatura
                                     </MudButton>
                                 </MudTd>
                             </RowTemplate>
@@ -225,6 +221,7 @@
     private bool _isLoading = true;
     private Guid? _enterpriseId;
     private List<JobCompanyVm> ActiveJobs { get; set; } = new();
+    private List<ApplicationVm> RecentCandidates { get; set; } = new();
 
     private bool _hydrated;     
     private bool _loadingJobs; 
@@ -240,12 +237,12 @@
         {
             _hydrated = true;
             await CurrentUser.RefreshAsync();
-            await LoadJobsAsync();
+            await LoadAsync();
             StateHasChanged();
         }
     }
 
-    private async Task LoadJobsAsync()
+    private async Task LoadAsync()
     {
         if (_loadingJobs) return;   // trava reentrada
         _loadingJobs = true;
@@ -262,6 +259,19 @@
                     v.OpenedAt.ToLocalTime(),
                     v.Applicants,
                     v.Status)).ToList();
+
+                var applications = await _service.GetAllApplicationsByEnterpriseIdAsync(id);
+                RecentCandidates = applications
+                    .OrderByDescending(a => a.DataCandidatura)
+                    .Take(5)
+                    .Select(a => new ApplicationVm(
+                        a.NomeCandidato,
+                        a.TituloVaga,
+                        a.DataCandidatura,
+                        a.NomeCurso,
+                        a.CandidateIdentifier)
+                    )
+                    .ToList();
             }
             else
             {
@@ -294,7 +304,7 @@
 
     private void OnVerInscritos(JobCompanyVm job) => Snackbar.Add($"Ver inscritos de \"{job.Titulo}\" (mock).", Severity.Normal);
     private void OnEditarVaga(JobCompanyVm job) => Nav.NavigateTo($"/empresa/vagas/{job.JobId}/editar");
-    private void OnVerPerfil(CandidateVm c) => Snackbar.Add($"Abrir perfil de {c.Nome} (mock).", Severity.Normal);
+    private void OnGerenciarCandidatura(Guid candidatoId) => Snackbar.Add($"Gerenciar candidatura. id: {candidatoId}", Severity.Normal);
     private void OnAgendarEntrevista(CandidateVm c) => Snackbar.Add($"Agendar entrevista com {c.Nome} (mock).", Severity.Success);
 
     private Color JobStatusColor(string status) => status switch
@@ -309,16 +319,17 @@
     private record JobCompanyVm(Guid JobId, string Titulo, DateTime DataAbertura, int Inscritos, string Status);
     private record CandidateVm(string Nome, string Curso, string Vaga, DateTime Data);
     private record InterviewVm(string Candidato, string Vaga, DateTime Data, string Canal);
+    private record ApplicationVm(string NomeCandidato, string TituloVaga, DateTime DataCandidatura, string NomeCursoCandidato, Guid idCandidato);
     private record NotificationVm(string Texto, DateTime Data);
 
     private StatsVm Stats = new(3, 28, 6, 0.65);
 
-    private List<CandidateVm> RecentCandidates = new()
-    {
-        new("Ana Souza", "Eng. de Software (5º)", "Estagiário(a) Frontend (Blazor)", DateTime.Today.AddDays(-1)),
-        new("Bruno Lima", "Sistemas de Informação (4º)", "QA Júnior (Estágio)", DateTime.Today.AddDays(-2)),
-        new("Carla Menezes", "Ciência da Computação (6º)", "Suporte TI (Home Office)", DateTime.Today.AddDays(-3)),
-    };
+    // private List<CandidateVm> RecentCandidates = new()
+    // {
+    //     new("Ana Souza", "Eng. de Software (5º)", "Estagiário(a) Frontend (Blazor)", DateTime.Today.AddDays(-1)),
+    //     new("Bruno Lima", "Sistemas de Informação (4º)", "QA Júnior (Estágio)", DateTime.Today.AddDays(-2)),
+    //     new("Carla Menezes", "Ciência da Computação (6º)", "Suporte TI (Home Office)", DateTime.Today.AddDays(-3)),
+    // };
 
     private List<InterviewVm> UpcomingInterviews = new()
     {

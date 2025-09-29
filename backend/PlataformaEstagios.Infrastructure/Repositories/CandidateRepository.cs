@@ -25,5 +25,17 @@ namespace PlataformaEstagios.Infrastructure.Repositories
                 ICollection<Domain.Entities.Application>?>)q.AsNoTracking();
             return await q.FirstOrDefaultAsync(c => c.CandidateIdentifier == id, ct);
         }
+        public async Task<string> GetCandidateNameByIdAsync(Guid candidateId)
+        {
+            return (await _dbcontext.Candidates
+                .AsNoTracking()
+                .FirstOrDefaultAsync(e => e.CandidateIdentifier == candidateId)).Name;
+        }
+        public async Task<string> GetCandidateCourseNameByIdAsync(Guid candidateId)
+        {
+            return (await _dbcontext.Candidates
+                .AsNoTracking()
+                .FirstOrDefaultAsync(e => e.CandidateIdentifier == candidateId)).CourseName;
+        }
     }
 }

@@ -34,5 +34,17 @@ namespace PlataformaEstagios.Infrastructure.Repositories
                 .OrderByDescending(a => a.ApplicationDate)
                 .ToListAsync();
         }
+
+        public async Task<IReadOnlyList<Domain.Entities.Application>> GetRecentApplicationsByEnterpriseIdAsync(Guid enterpriseId)
+        {
+            return await _dbcontext.Applications
+                .AsNoTracking()
+                .Where(a => a.Vacancy.EnterpriseIdentifier == enterpriseId)
+                .Include(a => a.Vacancy)   // se você vai ler a entidade Vacancy depois
+                .Include(a => a.Candidate) // idem Candidate
+                .OrderByDescending(a => a.ApplicationDate)
+                .ToListAsync();
+
+        }
     }
 }
