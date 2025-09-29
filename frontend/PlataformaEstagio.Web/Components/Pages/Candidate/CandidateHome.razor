@@ -10,34 +10,70 @@
     <MudContainer MaxWidth="MaxWidth.False" Class="px-6 py-4">
     <MudGrid>
         <!-- Header / Perfil -->
-        <MudItem xs="12">
+            <!-- Header / Perfil -->
+            <MudItem xs="12">
                 <MudPaper Class="pa-6">
-                <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Spacing="2">
-                    <MudStack>
-                        <MudText Typo="Typo.h5" Class="font-weight-bold">
+                    <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Spacing="2">
+                        <MudStack>
+                            <MudText Typo="Typo.h5" Class="font-weight-bold">
                                 Olá, @GetDisplayName(auth.User) 👋
-                        </MudText>
-                        <MudText Typo="Typo.subtitle2" Color="Color.Secondary">
-                            Continue seu perfil para receber recomendações mais precisas.
-                        </MudText>
+                            </MudText>
+
+                            <MudText Typo="Typo.subtitle2" Color="Color.Secondary">
+                                @(ProfileCompletion >= 100
+                                                                ? "Perfil completo! Você já pode focar nas vagas."
+                                                                : "Finalize seu perfil para receber recomendações mais precisas.")
+                            </MudText>
+                        </MudStack>
+
+                        <MudStack Row Spacing="1">
+                            @if (ProfileCompletion < 100)
+                            {
+                                <MudButton Variant="Variant.Filled"
+                                           StartIcon="@Icons.Material.Filled.Person"
+                                           Color="Color.Primary"
+                                           OnClick="OnIrParaPerfil">
+                                    Completar Perfil (@ProfileCompletion%)
+                                </MudButton>
+                            }
+                            else
+                            {
+                                <MudChip Color="Color.Success"
+                                         StartIcon="@Icons.Material.Filled.CheckCircle"
+                                         Variant="Variant.Filled"
+                                         T="string">
+                                    Perfil completo
+                                </MudChip>
+
+                                <!-- Ainda permite edição, mas separado do CTA principal -->
+                                <MudButton Variant="Variant.Outlined"
+                                           StartIcon="@Icons.Material.Filled.Edit"
+                                           OnClick="OnIrParaPerfil">
+                                    Editar
+                                </MudButton>
+                            }
+
+                            <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Search" OnClick="OnBuscarvagas">
+                                Buscar Vagas
+                            </MudButton>
+                            <MudButton Variant="Variant.Text" StartIcon="@Icons.Material.Filled.Alarm" OnClick="OnConfigurarAlertas">
+                                Alertas
+                            </MudButton>
+                        </MudStack>
                     </MudStack>
 
-                    <MudStack Row Spacing="1">
-                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Person" Color="Color.Primary" OnClick="OnIrParaPerfil">
-                            Completar Perfil (@ProfileCompletion% )
-                        </MudButton>
-                        <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Search" OnClick="OnBuscarvagas">
-                            Buscar Vagas
-                        </MudButton>
-                        <MudButton Variant="Variant.Text" StartIcon="@Icons.Material.Filled.Alarm" OnClick="OnConfigurarAlertas">
-                            Alertas
-                        </MudButton>
-                    </MudStack>
-                </MudStack>
+                    @if (ProfileCompletion < 100)
+                    {
+                        <MudProgressLinear Class="mt-3" Value="@ProfileCompletion" Color="Color.Success" />
+                    }
+                    else
+                    {
+                        <!-- Mantém respiro visual quando a barra some -->
+                        <MudDivider Class="mt-3" />
+                    }
+                </MudPaper>
+            </MudItem>
 
-                <MudProgressLinear Class="mt-3" Value="@ProfileCompletion" Color="Color.Success" />
-            </MudPaper>
-        </MudItem>
 
         <!-- Coluna esquerda -->
         <MudItem xs="12" md="8">
@@ -237,6 +273,12 @@
         {
             if (CurrentUser.UserTypeId is Guid id)
             {
+                var profile = await _service.GetByIdAsync(id);
+
+                ProfileCompletion = ComputeProfileCompletion(profile);
+
+
+
                 var vagasRecentes = await _service.GetOpenVacanciesAsync();
                 RecentVacancies = vagasRecentes.Select(v => new RecentVacanciesVm(
                     
@@ -329,4 +371,34 @@
         new("Sua inscrição na Tech Corp mudou para 'Em análise'", DateTime.Today.AddHours(-5)),
         new("Nova vaga de Blazor publicada pela DevHouse", DateTime.Today.AddDays(-1))
     };
+
+    // Helpers
+    private static string OnlyDigits(string? s) =>
+        string.IsNullOrWhiteSpace(s) ? string.Empty : new string(s.Where(char.IsDigit).ToArray());
+
+    private static bool TwoLetters(string? s) =>
+        !string.IsNullOrWhiteSpace(s) && s.Trim().Length == 2;
+
+    // Regra simples: 10 itens, cada um vale 10%
+    private static int ComputeProfileCompletion(PlataformaEstagios.Communication.Responses.ResponseGetCandidateProfileJson dto)
+    {
+        int total = 10, score = 0;
+
+        if (!string.IsNullOrWhiteSpace(dto.FullName)) score++;
+        if (dto.BirthDate.HasValue) score++;
+        if (!string.IsNullOrWhiteSpace(dto.CourseName)) score++;
+        if (!string.IsNullOrWhiteSpace(dto.BioResume)) score++;
+
+        var a = dto.Address;
+        if (!string.IsNullOrWhiteSpace(a?.Street)) score++;
+        if (!string.IsNullOrWhiteSpace(a?.City)) score++;
+        if (TwoLetters(a?.Uf)) score++;
+        if (OnlyDigits(a?.Cep).Length == 8) score++;
+
+        if (!string.IsNullOrWhiteSpace(dto.ProfilePicturePath)) score++;
+        if (!string.IsNullOrWhiteSpace(dto.ResumePath)) score++;
+
+        return (int)Math.Round(score * 100.0 / total);
+    }
+
 }

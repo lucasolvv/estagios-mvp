@@ -21,4 +21,8 @@
     <ProjectReference Include="..\PlataformaEstagios.Infrastructure\PlataformaEstagios.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="UseCases\Enterprise\" />
+  </ItemGroup>
+
 </Project>

@@ -180,7 +180,10 @@ namespace PlataformaEstagios.Application.Services.AutoMapper
                 .ForMember(destinationMember => destinationMember.DataCandidatura, opt => opt.MapFrom(src => src.ApplicationDate))
                 .ForMember(destinationMember => destinationMember.Status, opt => opt.MapFrom(src => src.Status.ToString()))
                 .ForMember(destinationMember => destinationMember.ApplicationIdentifier, opt => opt.MapFrom(src => src.ApplicationIdentifier))
-                .ForMember(destinationMember => destinationMember.VacancyIdentifier, opt => opt.MapFrom(src => src.VacancyId));
+                .ForMember(destinationMember => destinationMember.VacancyIdentifier, opt => opt.MapFrom(src => src.VacancyId))
+                .ForMember(destinationMember => destinationMember.CandidateIdentifier, opt => opt.MapFrom(src => src.CandidateIdentifier))
+                .ForMember(destinationMember => destinationMember.NomeCandidato, opt => opt.Ignore())
+                .ForMember(destinationMember => destinationMember.NomeCurso, opt => opt.Ignore());
 
 
             CreateMap<Domain.Entities.Candidate, ResponseGetCandidateProfileJson>()
