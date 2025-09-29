@@ -304,7 +304,7 @@
 
     private void OnVerInscritos(JobCompanyVm job) => Snackbar.Add($"Ver inscritos de \"{job.Titulo}\" (mock).", Severity.Normal);
     private void OnEditarVaga(JobCompanyVm job) => Nav.NavigateTo($"/empresa/vagas/{job.JobId}/editar");
-    private void OnGerenciarCandidatura(Guid candidatoId) => Snackbar.Add($"Gerenciar candidatura. id: {candidatoId}", Severity.Normal);
+    private void OnGerenciarCandidatura(Guid candidatoId) => Nav.NavigateTo($"empresa/candidatura/gerenciar/{candidatoId}");
     private void OnAgendarEntrevista(CandidateVm c) => Snackbar.Add($"Agendar entrevista com {c.Nome} (mock).", Severity.Success);
 
     private Color JobStatusColor(string status) => status switch
@@ -323,13 +323,6 @@
     private record NotificationVm(string Texto, DateTime Data);
 
     private StatsVm Stats = new(3, 28, 6, 0.65);
-
-    // private List<CandidateVm> RecentCandidates = new()
-    // {
-    //     new("Ana Souza", "Eng. de Software (5º)", "Estagiário(a) Frontend (Blazor)", DateTime.Today.AddDays(-1)),
-    //     new("Bruno Lima", "Sistemas de Informação (4º)", "QA Júnior (Estágio)", DateTime.Today.AddDays(-2)),
-    //     new("Carla Menezes", "Ciência da Computação (6º)", "Suporte TI (Home Office)", DateTime.Today.AddDays(-3)),
-    // };
 
     private List<InterviewVm> UpcomingInterviews = new()
     {
