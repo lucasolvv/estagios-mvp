@@ -2,6 +2,7 @@
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Components.Web
 @using PlataformaEstagio.Web.Components.Services.Enterprise
+@using PlataformaEstagio.Web.Components.Services.Candidate
 @using PlataformaEstagio.Web.Components.Services.Auth
 @using PlataformaEstagios.Domain.Enums
 @inject IEnterpriseService EnterpriseService
@@ -229,7 +230,7 @@
 
 
 @code {
-    [Parameter] public Guid id { get; set; }
+    [Parameter] public Guid candidateId { get; set; }
 
     private MudForm? _form;
     private bool _busy;
@@ -260,10 +261,14 @@
         {
             // TODO: amarrar com EnterpriseService.GetManageApplicationAsync(id)
             // abaixo: placeholders para demonstrar o layout
+
+            var applicationDto = await EnterpriseService.GetApplicationByCandidateId(candidateId);
+            var candidateProfileDto = await EnterpriseService.GetCandidateProfileInfoByCandidateId(candidateId);
+
             _vm = new ApplicationManageVm
             {
-                ApplicationIdentifier = id,
-                Status = ApplicationStatus.Pending,
+                ApplicationIdentifier = candidateId,
+                Status = applicationDto.Status,
                 AppliedAt = DateTime.Now.AddDays(-2),
                 Vacancy = new VacancyVm { Title = "Estagiário(a) Frontend (Blazor)", OpeningDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-20)) },
                 Candidate = new CandidateVm
