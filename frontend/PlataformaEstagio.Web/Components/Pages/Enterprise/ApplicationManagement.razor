@@ -64,10 +64,10 @@
                                 <MudIcon Icon="@Icons.Material.Filled.Email" Class="mr-2" />
                                 @_vm.Candidate.Email
                             </MudListItem>
-                            <MudListItem>
+                            @* <MudListItem>
                                 <MudIcon Icon="@Icons.Material.Filled.Phone" Class="mr-2" />
                                 @_vm.Candidate.Phone
-                            </MudListItem>
+                            </MudListItem> *@
                         </MudList>
 
                         <MudStack Row Spacing="2">
@@ -75,8 +75,11 @@
                                 <MudIcon Icon="@Icons.Material.Filled.PersonSearch" Class="mr-2" />
                                 Ver mais
                             </MudButton>
-                            <MudButton Variant="Variant.Outlined" Disabled="@(!_vm.Candidate.HasResume)" OnClick="@OpenResume">
-                                <MudIcon Icon="@Icons.Material.Filled.Description" Class="mr-2" />
+                            <MudButton Variant="Variant.Outlined"
+                                       Disabled="@string.IsNullOrWhiteSpace(_vm.Candidate.ResumeUrl)"
+                                       StartIcon="@Icons.Material.Filled.Description"
+                                       Href="@_vm.Candidate.ResumeUrl"
+                                       Target="_blank">
                                 Ver currículo
                             </MudButton>
                         </MudStack>
@@ -212,7 +215,6 @@
                         <tr><td>Período</td><td>@_vm.Candidate.Semester</td></tr>
                         <tr><td>Cidade/UF</td><td>@_vm.Candidate.City - @_vm.Candidate.UF</td></tr>
                         <tr><td>E-mail</td><td>@_vm.Candidate.Email</td></tr>
-                        <tr><td>Telefone</td><td>@_vm.Candidate.Phone</td></tr>
                     </tbody>
                 </MudSimpleTable>
 
@@ -237,6 +239,16 @@
     private bool _loaded;
     private bool _hydrated;
     private bool _notFound;
+
+    private const string ApiPublicBase = "https://localhost:7095"; // ajuste p/ seu ambiente
+
+    private static string? ToAbsolute(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path)) return null;
+        if (path.StartsWith("http", StringComparison.OrdinalIgnoreCase)) return path;
+        var p = path.StartsWith("/") ? path : "/" + path;
+        return $"{ApiPublicBase.TrimEnd('/')}{p}";
+    }
 
     // --------- VM (apenas para UI; ligue com seu serviço depois) ----------
     private ApplicationManageVm _vm = new();
@@ -269,18 +281,18 @@
             {
                 ApplicationIdentifier = candidateId,
                 Status = applicationDto.StatusEnum,
-                AppliedAt = DateTime.Now.AddDays(-2),
-                Vacancy = new VacancyVm { Title = "Estagiário(a) Frontend (Blazor)", OpeningDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-20)) },
+                AppliedAt = applicationDto.DataCandidatura,
+                Vacancy = new VacancyVm { Title = applicationDto.TituloVaga, OpeningDate = applicationDto.DataCadastroVaga },
                 Candidate = new CandidateVm
                 {
-                    FullName = "Ana Souza",
-                    Course = "Engenharia de Software",
+                    FullName = candidateProfileDto.FullName,
+                    Course = candidateProfileDto.CourseName,
                     Semester = "5",
-                    City = "Volta Redonda",
-                    UF = "RJ",
-                    Email = "ana.souza@email.com",
-                    Phone = "(24) 99999-0000",
-                    ProfilePictureUrl = null, // se houver
+                    City = candidateProfileDto.Address.City,
+                    UF = candidateProfileDto.Address.Uf,
+                    Email = candidateProfileDto.Email,
+                    ProfilePictureUrl = ToAbsolute(candidateProfileDto.ProfilePicturePath), // se houver
+                    ResumeUrl = ToAbsolute(candidateProfileDto.ResumePath), // se houver
                     HasResume = true
                 },
                 Interviews = new List<InterviewVm>()
@@ -414,7 +426,7 @@
     private sealed class VacancyVm
     {
         public string Title { get; set; } = string.Empty;
-        public DateOnly? OpeningDate { get; set; }
+        public DateTime? OpeningDate { get; set; }
     }
 
     private sealed class CandidateVm
@@ -425,8 +437,8 @@
         public string? City { get; set; }
         public string? UF { get; set; }
         public string? Email { get; set; }
-        public string? Phone { get; set; }
         public string? ProfilePictureUrl { get; set; }
+        public string? ResumeUrl { get; set; }
         public bool HasResume { get; set; }
 
         public string Initials =>

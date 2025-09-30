@@ -5,6 +5,7 @@ namespace PlataformaEstagios.Communication.Responses
     public sealed class ResponseGetCandidateProfileJson
     {
         public Guid CandidateId { get; set; }
+        public string? Email { get; set; } 
         public string? FullName { get; set; }
         public string? CourseName { get; set; }
         public DateTime? BirthDate { get; set; }
