@@ -73,6 +73,7 @@ namespace PlataformaEstagios.Application.UseCases.Application.Get
             {
                 mappedApplication.TituloVaga = application.Vacancy.Title!;
                 mappedApplication.NomeEmpresa = await _enterpriseRepo.GetEnterpriseNameByIdAsync(application.Vacancy.EnterpriseIdentifier);
+                mappedApplication.DataCadastroVaga = application.Vacancy.PublishedAtUtc ?? DateTime.UtcNow.Date;
             }
             return mappedApplication;
         }

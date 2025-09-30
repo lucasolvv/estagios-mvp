@@ -37,5 +37,11 @@ namespace PlataformaEstagios.Infrastructure.Repositories
                 .AsNoTracking()
                 .FirstOrDefaultAsync(e => e.CandidateIdentifier == candidateId)).CourseName;
         }
+        public async Task<string> GetCandidateEmailByUserIdAsync(Guid userId)
+        {
+            return (await _dbcontext.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(e => e.UserIdentifier == userId)).Email;
+        }
     }
 }

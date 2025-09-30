@@ -184,7 +184,8 @@ namespace PlataformaEstagios.Application.Services.AutoMapper
                 .ForMember(destinationMember => destinationMember.CandidateIdentifier, opt => opt.MapFrom(src => src.CandidateIdentifier))
                 .ForMember(destinationMember => destinationMember.NomeCandidato, opt => opt.Ignore())
                 .ForMember(destinationMember => destinationMember.NomeCurso, opt => opt.Ignore())
-                .ForMember(destinationMember => destinationMember.StatusEnum, opt => opt.MapFrom(src => src.Status));
+                .ForMember(destinationMember => destinationMember.StatusEnum, opt => opt.MapFrom(src => src.Status))
+                .ForMember(destinationMember => destinationMember.DataCadastroVaga, opt => opt.Ignore());
 
 
             CreateMap<Domain.Entities.Candidate, ResponseGetCandidateProfileJson>()
@@ -194,7 +195,9 @@ namespace PlataformaEstagios.Application.Services.AutoMapper
                 .ForMember(destinationMember => destinationMember.BioResume, opt => opt.MapFrom(src => src.BioResume))
                 .ForMember(destinationMember => destinationMember.Address, opt => opt.MapFrom(src => src.Address))
                 .ForMember(destinationMember => destinationMember.ProfilePicturePath, opt => opt.MapFrom(src => src.ProfilePicturePath))
-                .ForMember(destinationMember => destinationMember.ResumePath, opt => opt.MapFrom(src => src.ResumePath));
+                .ForMember(destinationMember => destinationMember.ResumePath, opt => opt.MapFrom(src => src.ResumePath))
+                .ForMember(destinationMember => destinationMember.Email, opt => opt.Ignore())
+                ;
                 
 
 

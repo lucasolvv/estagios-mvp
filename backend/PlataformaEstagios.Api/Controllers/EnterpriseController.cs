@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PlataformaEstagios.Application.UseCases.Application.Get;
+using PlataformaEstagios.Application.UseCases.Candidate.Get;
 using PlataformaEstagios.Application.UseCases.Vacancy.Create;
 using PlataformaEstagios.Application.UseCases.Vacancy.Get;
 using PlataformaEstagios.Application.UseCases.Vacancy.Update;
@@ -74,23 +75,15 @@ namespace PlataformaEstagios.Api.Controllers
             return Ok(data);
         }
 
-
-        //[HttpGet("stats")]
-        //public async Task<ActionResult<EnterpriseHomeStatsResponse>> GetStats(CancellationToken ct)
-        //{
-        //    var enterpriseId = _user.EnterpriseIdentifier;
-        //    var data = await _queries.GetStatsAsync(enterpriseId, ct);
-        //    return Ok(data);
-        //}
-
-        //[HttpGet("recent-candidates")]
-        //public async Task<ActionResult<IReadOnlyList<RecentCandidateResponse>>> GetRecent(
-        //    [FromQuery] int take = 10, CancellationToken ct = default)
-        //{
-        //    var enterpriseId = _user.EnterpriseIdentifier;
-        //    var data = await _queries.GetRecentCandidatesAsync(enterpriseId, take, ct);
-        //    return Ok(data);
-        //}
+        [Authorize(Roles = "Enterprise")]
+        [HttpGet("candidato/{candidateId:guid}")]
+        [ProducesResponseType(typeof(ResponseGetVacancyJson), 200)]
+        public async Task<ActionResult<ResponseGetCandidateProfileJson>> GetCandidateProfileInfoByCandidateId(Guid candidateId,
+            [FromServices] IGetCandidateUseCase useCase)
+        {
+            var data = await useCase.GetCandidateByIdAsync(candidateId);
+            return Ok(data);
+        }
     }
 
 }
