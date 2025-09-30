@@ -63,5 +63,18 @@ namespace PlataformaEstagios.Application.UseCases.Application.Get
 
             return mappedApplications;
         }
+
+        public async Task<ResponseGetApplicationJson> GetApplicationByCandidateIdAsync(Guid enterpriseId)
+        {
+            var application = await _appReadRepo.GetApplicationByCandidateIdAsync(enterpriseId);
+            if (application == null) throw new NullReferenceException("Candidatura não encontrada");
+            var mappedApplication = _mapper.Map<ResponseGetApplicationJson>(application);
+            if (application.Vacancy != null)
+            {
+                mappedApplication.TituloVaga = application.Vacancy.Title!;
+                mappedApplication.NomeEmpresa = await _enterpriseRepo.GetEnterpriseNameByIdAsync(application.Vacancy.EnterpriseIdentifier);
+            }
+            return mappedApplication;
+        }
     }
 }

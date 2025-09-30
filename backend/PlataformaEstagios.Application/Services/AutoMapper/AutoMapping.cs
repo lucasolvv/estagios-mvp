@@ -183,7 +183,8 @@ namespace PlataformaEstagios.Application.Services.AutoMapper
                 .ForMember(destinationMember => destinationMember.VacancyIdentifier, opt => opt.MapFrom(src => src.VacancyId))
                 .ForMember(destinationMember => destinationMember.CandidateIdentifier, opt => opt.MapFrom(src => src.CandidateIdentifier))
                 .ForMember(destinationMember => destinationMember.NomeCandidato, opt => opt.Ignore())
-                .ForMember(destinationMember => destinationMember.NomeCurso, opt => opt.Ignore());
+                .ForMember(destinationMember => destinationMember.NomeCurso, opt => opt.Ignore())
+                .ForMember(destinationMember => destinationMember.StatusEnum, opt => opt.MapFrom(src => src.Status));
 
 
             CreateMap<Domain.Entities.Candidate, ResponseGetCandidateProfileJson>()

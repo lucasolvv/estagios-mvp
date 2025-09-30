@@ -14,5 +14,8 @@ namespace PlataformaEstagios.Communication.Responses
         public string NomeCurso { get; set; }
         public DateTime DataCandidatura { get; set; }
         public string Status { get; set; }
+        public ApplicationStatus StatusEnum { get; set; }
+
+
     }
 }

@@ -63,6 +63,18 @@ namespace PlataformaEstagios.Api.Controllers
             return Ok(data);
         }
 
+        [Authorize(Roles = "Enterprise")]
+        [HttpGet("candidatura/{candidateId:guid}")]
+        [ProducesResponseType(typeof(ResponseGetVacancyJson), 200)]
+
+        public async Task<ActionResult<ResponseGetApplicationJson>> GetApplicationByCandidateId(Guid candidateId, 
+            [FromServices] IGetApplicationUseCase useCase)
+        {
+            var data = await useCase.GetApplicationByCandidateIdAsync(candidateId);
+            return Ok(data);
+        }
+
+
         //[HttpGet("stats")]
         //public async Task<ActionResult<EnterpriseHomeStatsResponse>> GetStats(CancellationToken ct)
         //{

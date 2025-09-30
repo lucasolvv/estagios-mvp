@@ -304,7 +304,7 @@
 
     private void OnVerInscritos(JobCompanyVm job) => Snackbar.Add($"Ver inscritos de \"{job.Titulo}\" (mock).", Severity.Normal);
     private void OnEditarVaga(JobCompanyVm job) => Nav.NavigateTo($"/empresa/vagas/{job.JobId}/editar");
-    private void OnGerenciarCandidatura(Guid candidatoId) => Nav.NavigateTo($"empresa/candidatura/gerenciar/{candidatoId}");
+    private void OnGerenciarCandidatura(Guid candidateId) => Nav.NavigateTo($"/empresa/candidatura/gerenciar/{candidateId}");
     private void OnAgendarEntrevista(CandidateVm c) => Snackbar.Add($"Agendar entrevista com {c.Nome} (mock).", Severity.Success);
 
     private Color JobStatusColor(string status) => status switch

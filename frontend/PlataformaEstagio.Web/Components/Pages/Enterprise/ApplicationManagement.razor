@@ -1,4 +1,4 @@
-﻿@page "/empresa/candidatura/gerenciar/{id:guid}"
+﻿@page "/empresa/candidatura/gerenciar/{candidateId:guid}"
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Components.Web
 @using PlataformaEstagio.Web.Components.Services.Enterprise
@@ -268,7 +268,7 @@
             _vm = new ApplicationManageVm
             {
                 ApplicationIdentifier = candidateId,
-                Status = applicationDto.Status,
+                Status = applicationDto.StatusEnum,
                 AppliedAt = DateTime.Now.AddDays(-2),
                 Vacancy = new VacancyVm { Title = "Estagiário(a) Frontend (Blazor)", OpeningDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-20)) },
                 Candidate = new CandidateVm
