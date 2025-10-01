@@ -1,5 +1,6 @@
 ﻿using PlataformaEstagios.Communication.Requests;
 using PlataformaEstagios.Communication.Responses;
+using PlataformaEstagios.Domain.Enums;
 
 namespace PlataformaEstagio.Web.Components.Services.Enterprise
 {
@@ -18,7 +19,7 @@ namespace PlataformaEstagio.Web.Components.Services.Enterprise
 
         public async Task<ResponseGetApplicationJson> GetApplicationByCandidateId(Guid candidateId)
             => await GetJsonAsync<ResponseGetApplicationJson>($"api/enterprises/candidatura/{candidateId}")!;
-        
+
         public async Task<ResponseGetCandidateProfileJson> GetCandidateProfileInfoByCandidateId(Guid candidateId)
             => await GetJsonAsync<ResponseGetCandidateProfileJson>($"api/enterprises/candidato/{candidateId}")!;
 
@@ -62,5 +63,16 @@ namespace PlataformaEstagio.Web.Components.Services.Enterprise
         }
 
 
-    }
+        public async Task<(bool Success, string? Error)> UpdateApplicationStatus(Guid applicationId, ApplicationStatus status)
+        {
+            using var req = new HttpRequestMessage(HttpMethod.Put, $"api/enterprises/applications/{applicationId}/status")
+            {
+                Content = JsonContent.Create(new { Status = status.ToString() })
+            };
+            var resp = await SendAsync(req);
+            if (resp.IsSuccessStatusCode) return (true, null);
+            var msg = await resp.Content.ReadAsStringAsync();
+            return (false, string.IsNullOrWhiteSpace(msg) ? resp.StatusCode.ToString() : msg);
+        }
+     }
 }

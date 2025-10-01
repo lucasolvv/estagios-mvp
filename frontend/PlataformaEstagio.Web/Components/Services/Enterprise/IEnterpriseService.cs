@@ -1,5 +1,6 @@
 ﻿using PlataformaEstagios.Communication.Requests;
 using PlataformaEstagios.Communication.Responses;
+using PlataformaEstagios.Domain.Enums;
 
 namespace PlataformaEstagio.Web.Components.Services.Enterprise
 {
@@ -12,5 +13,7 @@ namespace PlataformaEstagio.Web.Components.Services.Enterprise
         Task<IReadOnlyList<ResponseGetApplicationJson>> GetAllApplicationsByEnterpriseIdAsync(Guid enterpriseId);
         Task<ResponseGetApplicationJson> GetApplicationByCandidateId(Guid candidateId);
         Task<ResponseGetCandidateProfileJson> GetCandidateProfileInfoByCandidateId(Guid candidateId);
+
+        Task<(bool Success, string? Error)> UpdateApplicationStatus(Guid applicationId, ApplicationStatus status);
     }
 }

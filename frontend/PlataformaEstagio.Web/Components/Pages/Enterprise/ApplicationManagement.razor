@@ -45,7 +45,14 @@
                     <MudStack Spacing="2">
                         <MudStack Row AlignItems="AlignItems.Center" Spacing="2">
                             <MudAvatar Size="Size.Large" Image="@_vm.Candidate.ProfilePictureUrl" Color="Color.Primary">
-                                @(_vm.Candidate.Initials)
+                                @if (string.IsNullOrEmpty(@_vm.Candidate.ProfilePictureUrl))
+                                {
+                                    @(_vm.Candidate.Initials)
+                                }
+                                else 
+                                {
+                                    <MudImage Src="@_vm.Candidate.ProfilePictureUrl"></MudImage>
+                                }
                             </MudAvatar>
                             <MudStack>
                                 <MudText Typo="Typo.h6">@_vm.Candidate.FullName</MudText>
@@ -312,7 +319,7 @@
         _busy = true;
         try
         {
-            // TODO: EnterpriseService.UpdateApplicationStatus(id, newStatus, notes)
+            await EnterpriseService.UpdateApplicationStatus(candidateId, newStatus);
             _vm.Status = newStatus;
             Snackbar.Add($"Status atualizado para {DisplayStatus(newStatus)}.", Severity.Success);
         }
@@ -378,16 +385,6 @@
         // TODO: Navegar para endpoint de download/visualização do currículo
         Snackbar.Add("Abrindo currículo…", Severity.Normal);
     }
-
-    // private async Task OpenCandidateDialog()
-    // {
-    //     var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
-    //     var parameters = new DialogParameters
-    //     {
-    //         ["vm"] = _vm.Candidate
-    //     };
-    //     DialogService.Show<CandidateDetailsDialog>("Perfil do candidato", parameters, options);
-    // }
 
     private bool _showDetails;
 
