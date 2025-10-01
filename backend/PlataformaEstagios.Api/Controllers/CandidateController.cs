@@ -77,10 +77,10 @@ namespace PlataformaEstagios.Api.Controllers
         [FromRoute] Guid candidateId,
         [FromServices] IGetCandidateUseCase useCase,
         CancellationToken ct = default)
-            {
-                var candidate = await useCase.GetCandidateByIdAsync(candidateId);
-                if (candidate is null) return NotFound();
-                return Ok(candidate);
-            }
+        {
+            var candidate = await useCase.GetCandidateByIdAsync(candidateId);
+            if (candidate is null) return NotFound();
+            return Ok(candidate);
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PlataformaEstagios.Domain.Enums;
 using PlataformaEstagios.Domain.Repositories.Application;
 using PlataformaEstagios.Infrastructure.DataAccess;
 
@@ -54,6 +55,31 @@ namespace PlataformaEstagios.Infrastructure.Repositories
                 .Include(a => a.Vacancy)   // se você vai ler a entidade Vacancy depois
                 .Include(a => a.Candidate) // idem Candidate
                 .FirstOrDefaultAsync();
+        }
+
+        public async Task<Domain.Entities.Application?> GetByIdAsync(Guid applicationId, CancellationToken ct = default)
+        {
+            // Tracking habilitado (para update posterior)
+            return await _dbcontext.Applications
+                .Include(a => a.Vacancy)
+                .Include(a => a.Candidate)
+                .FirstOrDefaultAsync(a => a.ApplicationIdentifier == applicationId, ct);
+        }
+
+        public Task UpdateAsync(Domain.Entities.Application application, CancellationToken ct = default)
+        {
+            // Se já estiver tracked, o EF detecta mudanças; se não, marcamos como Modified
+            _dbcontext.Entry(application).State = EntityState.Modified;
+            return Task.CompletedTask;
+        }
+
+        // Update só do status (eficiente). Requer EF Core 7+ por ExecuteUpdateAsync.
+        public async Task<int> UpdateStatusAsync(Guid applicationId, ApplicationStatus newStatus, CancellationToken ct = default)
+        {
+            return await _dbcontext.Applications
+                .Where(a => a.ApplicationIdentifier == applicationId)
+                .ExecuteUpdateAsync(setters =>
+                    setters.SetProperty(a => a.Status, newStatus), ct); // << ajuste "a.Status" se o nome for diferente
         }
     }
 }

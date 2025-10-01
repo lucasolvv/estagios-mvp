@@ -40,6 +40,7 @@ namespace PlataformaEstagios.Application
             services.AddScoped<IGetApplicationUseCase, GetApplicationUseCase>();
             services.AddScoped<IUpdateCandidateProfileUseCase, UpdateCandidateProfileUseCase>();
             services.AddScoped<IGetCandidateUseCase, GetCandidateUseCase>();
+            services.AddScoped<IGetCandidateUseCase, GetCandidateUseCase>();
 
         }
 

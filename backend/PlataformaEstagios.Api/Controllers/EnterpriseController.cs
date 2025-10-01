@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PlataformaEstagios.Application.UseCases.Application.Get;
+using PlataformaEstagios.Application.UseCases.Application.Update;
 using PlataformaEstagios.Application.UseCases.Candidate.Get;
 using PlataformaEstagios.Application.UseCases.Vacancy.Create;
 using PlataformaEstagios.Application.UseCases.Vacancy.Get;
@@ -55,6 +56,16 @@ namespace PlataformaEstagios.Api.Controllers
         }
 
         [Authorize(Roles = "Enterprise")]
+        [HttpPut("applications/{applicationId:guid}/status")]
+        public async Task<ActionResult> UpdateApplicationStatusAsync(Guid applicationId, 
+            [FromBody] string status,
+            [FromServices] IUpdateApplicationUseCase useCase, CancellationToken ct = default)
+        {
+            var result = await useCase.UpdateApplicationStatus(applicationId, status);
+            return Ok("Status da candidatura alterado com sucesso.");
+        }
+
+        [Authorize(Roles = "Enterprise")]
         [HttpGet("{enterpriseId:guid}/applications/all")]
         [ProducesResponseType(typeof(ResponseGetVacancyJson), 200)]
         public async Task<ActionResult<IReadOnlyList<ResponseGetApplicationJson>>> GetAllApplicationsByEnterpriseIdAsync(Guid enterpriseId,
@@ -84,6 +95,8 @@ namespace PlataformaEstagios.Api.Controllers
             var data = await useCase.GetCandidateByIdAsync(candidateId);
             return Ok(data);
         }
+
+
     }
 
 }
