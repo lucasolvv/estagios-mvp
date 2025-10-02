@@ -4,6 +4,7 @@ using PlataformaEstagios.Application.Services.Auth;
 using PlataformaEstagios.Application.Services.AutoMapper;
 using PlataformaEstagios.Application.UseCases.Application.Create;
 using PlataformaEstagios.Application.UseCases.Application.Get;
+using PlataformaEstagios.Application.UseCases.Application.Update;
 using PlataformaEstagios.Application.UseCases.Auth.Login;
 using PlataformaEstagios.Application.UseCases.Candidate.Get;
 using PlataformaEstagios.Application.UseCases.Candidate.UpdateProfile;
@@ -40,7 +41,7 @@ namespace PlataformaEstagios.Application
             services.AddScoped<IGetApplicationUseCase, GetApplicationUseCase>();
             services.AddScoped<IUpdateCandidateProfileUseCase, UpdateCandidateProfileUseCase>();
             services.AddScoped<IGetCandidateUseCase, GetCandidateUseCase>();
-            services.AddScoped<IGetCandidateUseCase, GetCandidateUseCase>();
+            services.AddScoped<IUpdateApplicationUseCase, UpdateApplicationUseCase>();
 
         }
 

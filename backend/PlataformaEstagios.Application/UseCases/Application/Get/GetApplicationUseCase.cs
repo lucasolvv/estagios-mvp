@@ -64,9 +64,9 @@ namespace PlataformaEstagios.Application.UseCases.Application.Get
             return mappedApplications;
         }
 
-        public async Task<ResponseGetApplicationJson> GetApplicationByCandidateIdAsync(Guid enterpriseId)
+        public async Task<ResponseGetApplicationJson> GetApplicationByApplicationIdAsync(Guid applicationId)
         {
-            var application = await _appReadRepo.GetApplicationByCandidateIdAsync(enterpriseId);
+            var application = await _appReadRepo.GetApplicationByApplicationIdAsync(applicationId);
             if (application == null) throw new NullReferenceException("Candidatura não encontrada");
             var mappedApplication = _mapper.Map<ResponseGetApplicationJson>(application);
             if (application.Vacancy != null)
