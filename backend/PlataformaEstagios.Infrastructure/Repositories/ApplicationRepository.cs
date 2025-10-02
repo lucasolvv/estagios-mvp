@@ -47,13 +47,12 @@ namespace PlataformaEstagios.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task<Domain.Entities.Application?> GetApplicationByCandidateIdAsync(Guid candidateId)
+        public async Task<Domain.Entities.Application?> GetApplicationByApplicationIdAsync(Guid applicationId)
         {
             return await _dbcontext.Applications
                 .AsNoTracking()
-                .Where(a => a.CandidateIdentifier == candidateId)
+                .Where(a => a.ApplicationIdentifier == applicationId)
                 .Include(a => a.Vacancy)   // se você vai ler a entidade Vacancy depois
-                .Include(a => a.Candidate) // idem Candidate
                 .FirstOrDefaultAsync();
         }
 
