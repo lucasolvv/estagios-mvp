@@ -1,4 +1,4 @@
-﻿@page "/empresa/candidatura/gerenciar/{candidateId:guid}"
+﻿@page "/empresa/candidatura/gerenciar/{applicationId:guid}/{candidateId:guid}"
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Components.Web
 @using PlataformaEstagio.Web.Components.Services.Enterprise
@@ -239,6 +239,7 @@
 
 
 @code {
+    [Parameter] public Guid applicationId { get; set; }
     [Parameter] public Guid candidateId { get; set; }
 
     private MudForm? _form;
@@ -281,12 +282,12 @@
             // TODO: amarrar com EnterpriseService.GetManageApplicationAsync(id)
             // abaixo: placeholders para demonstrar o layout
 
-            var applicationDto = await EnterpriseService.GetApplicationByCandidateId(candidateId);
+            var applicationDto = await EnterpriseService.GetApplicationByApplicationId(applicationId);
             var candidateProfileDto = await EnterpriseService.GetCandidateProfileInfoByCandidateId(candidateId);
 
             _vm = new ApplicationManageVm
             {
-                ApplicationIdentifier = candidateId,
+                ApplicationIdentifier = applicationDto.ApplicationIdentifier,
                 Status = applicationDto.StatusEnum,
                 AppliedAt = applicationDto.DataCandidatura,
                 Vacancy = new VacancyVm { Title = applicationDto.TituloVaga, OpeningDate = applicationDto.DataCadastroVaga },
@@ -316,19 +317,33 @@
 
     private async Task UpdateStatusAsync(ApplicationStatus newStatus)
     {
+        if (_busy || _vm.Status == newStatus) return;
+
         _busy = true;
         try
         {
-            await EnterpriseService.UpdateApplicationStatus(candidateId, newStatus);
+            var (ok, err) = await EnterpriseService.UpdateApplicationStatus(
+                _vm.ApplicationIdentifier, newStatus);
+
+            if (!ok)
+            {
+                Snackbar.Add(err ?? "Não foi possível atualizar o status.", Severity.Error);
+                return;
+            }
+
             _vm.Status = newStatus;
             Snackbar.Add($"Status atualizado para {DisplayStatus(newStatus)}.", Severity.Success);
         }
         catch
         {
-            Snackbar.Add("Não foi possível atualizar o status.", Severity.Error);
+            Snackbar.Add("Erro ao comunicar com a API.", Severity.Error);
         }
-        finally { _busy = false; }
+        finally
+        {
+            _busy = false;
+        }
     }
+
 
     private async Task ScheduleInterviewAsync()
     {
