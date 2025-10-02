@@ -57,12 +57,14 @@ namespace PlataformaEstagios.Api.Controllers
 
         [Authorize(Roles = "Enterprise")]
         [HttpPut("applications/{applicationId:guid}/status")]
-        public async Task<ActionResult> UpdateApplicationStatusAsync(Guid applicationId, 
-            [FromBody] string status,
-            [FromServices] IUpdateApplicationUseCase useCase, CancellationToken ct = default)
+        public async Task<IActionResult> UpdateApplicationStatusAsync(
+            Guid applicationId,
+            [FromBody] RequestUpdateApplicationStatusJson request,
+            [FromServices]IUpdateApplicationUseCase useCase,
+            CancellationToken ct = default)
         {
-            var result = await useCase.UpdateApplicationStatus(applicationId, status);
-            return Ok("Status da candidatura alterado com sucesso.");
+            var (ok, err) = await useCase.UpdateApplicationStatus(applicationId, request.Status, ct);
+            return ok ? NoContent() : BadRequest(err);
         }
 
         [Authorize(Roles = "Enterprise")]
@@ -76,13 +78,13 @@ namespace PlataformaEstagios.Api.Controllers
         }
 
         [Authorize(Roles = "Enterprise")]
-        [HttpGet("candidatura/{candidateId:guid}")]
+        [HttpGet("candidatura/{applicationId:guid}")]
         [ProducesResponseType(typeof(ResponseGetVacancyJson), 200)]
 
-        public async Task<ActionResult<ResponseGetApplicationJson>> GetApplicationByCandidateId(Guid candidateId, 
+        public async Task<ActionResult<ResponseGetApplicationJson>> GetApplicationByApplicationId(Guid applicationId, 
             [FromServices] IGetApplicationUseCase useCase)
         {
-            var data = await useCase.GetApplicationByCandidateIdAsync(candidateId);
+            var data = await useCase.GetApplicationByApplicationIdAsync(applicationId);
             return Ok(data);
         }
 
