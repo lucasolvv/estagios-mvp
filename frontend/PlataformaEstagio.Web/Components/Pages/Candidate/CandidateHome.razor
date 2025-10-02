@@ -334,9 +334,9 @@
 
     private Color StatusColor(string status) => status switch
     {
-        "Aprovado" => Color.Success,
-        "Entrevista marcada" => Color.Info,
-        "Reprovado" => Color.Error,
+        "Approved" => Color.Success,
+        "Pending" => Color.Warning,
+        "Rejected" => Color.Error,
         _ => Color.Warning
     };
 
