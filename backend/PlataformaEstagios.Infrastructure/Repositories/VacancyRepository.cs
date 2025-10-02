@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PlataformaEstagios.Communication.Responses;
+using PlataformaEstagios.Domain.Entities;
 using PlataformaEstagios.Domain.Repositories.Vacancy;
 namespace PlataformaEstagios.Infrastructure.Repositories
 {
@@ -19,7 +20,9 @@ namespace PlataformaEstagios.Infrastructure.Repositories
             Guid enterpriseId, CancellationToken ct = default)
         {
             return await _context.Vacancies
+
                 .Where(v => v.EnterpriseIdentifier == enterpriseId && v.IsActive)
+                .Include(v => v.Applications)
                 .OrderByDescending(v => v.UpdatedAt) 
                 .ToListAsync(ct);
         }
