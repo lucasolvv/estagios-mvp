@@ -75,10 +75,6 @@
                                         </MudChip>
                                     </MudTd>
                                     <MudTd Class="text-right">
-                                        <MudButton Size="Size.Small" Variant="Variant.Text" StartIcon="@Icons.Material.Filled.Visibility"
-                                                   OnClick="@(()=>OnVerInscritos(context))">
-                                            Ver inscritos
-                                        </MudButton>
                                         <MudButton Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined"
                                                    StartIcon="@Icons.Material.Filled.Edit" OnClick="@(()=>OnEditarVaga(context))">
                                             Editar
@@ -104,17 +100,23 @@
                                 <MudTh>Nome</MudTh>
                                 <MudTh>Curso</MudTh>
                                 <MudTh>Vaga</MudTh>
+                                <MudTh>Status</MudTh>
                                 <MudTh>Data</MudTh>
-                                <MudTh></MudTh>
                             </HeaderContent>
                             <RowTemplate>
                                 <MudTd>@context.NomeCandidato</MudTd>
                                 <MudTd>@context.NomeCursoCandidato</MudTd>
                                 <MudTd>@context.TituloVaga</MudTd>
+                                <MudTd>
+                                    <MudChip T="string" Color="@StatusColor(context.Status)" Variant="Variant.Filled" Size="Size.Small">
+                                        @context.Status
+                                    </MudChip>
+                                </MudTd>
+                                
                                 <MudTd>@context.DataCandidatura.ToString("dd/MM/yyyy")</MudTd>
                                 <MudTd Class="text-right">
                                     <MudButton Size="Size.Small" Color="Color.Primary" StartIcon="@Icons.Material.Filled.PersonSearch"
-                                               OnClick="@(()=>OnGerenciarCandidatura(context.idCandidato))">
+                                               OnClick="@(() => OnGerenciarCandidatura(context.idCandidatura, context.idCandidato))">
                                         Gerenciar candidatura
                                     </MudButton>
                                 </MudTd>
@@ -222,6 +224,7 @@
     private Guid? _enterpriseId;
     private List<JobCompanyVm> ActiveJobs { get; set; } = new();
     private List<ApplicationVm> RecentCandidates { get; set; } = new();
+    private StatsVm Stats { get; set; } = new(0, 0, 0, 0);
 
     private bool _hydrated;     
     private bool _loadingJobs; 
@@ -269,9 +272,18 @@
                         a.TituloVaga,
                         a.DataCandidatura,
                         a.NomeCurso,
-                        a.CandidateIdentifier)
+                        a.CandidateIdentifier,
+                        a.ApplicationIdentifier,
+                        a.Status)
                     )
                     .ToList();
+
+                Stats = new StatsVm(
+                    VagasAbertas: ActiveJobs.Count,
+                    Inscricoes: applications.Count,
+                    Entrevistas: 10, //applications.Count(a => a.Status == "Interview Scheduled"),
+                    TaxaPreenchimento: ActiveJobs.Count == 0 ? 0 : (double)applications.Count(a => a.Status == "Hired") / ActiveJobs.Count
+                );
             }
             else
             {
@@ -302,9 +314,8 @@
     private void OnBancoTalentos() => Snackbar.Add("Banco de talentos (TODO)", Severity.Info);
     private void OnConfigurarEntrevistas() => Snackbar.Add("Configurar entrevistas (TODO)", Severity.Info);
 
-    private void OnVerInscritos(JobCompanyVm job) => Snackbar.Add($"Ver inscritos de \"{job.Titulo}\" (mock).", Severity.Normal);
     private void OnEditarVaga(JobCompanyVm job) => Nav.NavigateTo($"/empresa/vagas/{job.JobId}/editar");
-    private void OnGerenciarCandidatura(Guid candidateId) => Nav.NavigateTo($"/empresa/candidatura/gerenciar/{candidateId}");
+    private void OnGerenciarCandidatura(Guid applicationId, Guid candidateId) => Nav.NavigateTo($"/empresa/candidatura/gerenciar/{applicationId}/{candidateId}");
     private void OnAgendarEntrevista(CandidateVm c) => Snackbar.Add($"Agendar entrevista com {c.Nome} (mock).", Severity.Success);
 
     private Color JobStatusColor(string status) => status switch
@@ -319,10 +330,10 @@
     private record JobCompanyVm(Guid JobId, string Titulo, DateTime DataAbertura, int Inscritos, string Status);
     private record CandidateVm(string Nome, string Curso, string Vaga, DateTime Data);
     private record InterviewVm(string Candidato, string Vaga, DateTime Data, string Canal);
-    private record ApplicationVm(string NomeCandidato, string TituloVaga, DateTime DataCandidatura, string NomeCursoCandidato, Guid idCandidato);
+    private record ApplicationVm(string NomeCandidato, string TituloVaga, DateTime DataCandidatura, string NomeCursoCandidato, Guid idCandidato, Guid idCandidatura, string Status);
     private record NotificationVm(string Texto, DateTime Data);
 
-    private StatsVm Stats = new(3, 28, 6, 0.65);
+
 
     private List<InterviewVm> UpcomingInterviews = new()
     {
@@ -334,5 +345,13 @@
     {
         new("Novo candidato em 'Frontend (Blazor)': Ana Souza", DateTime.Today.AddHours(-3)),
         new("Bruno Lima confirmou entrevista para amanhã", DateTime.Today.AddHours(-6))
+    };
+
+    private Color StatusColor(string status) => status switch
+    {
+        "Approved" => Color.Success,
+        "Pending" => Color.Warning,
+        "Rejected" => Color.Error,
+        _ => Color.Warning
     };
 }

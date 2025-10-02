@@ -17,8 +17,8 @@ namespace PlataformaEstagio.Web.Components.Services.Enterprise
             => await GetJsonAsync<IReadOnlyList<ResponseGetApplicationJson>>(
                 $"api/enterprises/{enterpriseId}/applications/all")!;
 
-        public async Task<ResponseGetApplicationJson> GetApplicationByCandidateId(Guid candidateId)
-            => await GetJsonAsync<ResponseGetApplicationJson>($"api/enterprises/candidatura/{candidateId}")!;
+        public async Task<ResponseGetApplicationJson> GetApplicationByApplicationId(Guid applicationId)
+            => await GetJsonAsync<ResponseGetApplicationJson>($"api/enterprises/candidatura/{applicationId}")!;
 
         public async Task<ResponseGetCandidateProfileJson> GetCandidateProfileInfoByCandidateId(Guid candidateId)
             => await GetJsonAsync<ResponseGetCandidateProfileJson>($"api/enterprises/candidato/{candidateId}")!;
