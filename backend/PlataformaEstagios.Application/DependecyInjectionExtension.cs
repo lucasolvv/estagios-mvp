@@ -8,6 +8,7 @@ using PlataformaEstagios.Application.UseCases.Application.Update;
 using PlataformaEstagios.Application.UseCases.Auth.Login;
 using PlataformaEstagios.Application.UseCases.Candidate.Get;
 using PlataformaEstagios.Application.UseCases.Candidate.UpdateProfile;
+using PlataformaEstagios.Application.UseCases.Interview.Create;
 using PlataformaEstagios.Application.UseCases.User.Create;
 using PlataformaEstagios.Application.UseCases.Vacancy.Create;
 using PlataformaEstagios.Application.UseCases.Vacancy.Get;
@@ -42,6 +43,7 @@ namespace PlataformaEstagios.Application
             services.AddScoped<IUpdateCandidateProfileUseCase, UpdateCandidateProfileUseCase>();
             services.AddScoped<IGetCandidateUseCase, GetCandidateUseCase>();
             services.AddScoped<IUpdateApplicationUseCase, UpdateApplicationUseCase>();
+            services.AddScoped<ICreateInterviewUseCase, CreateInterviewUseCase>();
 
         }
 

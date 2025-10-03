@@ -10,8 +10,8 @@ namespace PlataformaEstagios.Infrastructure.DataAccess {
         public DbSet<Address> Addresses => Set<Address>();
         public DbSet<Vacancy> Vacancies => Set<Vacancy>();
         public DbSet<Application> Applications => Set<Application>();
+        public DbSet<Interview> Interviews => Set<Interview>();
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
-            // --- Candidate ---
             modelBuilder.Entity<Candidate>(e => {
                 e.ToTable("Candidates");
                 e.HasKey(c => c.Id);
@@ -39,7 +39,6 @@ namespace PlataformaEstagios.Infrastructure.DataAccess {
                             .IsRequired(false);
             });
 
-            // --- Enterprise ---
             modelBuilder.Entity<Enterprise>(e => {
                 e.ToTable("Enterprises"); e.HasKey(x => x.Id);
                 e.Property(x => x.Id).ValueGeneratedOnAdd();
@@ -58,8 +57,6 @@ namespace PlataformaEstagios.Infrastructure.DataAccess {
                 e.Property(x => x.Active).HasDefaultValue(true);
                 e.Property(x => x.CreatedOn).HasDefaultValueSql("CURRENT_TIMESTAMP AT TIME ZONE 'UTC'");
             });
-
-            // --- Address ---
 
             modelBuilder.Entity<Address>(e => {
                 e.ToTable("Addresses");
@@ -96,8 +93,7 @@ namespace PlataformaEstagios.Infrastructure.DataAccess {
                 // XOR: endereço pertence a um OU outro
                 e.HasCheckConstraint("CK_Addresses_Owner", "(\"CandidateIdentifier\" IS NOT NULL AND \"EnterpriseIdentifier\" IS NULL) " + "OR (\"CandidateIdentifier\" IS NULL AND \"EnterpriseIdentifier\" IS NOT NULL)");
                 e.Property(a => a.Active).HasDefaultValue(true);
-                e.Property(a => a.CreatedOn).HasDefaultValueSql("CURRENT_TIMESTAMP AT TIME ZONE 'UTC'"); });
-            // Se ainda não vai mapear essas entidades agora:
+                e.Property(a => a.CreatedOn).HasDefaultValueSql("CURRENT_TIMESTAMP AT TIME ZONE 'UTC'"); });     
 
             modelBuilder.Entity<Vacancy>(e =>
             {
@@ -143,11 +139,44 @@ namespace PlataformaEstagios.Infrastructure.DataAccess {
                 // Evitar duplicidade: um candidato por vaga
                 e.HasIndex(x => new { x.VacancyId, x.CandidateIdentifier }).IsUnique();
             });
-            
-            
-            //modelBuilder.Entity<Candidate>().Ignore(c => c.Applications);
-            //modelBuilder.Entity<Enterprise>().Ignore(e => e.Vacancies);
-            //modelBuilder.Ignore<Vacancy>();
-            } 
+
+            modelBuilder.Entity<Interview>(e =>
+            {
+                e.ToTable("Interviews");
+
+                e.HasKey(x => x.InterviewIdentifier);
+                e.Property(x => x.InterviewIdentifier).ValueGeneratedNever();
+
+                // FK obrigatória para Application (PK = ApplicationIdentifier)
+                e.Property(x => x.ApplicationIdentifier).IsRequired();
+
+                e.HasOne(x => x.Application)
+                 .WithMany() // se existir coleção em Application (ex.: .WithMany(a => a.Interviews)), pode trocar
+                 .HasForeignKey(x => x.ApplicationIdentifier)
+                 .HasPrincipalKey(nameof(Application.ApplicationIdentifier))
+                 .OnDelete(DeleteBehavior.Cascade);
+
+                // Dados do agendamento
+                e.Property(x => x.StartAt).IsRequired();           // DateTimeOffset
+                e.Property(x => x.DurationMinutes).IsRequired();
+
+                e.Property(x => x.Location).HasMaxLength(200);
+                e.Property(x => x.MeetingLink).HasMaxLength(300);
+                e.Property(x => x.Notes).HasMaxLength(1000);
+
+                // Metadados
+                e.Property(x => x.CreatedAt)
+                 .HasDefaultValueSql("CURRENT_TIMESTAMP AT TIME ZONE 'UTC'");
+                e.Property(x => x.UpdatedAt);
+
+                // Índices úteis
+                e.HasIndex(x => x.ApplicationIdentifier);
+                e.HasIndex(x => new { x.ApplicationIdentifier, x.StartAt });
+
+                // (Opcional) duração positiva
+                e.HasCheckConstraint("CK_Interviews_Duration_Positive", "\"DurationMinutes\" > 0");
+            });
+
+        }
     } 
 }

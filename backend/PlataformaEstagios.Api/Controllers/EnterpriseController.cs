@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PlataformaEstagios.Application.UseCases.Application.Get;
 using PlataformaEstagios.Application.UseCases.Application.Update;
 using PlataformaEstagios.Application.UseCases.Candidate.Get;
+using PlataformaEstagios.Application.UseCases.Interview.Create;
 using PlataformaEstagios.Application.UseCases.Vacancy.Create;
 using PlataformaEstagios.Application.UseCases.Vacancy.Get;
 using PlataformaEstagios.Application.UseCases.Vacancy.Update;
@@ -96,6 +97,24 @@ namespace PlataformaEstagios.Api.Controllers
         {
             var data = await useCase.GetCandidateByIdAsync(candidateId);
             return Ok(data);
+        }
+
+        [Authorize(Roles = "Enterprise")]
+        [HttpPost("applications/{applicationId:guid}/interviews")] // <-- sem espaço!
+        public async Task<IActionResult> CreateInterviewAsync(
+            [FromRoute] Guid applicationId,
+            [FromBody] RequestCreateScheduleInterviewJson request,
+            [FromServices] ICreateInterviewUseCase createInterview,
+            CancellationToken ct = default)
+        {
+            // se ainda não extrai o EnterpriseIdentifier das claims, passe null
+            var (ok, code, error) = await createInterview.ExecuteAsync(applicationId, request, /* enterpriseIdentifier: */ null);
+
+            if (ok) return NoContent();           // 204
+            if (code == 404) return NotFound(error);       // 404
+            if (code == 403) return Forbid();              // 403
+            if (code == 409) return Conflict(error);       // 409
+            return BadRequest(error);                          // 400
         }
 
 

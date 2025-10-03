@@ -9,5 +9,6 @@ namespace PlataformaEstagios.Domain.Repositories.Application
         Task<IReadOnlyList<Domain.Entities.Application>> GetRecentApplicationsByEnterpriseIdAsync(Guid enterpriseId);
         Task<Entities.Application?> GetApplicationByApplicationIdAsync(Guid applicationId);
         Task<Entities.Application?> GetByIdAsync(Guid applicationId, CancellationToken ct = default);
+        Task<bool> BelongsToEnterpriseAsync(Guid applicationId, Guid enterpriseIdentifier);
     }
 }

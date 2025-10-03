@@ -5,6 +5,7 @@ using PlataformaEstagios.Domain.Repositories;
 using PlataformaEstagios.Domain.Repositories.Application;
 using PlataformaEstagios.Domain.Repositories.Candidate;
 using PlataformaEstagios.Domain.Repositories.Enterprise;
+using PlataformaEstagios.Domain.Repositories.Interview;
 using PlataformaEstagios.Domain.Repositories.User;
 using PlataformaEstagios.Domain.Repositories.Vacancy;
 using PlataformaEstagios.Infrastructure.DataAccess;
@@ -35,6 +36,8 @@ namespace PlataformaEstagios.Infrastructure
             services.AddScoped<IVacancyWriteOnlyRepository, VacancyRepository>();
             services.AddScoped<IApplicationWriteOnlyRepository, ApplicationRepository>();
             services.AddScoped<IApplicationReadOnlyRepository, ApplicationRepository>();
+            services.AddScoped<IInterviewReadOnlyRepository, InterviewRepository>();
+            services.AddScoped<IInterviewWriteOnlyRepository, InterviewRepository>();
             services.AddScoped<IFileStorage, LocalFileStorage>();
 
         }

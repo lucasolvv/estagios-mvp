@@ -119,6 +119,20 @@ namespace PlataformaEstagios.Application.Services.AutoMapper
             CreateMap<RequestUpdateAddressJson, Address>()
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
 
+            // Interview (criar agendamento)
+            CreateMap<RequestCreateScheduleInterviewJson, Interview>()
+                .ForMember(d => d.InterviewIdentifier, o => o.Ignore())   // Gerado no UseCase
+                .ForMember(d => d.ApplicationIdentifier, o => o.Ignore()) // Vem da rota (UseCase)
+                .ForMember(d => d.Application, o => o.Ignore())           // nav
+                .ForMember(d => d.StartAt, o => o.MapFrom(s => s.StartAt))
+                .ForMember(d => d.DurationMinutes, o => o.MapFrom(s => s.DurationMinutes))
+                .ForMember(d => d.Location, o => o.MapFrom(s => s.Location))
+                .ForMember(d => d.MeetingLink, o => o.MapFrom(s => s.MeetingLink))
+                .ForMember(d => d.Notes, o => o.MapFrom(s => s.Notes))
+                .ForMember(d => d.CreatedAt, o => o.Ignore())             // setado pelo banco/UseCase
+                .ForMember(d => d.UpdatedAt, o => o.Ignore());
+
+
 
         }
 

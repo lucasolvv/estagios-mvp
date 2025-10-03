@@ -80,5 +80,11 @@ namespace PlataformaEstagios.Infrastructure.Repositories
                 .ExecuteUpdateAsync(setters =>
                     setters.SetProperty(a => a.Status, newStatus), ct); // << ajuste "a.Status" se o nome for diferente
         }
+        public async Task<bool> BelongsToEnterpriseAsync(Guid applicationId, Guid enterpriseIdentifier)
+        {
+            return await _dbcontext.Applications
+                .AnyAsync(a => a.ApplicationIdentifier == applicationId &&
+                               a.Vacancy.EnterpriseIdentifier == enterpriseIdentifier);
+        }
     }
 }
