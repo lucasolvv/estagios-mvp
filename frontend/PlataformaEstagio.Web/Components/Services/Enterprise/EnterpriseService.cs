@@ -1,6 +1,7 @@
 ﻿using PlataformaEstagios.Communication.Requests;
 using PlataformaEstagios.Communication.Responses;
 using PlataformaEstagios.Domain.Enums;
+using System.Text.Json;
 
 namespace PlataformaEstagio.Web.Components.Services.Enterprise
 {
@@ -74,5 +75,16 @@ namespace PlataformaEstagio.Web.Components.Services.Enterprise
             var msg = await resp.Content.ReadAsStringAsync();
             return (false, string.IsNullOrWhiteSpace(msg) ? resp.StatusCode.ToString() : msg);
         }
-     }
+
+        public async Task<(bool Success, string? Error)> ScheduleInterviewAsync(Guid applicationId, RequestCreateScheduleInterviewJson body)
+        {
+            using var req = new HttpRequestMessage(HttpMethod.Post, $"api/enterprises/applications/{applicationId}/interviews")
+            { Content = JsonContent.Create(body) };
+
+            var resp = await SendAsync(req);
+            var text = await resp.Content.ReadAsStringAsync();
+
+            return (resp.IsSuccessStatusCode, string.IsNullOrWhiteSpace(text) ? null : text);
+        }
+    }
 }

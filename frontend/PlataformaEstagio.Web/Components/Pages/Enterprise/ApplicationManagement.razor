@@ -4,6 +4,7 @@
 @using PlataformaEstagio.Web.Components.Services.Enterprise
 @using PlataformaEstagio.Web.Components.Services.Candidate
 @using PlataformaEstagio.Web.Components.Services.Auth
+@using PlataformaEstagios.Communication.Requests
 @using PlataformaEstagios.Domain.Enums
 @inject IEnterpriseService EnterpriseService
 @inject IUserContext CurrentUser
@@ -370,23 +371,36 @@
         _busy = true;
         try
         {
-            var start = _interview.StartDate.Value.Add(_interview.StartTime.Value);
-            var dtoStart = new DateTimeOffset(start, TimeZoneInfo.Local.GetUtcOffset(start));
+            var local = _interview.StartDate.Value.Add(_interview.StartTime.Value);
+            var dtoStartUtc = new DateTimeOffset(local, TimeZoneInfo.Local.GetUtcOffset(local)).ToUniversalTime();
 
-            // TODO: EnterpriseService.ScheduleInterview(id, dtoStart, _interview.DurationMinutes, _interview.Location, _interview.MeetingLink, _interview.Notes)
+            var req = new RequestCreateScheduleInterviewJson
+            {
+                StartAt = dtoStartUtc,               // <-- UTC (offset 0)
+                DurationMinutes = _interview.DurationMinutes,
+                Location = _interview.Location,
+                MeetingLink = _interview.MeetingLink,
+                Notes = _interview.Notes
+            };
 
+            var (ok, err) = await EnterpriseService.ScheduleInterviewAsync(_vm.ApplicationIdentifier, req);
+            if (!ok) { Snackbar.Add(err ?? "Não foi possível agendar a entrevista.", Severity.Error); return; }
+
+            // await RefreshInterviewsAsync(); busca no back e repopula a lista
+            
             _vm.Interviews.Add(new InterviewVm
             {
-                InterviewIdentifier = Guid.NewGuid(),
-                StartAt = dtoStart,
+                InterviewIdentifier = Guid.NewGuid(), // <- substitui o iid
+                StartAt = dtoStartUtc,
                 DurationMinutes = _interview.DurationMinutes,
                 Location = _interview.Location,
                 MeetingLink = _interview.MeetingLink,
                 Notes = _interview.Notes
             });
-
+            
             Snackbar.Add("Entrevista agendada!", Severity.Success);
-            _interview = new InterviewForm(); // limpa
+            _interview = new InterviewForm();
+
         }
         catch
         {
@@ -405,6 +419,25 @@
 
     private void OpenCandidateInlineDialog() => _showDetails = true;
     private void CloseCandidateInlineDialog() => _showDetails = false;
+
+
+    private async Task RefreshInterviewsAsync()
+    {
+        // var items = await EnterpriseService.GetInterviewsByApplicationId(_vm.ApplicationIdentifier);
+        // _vm.Interviews = items
+        //     .OrderByDescending(i => i.StartAt)
+        //     .Select(i => new InterviewVm
+        //     {
+        //         InterviewIdentifier = i.InterviewIdentifier,
+        //         StartAt = i.StartAt,
+        //         DurationMinutes = i.DurationMinutes,
+        //         Location = i.Location,
+        //         MeetingLink = i.MeetingLink,
+        //         Notes = i.Notes
+        //     }).ToList();
+
+       
+    }
 
 
     // -------- helpers de UI --------

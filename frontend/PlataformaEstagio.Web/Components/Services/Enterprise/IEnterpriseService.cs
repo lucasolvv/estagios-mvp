@@ -13,7 +13,7 @@ namespace PlataformaEstagio.Web.Components.Services.Enterprise
         Task<IReadOnlyList<ResponseGetApplicationJson>> GetAllApplicationsByEnterpriseIdAsync(Guid enterpriseId);
         Task<ResponseGetApplicationJson> GetApplicationByApplicationId(Guid applicationId);
         Task<ResponseGetCandidateProfileJson> GetCandidateProfileInfoByCandidateId(Guid candidateId);
-
         Task<(bool Success, string? Error)> UpdateApplicationStatus(Guid applicationId, ApplicationStatus status);
+        Task<(bool Success, string? Error)> ScheduleInterviewAsync(Guid applicationId, RequestCreateScheduleInterviewJson body);
     }
 }
