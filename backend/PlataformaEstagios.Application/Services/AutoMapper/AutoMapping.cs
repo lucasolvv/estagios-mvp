@@ -121,15 +121,17 @@ namespace PlataformaEstagios.Application.Services.AutoMapper
 
             // Interview (criar agendamento)
             CreateMap<RequestCreateScheduleInterviewJson, Interview>()
-                .ForMember(d => d.InterviewIdentifier, o => o.Ignore())   // Gerado no UseCase
-                .ForMember(d => d.ApplicationIdentifier, o => o.Ignore()) // Vem da rota (UseCase)
-                .ForMember(d => d.Application, o => o.Ignore())           // nav
+                .ForMember(d => d.InterviewIdentifier, o => o.Ignore())   // gerado no UseCase
+                .ForMember(d => d.ApplicationIdentifier, o => o.Ignore())   // vem da rota (UseCase)
+                .ForMember(d => d.CandidateIdentifier, o => o.Ignore())   // desnormalizado no UseCase
+                .ForMember(d => d.EnterpriseIdentifier, o => o.Ignore())   // desnormalizado no UseCase
+                .ForMember(d => d.Application, o => o.Ignore())   // nav
                 .ForMember(d => d.StartAt, o => o.MapFrom(s => s.StartAt))
                 .ForMember(d => d.DurationMinutes, o => o.MapFrom(s => s.DurationMinutes))
                 .ForMember(d => d.Location, o => o.MapFrom(s => s.Location))
                 .ForMember(d => d.MeetingLink, o => o.MapFrom(s => s.MeetingLink))
                 .ForMember(d => d.Notes, o => o.MapFrom(s => s.Notes))
-                .ForMember(d => d.CreatedAt, o => o.Ignore())             // setado pelo banco/UseCase
+                .ForMember(d => d.CreatedAt, o => o.Ignore())
                 .ForMember(d => d.UpdatedAt, o => o.Ignore());
 
 
@@ -210,9 +212,16 @@ namespace PlataformaEstagios.Application.Services.AutoMapper
                 .ForMember(destinationMember => destinationMember.Address, opt => opt.MapFrom(src => src.Address))
                 .ForMember(destinationMember => destinationMember.ProfilePicturePath, opt => opt.MapFrom(src => src.ProfilePicturePath))
                 .ForMember(destinationMember => destinationMember.ResumePath, opt => opt.MapFrom(src => src.ResumePath))
-                .ForMember(destinationMember => destinationMember.Email, opt => opt.Ignore())
-                ;
-                
+                .ForMember(destinationMember => destinationMember.Email, opt => opt.Ignore());
+
+            CreateMap<Interview, ResponseGetInterviewItemJson>()
+                .ForMember(d => d.InterviewIdentifier, o => o.MapFrom(s => s.InterviewIdentifier))
+                .ForMember(d => d.StartAt, o => o.MapFrom(s => s.StartAt))          // DateTimeOffset (UTC)
+                .ForMember(d => d.DurationMinutes, o => o.MapFrom(s => s.DurationMinutes))
+                .ForMember(d => d.Location, o => o.MapFrom(s => s.Location))
+                .ForMember(d => d.MeetingLink, o => o.MapFrom(s => s.MeetingLink))
+                .ForMember(d => d.Notes, o => o.MapFrom(s => s.Notes));
+
 
 
         }

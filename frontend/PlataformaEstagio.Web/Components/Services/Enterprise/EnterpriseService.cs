@@ -2,6 +2,7 @@
 using PlataformaEstagios.Communication.Responses;
 using PlataformaEstagios.Domain.Enums;
 using System.Text.Json;
+using static System.Net.WebRequestMethods;
 
 namespace PlataformaEstagio.Web.Components.Services.Enterprise
 {
@@ -86,5 +87,21 @@ namespace PlataformaEstagio.Web.Components.Services.Enterprise
 
             return (resp.IsSuccessStatusCode, string.IsNullOrWhiteSpace(text) ? null : text);
         }
-    }
+
+        public async Task<IReadOnlyList<ResponseGetInterviewItemJson>?> GetInterviewsByApplicationIdAsync(Guid applicationId)
+            {
+                using var req = new HttpRequestMessage(
+                HttpMethod.Get,
+                $"api/enterprises/applications/{applicationId}/interviews");
+
+                var response = await SendAsync(req);
+
+                if (response.IsSuccessStatusCode)
+                    return await response.Content.ReadFromJsonAsync<List<ResponseGetInterviewItemJson>>();
+
+                return null;
+            }
+    }   
+
+
 }

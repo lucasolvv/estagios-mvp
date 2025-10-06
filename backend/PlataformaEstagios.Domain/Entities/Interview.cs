@@ -3,6 +3,8 @@
     public class Interview : EntityBase
     {
         public Guid InterviewIdentifier { get; set; } = Guid.NewGuid();
+        public Guid EnterpriseIdentifier { get; set; } // FK para a empresa
+        public Guid CandidateIdentifier { get; set; }  // FK para o candidato
 
         // FK para a candidatura
         public Guid ApplicationIdentifier { get; set; }

@@ -5,6 +5,7 @@
 @using PlataformaEstagio.Web.Components.Services.Candidate
 @using PlataformaEstagio.Web.Components.Services.Auth
 @using PlataformaEstagios.Communication.Requests
+@using PlataformaEstagios.Communication.Responses
 @using PlataformaEstagios.Domain.Enums
 @inject IEnterpriseService EnterpriseService
 @inject IUserContext CurrentUser
@@ -175,7 +176,7 @@
                             @if (_vm.Interviews.Any())
                             {
                                 <MudDivider Class="my-3" />
-                                <MudText Typo="Typo.subtitle2" Class="font-weight-bold mb-2">Entrevistas marcadas</MudText>
+                                <MudText Typo="Typo.subtitle2" Class="font-weight-bold mb-2">Agenda de Entrevistas</MudText>
                                 <MudList Dense="true" T="string">
                                     @foreach (var it in _vm.Interviews.OrderByDescending(i => i.StartAt))
                                     {
@@ -285,6 +286,7 @@
 
             var applicationDto = await EnterpriseService.GetApplicationByApplicationId(applicationId);
             var candidateProfileDto = await EnterpriseService.GetCandidateProfileInfoByCandidateId(candidateId);
+            var interviews = await EnterpriseService.GetInterviewsByApplicationIdAsync(applicationDto.ApplicationIdentifier);
 
             _vm = new ApplicationManageVm
             {
@@ -304,7 +306,19 @@
                     ResumeUrl = ToAbsolute(candidateProfileDto.ResumePath), // se houver
                     HasResume = true
                 },
-                Interviews = new List<InterviewVm>()
+
+                Interviews = (interviews ?? new List<ResponseGetInterviewItemJson>())
+                .OrderByDescending(i => i.StartAt)
+                .Select(i => new InterviewVm
+                {
+                    InterviewIdentifier = i.InterviewIdentifier,
+                    StartAt = i.StartAt,              // renderize com .LocalDateTime na UI
+                    DurationMinutes = i.DurationMinutes,
+                    Location = i.Location,
+                    MeetingLink = i.MeetingLink,
+                    Notes = i.Notes
+                })
+                .ToList()
             };
 
             _loaded = true;
@@ -387,7 +401,7 @@
             if (!ok) { Snackbar.Add(err ?? "Não foi possível agendar a entrevista.", Severity.Error); return; }
 
             // await RefreshInterviewsAsync(); busca no back e repopula a lista
-            
+
             _vm.Interviews.Add(new InterviewVm
             {
                 InterviewIdentifier = Guid.NewGuid(), // <- substitui o iid
@@ -397,9 +411,10 @@
                 MeetingLink = _interview.MeetingLink,
                 Notes = _interview.Notes
             });
-            
+
             Snackbar.Add("Entrevista agendada!", Severity.Success);
             _interview = new InterviewForm();
+            StateHasChanged();
 
         }
         catch

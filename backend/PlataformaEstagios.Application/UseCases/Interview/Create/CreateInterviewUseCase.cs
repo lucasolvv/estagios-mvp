@@ -30,9 +30,9 @@ namespace PlataformaEstagios.Application.UseCases.Interview.Create
         }
 
         public async Task<(bool Success, int Code, string? Error)> ExecuteAsync(
-          Guid applicationId,
-          RequestCreateScheduleInterviewJson request,
-          Guid? enterpriseIdentifier)
+         Guid applicationId,
+         RequestCreateScheduleInterviewJson request,
+         Guid? enterpriseIdentifier)
         {
             // 1) Validações básicas do request
             if (request is null) return (false, 400, "Requisição inválida.");
@@ -40,14 +40,15 @@ namespace PlataformaEstagios.Application.UseCases.Interview.Create
             if (string.IsNullOrWhiteSpace(request.Location) && string.IsNullOrWhiteSpace(request.MeetingLink))
                 return (false, 400, "Informe um local presencial ou um link de reunião.");
 
-            var now = DateTimeOffset.UtcNow;
-            if (request.StartAt <= now) return (false, 400, "Data/hora deve ser futura.");
+            var startUtc = request.StartAt.ToUniversalTime();
+            if (startUtc <= DateTimeOffset.UtcNow) return (false, 400, "Data/hora deve ser futura.");
 
-            // 2) Carrega a candidatura
+            // 2) Carrega a candidatura (inclua Vacancy no repositório)
             var app = await _applications.GetByIdAsync(applicationId);
             if (app is null) return (false, 404, "Candidatura não encontrada.");
+            if (app.Vacancy is null) return (false, 404, "Vaga da candidatura não encontrada.");
 
-            // 3) Regras de status (no MVP, apenas bloqueia quando Rejected)
+            // 3) Regras de status (MVP)
             if (app.Status == ApplicationStatus.Rejected)
                 return (false, 409, "Não é possível agendar entrevista para candidatura rejeitada.");
 
@@ -58,21 +59,27 @@ namespace PlataformaEstagios.Application.UseCases.Interview.Create
                 if (!belongs) return (false, 403, "Você não tem permissão para esta candidatura.");
             }
 
-            // 5) (Opcional) Conflito de horário por Application (evita duplicado exato)
-            var hasOverlap = await _interviewsRead.ExistsSameStartAsync(applicationId, request.StartAt);
+            // 5) Conflito exato por Application no mesmo horário (use sempre UTC)
+            var hasOverlap = await _interviewsRead.ExistsSameStartAsync(applicationId, startUtc);
             if (hasOverlap) return (false, 409, "Já existe entrevista marcada neste horário para esta candidatura.");
 
-            
+            // 6) Mapear e completar campos
             var entity = _mapper.Map<Domain.Entities.Interview>(request);
             entity.InterviewIdentifier = Guid.NewGuid();
             entity.ApplicationIdentifier = applicationId;
-            entity.StartAt = request.StartAt.ToUniversalTime(); // garante offset 0
-            // 7) Persiste
+            entity.StartAt = startUtc; // UTC
+
+            // Desnormalização (NOVO)
+            entity.CandidateIdentifier = app.CandidateIdentifier;
+            entity.EnterpriseIdentifier = app.Vacancy.EnterpriseIdentifier;
+
+            // 7) Persistir
             await _interviewsWrite.AddAsync(entity);
             await _unitOfWork.Commit();
 
             return (true, 204, null);
         }
+
 
 
     }

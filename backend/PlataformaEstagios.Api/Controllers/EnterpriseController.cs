@@ -4,6 +4,7 @@ using PlataformaEstagios.Application.UseCases.Application.Get;
 using PlataformaEstagios.Application.UseCases.Application.Update;
 using PlataformaEstagios.Application.UseCases.Candidate.Get;
 using PlataformaEstagios.Application.UseCases.Interview.Create;
+using PlataformaEstagios.Application.UseCases.Interview.Get;
 using PlataformaEstagios.Application.UseCases.Vacancy.Create;
 using PlataformaEstagios.Application.UseCases.Vacancy.Get;
 using PlataformaEstagios.Application.UseCases.Vacancy.Update;
@@ -115,6 +116,17 @@ namespace PlataformaEstagios.Api.Controllers
             if (code == 403) return Forbid();              // 403
             if (code == 409) return Conflict(error);       // 409
             return BadRequest(error);                          // 400
+        }
+
+        [Authorize(Roles = "Enterprise")]
+        [HttpGet("applications/{applicationId:guid}/interviews")]
+        public async Task<ActionResult<IEnumerable<ResponseGetInterviewItemJson>>> GetInterviewsByApplicationAsync(
+        [FromRoute] Guid applicationId,
+        [FromServices] IGetInterviewUseCase useCase,
+        CancellationToken ct = default)
+        {
+            var list = await useCase.GetInterviewsByApplicationIdAsync(applicationId);
+            return Ok(list); // IEnumerable<ResponseGetInterviewItemJson>
         }
 
 

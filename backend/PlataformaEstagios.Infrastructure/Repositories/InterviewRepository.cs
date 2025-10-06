@@ -16,5 +16,13 @@ namespace PlataformaEstagios.Infrastructure.Repositories
 
         public async Task<bool> ExistsSameStartAsync(Guid applicationId, DateTimeOffset startAt)
             => await _db.Interviews.AnyAsync(i => i.ApplicationIdentifier == applicationId && i.StartAt == startAt);
+
+        public async Task<IReadOnlyList<Interview>?> GetByApplicationIdAsync(Guid applicationId)
+        {
+            return await _db.Interviews
+                .AsNoTracking()
+                .Where(i => i.ApplicationIdentifier == applicationId)
+                .ToListAsync();
+        }
     }
 }
