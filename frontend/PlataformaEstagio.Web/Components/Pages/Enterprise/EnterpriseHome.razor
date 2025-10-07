@@ -1,6 +1,7 @@
 ﻿@page "/empresa/home"
 @using System.Security.Claims
 @using PlataformaEstagio.Web.Components.Services.Enterprise
+@using PlataformaEstagios.Communication.Responses
 @inject AuthenticationStateProvider AuthProvider
 @inject ISnackbar Snackbar
 @inject NavigationManager Nav
@@ -224,6 +225,7 @@
     private Guid? _enterpriseId;
     private List<JobCompanyVm> ActiveJobs { get; set; } = new();
     private List<ApplicationVm> RecentCandidates { get; set; } = new();
+    private List<InterviewVm> UpcomingInterviews { get; set; } = new();
     private StatsVm Stats { get; set; } = new(0, 0, 0, 0);
 
     private bool _hydrated;     
@@ -278,12 +280,44 @@
                     )
                     .ToList();
 
+                // 1) busca entrevistas (pode vir null do service)
+                var interviews = await _service.GetAllInterviewsByEnterpriseIdAsync(id)
+                                 ?? Array.Empty<ResponseGetInterviewItemJson>();
+
+                // 2) índice das candidaturas (se a lista estiver vazia, vira dicionário vazio)
+                var appsById = RecentCandidates?.ToDictionary(a => a.idCandidatura, a => a)
+                              ?? new Dictionary<Guid, ApplicationVm>();
+
+                // 3) monta os cards; se não achar candidatura correspondente, usa "—"
+                UpcomingInterviews = interviews
+                    .Where(i => i.StartAt > DateTimeOffset.UtcNow)
+                    .OrderBy(i => i.StartAt)
+                    .Take(5)
+                    .Select(i =>
+                    {
+                        appsById.TryGetValue(i.ApplicationIdentifier, out var app);
+                        var candidato = app?.NomeCandidato ?? "—";
+                        var vaga = app?.TituloVaga ?? "—";
+                        var canal = ChannelLabel(i.Location, i.MeetingLink);
+
+                        return new InterviewVm(
+                            candidato,
+                            vaga,
+                            i.StartAt.LocalDateTime,   // <- melhor que .Date.ToLocalTime()
+                            canal
+                        );
+                    })
+                    .ToList();
+
+                // 4) métricas (interviews pode ser vazio)
                 Stats = new StatsVm(
                     VagasAbertas: ActiveJobs.Count,
                     Inscricoes: applications.Count,
-                    Entrevistas: 10, //applications.Count(a => a.Status == "Interview Scheduled"),
-                    TaxaPreenchimento: ActiveJobs.Count == 0 ? 0 : (double)applications.Count(a => a.Status == "Hired") / ActiveJobs.Count
+                    Entrevistas: interviews.Count(),
+                    TaxaPreenchimento: ActiveJobs.Count == 0 ? 0 :
+                        (double)applications.Count(a => a.Status == "Approved") / ActiveJobs.Count
                 );
+
             }
             else
             {
@@ -301,6 +335,18 @@
             // segura o render no fim do ciclo atual
             await InvokeAsync(StateHasChanged);
         }
+    }
+
+    private static string ChannelLabel(string? location, string? link)
+    {
+        if (!string.IsNullOrWhiteSpace(link))
+        {
+            var l = link.ToLowerInvariant();
+            if (l.Contains("meet.google")) return "Google Meet";
+            if (l.Contains("teams.microsoft")) return "Microsoft Teams";
+            return "Online";
+        }
+        return string.IsNullOrWhiteSpace(location) ? "—" : location;
     }
 
     private static string GetDisplayName(ClaimsPrincipal user)
@@ -332,14 +378,6 @@
     private record InterviewVm(string Candidato, string Vaga, DateTime Data, string Canal);
     private record ApplicationVm(string NomeCandidato, string TituloVaga, DateTime DataCandidatura, string NomeCursoCandidato, Guid idCandidato, Guid idCandidatura, string Status);
     private record NotificationVm(string Texto, DateTime Data);
-
-
-
-    private List<InterviewVm> UpcomingInterviews = new()
-    {
-        new("Ana Souza", "Estagiário(a) Frontend (Blazor)", DateTime.Today.AddDays(1).AddHours(14), "Google Meet"),
-        new("Bruno Lima", "QA Júnior (Estágio)", DateTime.Today.AddDays(2).AddHours(10), "Google Meet"),
-    };
 
     private List<NotificationVm> Notifications = new()
     {
