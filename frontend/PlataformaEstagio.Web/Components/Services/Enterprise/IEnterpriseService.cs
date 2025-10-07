@@ -16,5 +16,6 @@ namespace PlataformaEstagio.Web.Components.Services.Enterprise
         Task<(bool Success, string? Error)> UpdateApplicationStatus(Guid applicationId, ApplicationStatus status);
         Task<(bool Success, string? Error)> ScheduleInterviewAsync(Guid applicationId, RequestCreateScheduleInterviewJson body);
         Task<IReadOnlyList<ResponseGetInterviewItemJson>?> GetInterviewsByApplicationIdAsync(Guid applicationId);
+        Task<IReadOnlyList<ResponseGetInterviewItemJson>?> GetAllInterviewsByEnterpriseIdAsync(Guid enterpriseId);
     }
 }

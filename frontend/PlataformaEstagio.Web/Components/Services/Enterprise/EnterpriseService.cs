@@ -89,18 +89,31 @@ namespace PlataformaEstagio.Web.Components.Services.Enterprise
         }
 
         public async Task<IReadOnlyList<ResponseGetInterviewItemJson>?> GetInterviewsByApplicationIdAsync(Guid applicationId)
-            {
-                using var req = new HttpRequestMessage(
-                HttpMethod.Get,
-                $"api/enterprises/applications/{applicationId}/interviews");
+        {
+            using var req = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"api/enterprises/applications/{applicationId}/interviews");
 
-                var response = await SendAsync(req);
+            var response = await SendAsync(req);
 
-                if (response.IsSuccessStatusCode)
-                    return await response.Content.ReadFromJsonAsync<List<ResponseGetInterviewItemJson>>();
+            if (response.IsSuccessStatusCode)
+                return await response.Content.ReadFromJsonAsync<List<ResponseGetInterviewItemJson>>();
 
-                return null;
-            }
+            return null;
+        }
+
+        public async Task<IReadOnlyList<ResponseGetInterviewItemJson>?> GetAllInterviewsByEnterpriseIdAsync(Guid enterpriseId)
+        {
+            using var req = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"api/enterprises/{enterpriseId}/interviews");
+            
+            var response = await SendAsync(req);
+           
+            if (response.IsSuccessStatusCode)
+                return await response.Content.ReadFromJsonAsync<List<ResponseGetInterviewItemJson>>();
+            return null;
+        }
     }   
 
 
