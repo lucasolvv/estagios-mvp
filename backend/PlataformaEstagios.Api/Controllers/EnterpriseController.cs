@@ -129,6 +129,17 @@ namespace PlataformaEstagios.Api.Controllers
             return Ok(list); // IEnumerable<ResponseGetInterviewItemJson>
         }
 
+        [Authorize(Roles = "Enterprise")]
+        [HttpGet("{enterpriseId:guid}/interviews")]
+        public async Task<ActionResult<IEnumerable<ResponseGetInterviewItemJson>>> GetInterviewsByEnterpriseIdAsync(
+        [FromRoute] Guid enterpriseId,
+        [FromServices] IGetInterviewUseCase useCase,
+        CancellationToken ct = default)
+        {
+            var list = await useCase.GetInterviewsByEnterpriseIdAsync(enterpriseId);
+            return Ok(list); // IEnumerable<ResponseGetInterviewItemJson>
+        }
+
 
     }
 
