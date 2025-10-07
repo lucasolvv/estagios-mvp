@@ -137,9 +137,14 @@
             await OnUserTypeChange(tipo);
             Nav.NavigateTo("/");
         }
+        catch (ApplicationException ax)
+        {
+            foreach (var line in ax.Message.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+                Snackbar.Add(line, Severity.Error);
+        }
         catch (Exception ex)
         {
-            Snackbar.Add($"Erro: {ex.Message}", Severity.Error);
+            Snackbar.Add($"Erro inesperado: {ex.Message}", Severity.Error);
         }
     }
 

@@ -8,7 +8,7 @@ namespace PlataformaEstagios.Application.UseCases.User.Create
         public RequestCandidateValidator()
         {
             RuleFor(c => c.FullName)
-                .NotEmpty().WithMessage("FullName is required.")
+                .NotEmpty().WithMessage("Nome todo é obrigatório.")
                 .MaximumLength(120);
 
             RuleFor(c => c.CourseName)
@@ -17,7 +17,7 @@ namespace PlataformaEstagios.Application.UseCases.User.Create
             RuleFor(c => c.BirthDate)
                 .LessThan(DateTime.UtcNow.Date)
                 .When(c => c.BirthDate.HasValue)
-                .WithMessage("BirthDate must be in the past.");
+                .WithMessage("Data de nascimento precisa ser no passado.");
 
             // Address is optional; if present, validate it
             When(c => c.Address is not null, () =>

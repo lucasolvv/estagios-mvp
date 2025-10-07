@@ -10,44 +10,44 @@ namespace PlataformaEstagios.Application.UseCases.User.Create
         {
             RuleFor(u => u.Nickname)
                 .Cascade(CascadeMode.Stop)
-                .NotEmpty().WithMessage("NickName is Required")
-                .Must(s => !string.IsNullOrWhiteSpace(s)).WithMessage("Nickname cannot be whitespace.")
-                .Length(3, 32).WithMessage("Nickname must be between 3 and 32 characters.")
-                .Matches("^[a-zA-Z0-9._-]+$").WithMessage("Nickname can contain only letters, numbers, '.', '_' and '-'.");
+                .NotEmpty().WithMessage("O nome de usuário é obrigatório.")
+                .Must(s => !string.IsNullOrWhiteSpace(s)).WithMessage("O nome de usuário não pode conter apenas espaços em branco.")
+                .Length(3, 32).WithMessage("O nome de usuário deve ter entre 3 e 32 caracteres.")
+                .Matches("^[a-zA-Z0-9._-]+$").WithMessage("O nome de usuário só pode conter letras, números, pontos (.), underlines (_) e hifens (-).");
 
             RuleFor(u => u.Email)
                 .Cascade(CascadeMode.Stop)
-                .NotEmpty().WithMessage("Email is required.")
-                .EmailAddress().WithMessage("Email is invalid.")
-                .MaximumLength(100).WithMessage("Email must be at most 100 characters.");
+                .NotEmpty().WithMessage("O e-mail é obrigatório.")
+                .EmailAddress().WithMessage("O e-mail informado não é válido.")
+                .MaximumLength(100).WithMessage("O e-mail deve ter no máximo 100 caracteres.");
 
             RuleFor(u => u.Password)
                 .Cascade(CascadeMode.Stop)
-                .NotEmpty().WithMessage("Password is required.")
-                .MinimumLength(4).WithMessage("Password looks invalid (too short). Minimal 4 chars")
-                .MaximumLength(200).WithMessage("Password looks invalid (too long).");
+                .NotEmpty().WithMessage("A senha é obrigatória.")
+                .MinimumLength(4).WithMessage("A senha deve ter pelo menos 4 caracteres.")
+                .MaximumLength(200).WithMessage("A senha é muito longa.");
 
             RuleFor(u => u.UserType)
-                .IsInEnum().WithMessage("UserType is invalid.");
+                .IsInEnum().WithMessage("O tipo de usuário informado é inválido.");
 
-            // Conditional: Candidate
+            // Caso o tipo seja Candidato
             When(u => u.UserType == UserType.Candidate, () =>
             {
                 RuleFor(u => u.Candidate)
-                    .NotNull().WithMessage("Candidate payload is required for UserType.Candidate.")
+                    .NotNull().WithMessage("Os dados do candidato são obrigatórios para o tipo de usuário 'Candidato'.")
                     .SetValidator(new RequestCandidateValidator());
                 RuleFor(u => u.Enterprise)
-                    .Null().WithMessage("Enterprise payload must be null for UserType.Candidate.");
+                    .Null().WithMessage("Os dados da empresa devem estar vazios para o tipo de usuário 'Candidato'.");
             });
 
-            // Conditional: Enterprise
+            // Caso o tipo seja Empresa
             When(u => u.UserType == UserType.Enterprise, () =>
             {
                 RuleFor(u => u.Enterprise)
-                    .NotNull().WithMessage("Enterprise payload is required for UserType.Enterprise.")
+                    .NotNull().WithMessage("Os dados da empresa são obrigatórios para o tipo de usuário 'Empresa'.")
                     .SetValidator(new RequestEnterpriseValidator());
                 RuleFor(u => u.Candidate)
-                    .Null().WithMessage("Candidate payload must be null for UserType.Enterprise.");
+                    .Null().WithMessage("Os dados do candidato devem estar vazios para o tipo de usuário 'Empresa'.");
             });
         }
     }
