@@ -220,7 +220,8 @@ namespace PlataformaEstagios.Application.Services.AutoMapper
                 .ForMember(d => d.DurationMinutes, o => o.MapFrom(s => s.DurationMinutes))
                 .ForMember(d => d.Location, o => o.MapFrom(s => s.Location))
                 .ForMember(d => d.MeetingLink, o => o.MapFrom(s => s.MeetingLink))
-                .ForMember(d => d.Notes, o => o.MapFrom(s => s.Notes));
+                .ForMember(d => d.Notes, o => o.MapFrom(s => s.Notes))
+                .ForMember(d => d.ApplicationIdentifier, o => o.MapFrom(s => s.ApplicationIdentifier));
 
 
 

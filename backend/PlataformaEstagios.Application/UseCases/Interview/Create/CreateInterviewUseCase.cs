@@ -43,7 +43,7 @@ namespace PlataformaEstagios.Application.UseCases.Interview.Create
             var startUtc = request.StartAt.ToUniversalTime();
             if (startUtc <= DateTimeOffset.UtcNow) return (false, 400, "Data/hora deve ser futura.");
 
-            // 2) Carrega a candidatura (inclua Vacancy no repositório)
+            // 2) Carrega a candidatura 
             var app = await _applications.GetByIdAsync(applicationId);
             if (app is null) return (false, 404, "Candidatura não encontrada.");
             if (app.Vacancy is null) return (false, 404, "Vaga da candidatura não encontrada.");
@@ -52,28 +52,25 @@ namespace PlataformaEstagios.Application.UseCases.Interview.Create
             if (app.Status == ApplicationStatus.Rejected)
                 return (false, 409, "Não é possível agendar entrevista para candidatura rejeitada.");
 
-            // 4) (Opcional) Autorização do dono da vaga
+            // 4) Autorização do dono da vaga
             if (enterpriseIdentifier.HasValue)
             {
                 var belongs = await _applications.BelongsToEnterpriseAsync(applicationId, enterpriseIdentifier.Value);
                 if (!belongs) return (false, 403, "Você não tem permissão para esta candidatura.");
             }
 
-            // 5) Conflito exato por Application no mesmo horário (use sempre UTC)
+            // 5) Conflito exato por Application no mesmo horário
             var hasOverlap = await _interviewsRead.ExistsSameStartAsync(applicationId, startUtc);
             if (hasOverlap) return (false, 409, "Já existe entrevista marcada neste horário para esta candidatura.");
 
-            // 6) Mapear e completar campos
+
             var entity = _mapper.Map<Domain.Entities.Interview>(request);
             entity.InterviewIdentifier = Guid.NewGuid();
             entity.ApplicationIdentifier = applicationId;
-            entity.StartAt = startUtc; // UTC
-
-            // Desnormalização (NOVO)
+            entity.StartAt = startUtc;
             entity.CandidateIdentifier = app.CandidateIdentifier;
             entity.EnterpriseIdentifier = app.Vacancy.EnterpriseIdentifier;
 
-            // 7) Persistir
             await _interviewsWrite.AddAsync(entity);
             await _unitOfWork.Commit();
 

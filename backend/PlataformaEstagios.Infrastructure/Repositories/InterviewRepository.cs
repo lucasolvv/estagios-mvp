@@ -24,5 +24,12 @@ namespace PlataformaEstagios.Infrastructure.Repositories
                 .Where(i => i.ApplicationIdentifier == applicationId)
                 .ToListAsync();
         }
+        public async Task<IReadOnlyList<Interview>?> GetByEnterpriseIdAsync(Guid enterpriseId)
+        {
+            return await _db.Interviews
+                .AsNoTracking()
+                .Where(i => i.EnterpriseIdentifier == enterpriseId)
+                .ToListAsync();
+        }
     }
 }
