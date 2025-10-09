@@ -31,5 +31,13 @@ namespace PlataformaEstagios.Infrastructure.Repositories
                 .Where(i => i.EnterpriseIdentifier == enterpriseId)
                 .ToListAsync();
         }
+
+        public async Task<IReadOnlyList<Interview>?> GetByCandidateIdAsync(Guid candidateId)
+        {
+            return await _db.Interviews
+                .AsNoTracking()
+                .Where(i => i.CandidateIdentifier == candidateId)
+                .ToListAsync();
+        }
     }
 }

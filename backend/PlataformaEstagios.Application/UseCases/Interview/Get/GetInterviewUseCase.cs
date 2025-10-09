@@ -26,5 +26,11 @@ namespace PlataformaEstagios.Application.UseCases.Interview.Get
             var interviews = await _interviewReadRepo.GetByEnterpriseIdAsync(enterpriseId);
             return _mapper.Map<IReadOnlyList<ResponseGetInterviewItemJson>>(interviews);
         }
+
+        public async Task<IReadOnlyList<ResponseGetInterviewItemJson>?> GetInterviewsByCandidateIdAsync(Guid candidateId)
+        {
+            var interviews = await _interviewReadRepo.GetByCandidateIdAsync(candidateId);
+            return _mapper.Map<IReadOnlyList<ResponseGetInterviewItemJson>>(interviews);
+        }
     }
 }

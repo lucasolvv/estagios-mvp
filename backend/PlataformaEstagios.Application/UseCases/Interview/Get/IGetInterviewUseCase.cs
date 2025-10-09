@@ -6,5 +6,6 @@ namespace PlataformaEstagios.Application.UseCases.Interview.Get
     {
         Task<IReadOnlyList<ResponseGetInterviewItemJson>?> GetInterviewsByApplicationIdAsync(Guid applicationId);
         Task<IReadOnlyList<ResponseGetInterviewItemJson>?> GetInterviewsByEnterpriseIdAsync(Guid enterpriseId);
+        Task<IReadOnlyList<ResponseGetInterviewItemJson>?> GetInterviewsByCandidateIdAsync(Guid candidateId);
     }
 }

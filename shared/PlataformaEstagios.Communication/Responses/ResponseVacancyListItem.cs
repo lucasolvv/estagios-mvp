@@ -2,6 +2,7 @@
 {
     public class ResponseVacancyListItem
     {
+        public Guid EnterpriseIdentifier { get; set; }
         public Guid VacancyIdentifier { get; set; }
         public string Title {get; set;}
         public DateTime OpenedAt {get; set;}

@@ -6,5 +6,6 @@
         // (depois você pode adicionar: GetByApplicationIdAsync, UpcomingByEnterpriseAsync, etc.)
         Task<IReadOnlyList<Entities.Interview>?> GetByApplicationIdAsync(Guid applicationId);
         Task<IReadOnlyList<Entities.Interview>?> GetByEnterpriseIdAsync(Guid enterpriseId);
+        Task<IReadOnlyList<Entities.Interview>?> GetByCandidateIdAsync(Guid candidateId);
     }
 }

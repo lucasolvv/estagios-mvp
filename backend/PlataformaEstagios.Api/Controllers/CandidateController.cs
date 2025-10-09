@@ -5,6 +5,7 @@ using PlataformaEstagios.Application.UseCases.Application.Create;
 using PlataformaEstagios.Application.UseCases.Application.Get;
 using PlataformaEstagios.Application.UseCases.Candidate.Get;
 using PlataformaEstagios.Application.UseCases.Candidate.UpdateProfile;
+using PlataformaEstagios.Application.UseCases.Interview.Get;
 using PlataformaEstagios.Application.UseCases.Vacancy.Get;
 using PlataformaEstagios.Communication.Requests;
 using PlataformaEstagios.Communication.Responses;
@@ -81,6 +82,17 @@ namespace PlataformaEstagios.Api.Controllers
             var candidate = await useCase.GetCandidateByIdAsync(candidateId);
             if (candidate is null) return NotFound();
             return Ok(candidate);
+        }
+
+        [Authorize(Roles = "Candidate")]
+        [HttpGet("{candidateId:guid}/interviews")]
+        public async Task<ActionResult<IEnumerable<ResponseGetInterviewItemJson>>> GetInterviewsByCandidateIdAsync(
+        [FromRoute] Guid candidateId,
+        [FromServices] IGetInterviewUseCase useCase,
+        CancellationToken ct = default)
+        {
+            var list = await useCase.GetInterviewsByCandidateIdAsync(candidateId);
+            return Ok(list); // IEnumerable<ResponseGetInterviewItemJson>
         }
     }
 }

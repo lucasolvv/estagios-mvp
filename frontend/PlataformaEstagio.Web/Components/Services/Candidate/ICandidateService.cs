@@ -16,5 +16,9 @@ namespace PlataformaEstagio.Web.Components.Services.Candidate
             Guid candidateId,
             RequestUpdateCandidateProfileJson dto,
             CancellationToken ct = default);
+
+        Task<IReadOnlyList<ResponseGetInterviewItemJson>?> GetAllInterviewsByCandidateIdAsync(Guid candidateId);
     }
+
+
 }

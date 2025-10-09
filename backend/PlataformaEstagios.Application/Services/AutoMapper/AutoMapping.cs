@@ -156,6 +156,7 @@ namespace PlataformaEstagios.Application.Services.AutoMapper
 
             // DomainToResponse()
             CreateMap<Vacancy, ResponseVacancyListItem>()
+                .ForMember(d => d.EnterpriseIdentifier, o => o.MapFrom(s => s.EnterpriseIdentifier))
                 .ForMember(d => d.VacancyIdentifier, o => o.MapFrom(s => s.VacancyIdentifier))
                 .ForMember(d => d.Title, o => o.MapFrom(s => s.Title ?? string.Empty))
                 .ForMember(d => d.OpenedAt, o => o.MapFrom(s => s.PublishedAtUtc))

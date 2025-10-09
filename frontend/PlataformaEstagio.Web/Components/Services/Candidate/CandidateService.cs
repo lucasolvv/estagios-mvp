@@ -65,5 +65,18 @@ namespace PlataformaEstagio.Web.Components.Services.Candidate
             return (false, await resp.Content.ReadAsStringAsync(ct));
         }
 
+        public async Task<IReadOnlyList<ResponseGetInterviewItemJson>?> GetAllInterviewsByCandidateIdAsync(Guid candidateId)
+        {
+            using var req = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"api/candidate/{candidateId}/interviews");
+
+            var response = await SendAsync(req);
+
+            if (response.IsSuccessStatusCode)
+                return await response.Content.ReadFromJsonAsync<List<ResponseGetInterviewItemJson>>();
+            return null;
+        }
+
     }
 }
