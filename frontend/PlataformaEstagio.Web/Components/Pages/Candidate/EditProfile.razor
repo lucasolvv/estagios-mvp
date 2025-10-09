@@ -10,10 +10,15 @@
 @inject NavigationManager Nav
 
 <MudContainer MaxWidth="MaxWidth.False" Class="px-6 py-4">
-    <MudPaper Class="px-4 py-4">
-        <MudText Typo="Typo.h5" Color="Color.Secondary" Class="mb-3">
-            Editar Perfil
-        </MudText>
+    <!-- HERO -->
+    <MudPaper Class="hero-card mb-4" Elevation="0">
+        <MudStack Row AlignItems="AlignItems.Center" Spacing="1" Class="hero-inner">
+            <MudIcon Icon="@Icons.Material.Outlined.Edit" Size="Size.Large" />
+            <MudText Typo="Typo.h5" Class="font-bold">Editar Perfil</MudText>
+        </MudStack>
+    </MudPaper>
+
+    <MudPaper Class="px-4 py-4 elev">
 
         @if (!_hydrated)
         {
@@ -32,117 +37,241 @@
         else
         {
             <MudForm @ref="_form" Disabled="_busy">
-                <MudGrid>
-                    <MudItem xs="12" md="6">
-                        <MudTextField @bind-Value="_vm.FullName" Label="Nome" Required="true" />
-                    </MudItem>
 
-                    <MudItem xs="12" md="3">
-                        @* <MudDatePicker Label="Data de Nascimento"
-                                       @bind-Date="_vm.BirthDate"
-                                       DateFormat="dd/MM/yyyy"
-                                       Clearable="true" /> *@
+                <!-- Seção: Dados básicos -->
+                <div class="section">
+                    <div class="section__title">
+                        <MudIcon Icon="@Icons.Material.Outlined.Badge" />
+                        <MudText Typo="Typo.subtitle1" Class="font-medium">Dados básicos</MudText>
+                    </div>
 
-                        <MudDatePicker @bind-Date="_vm.BirthDate" Label="Data de Nascimento" />
-                    </MudItem>
-                    <MudItem xs="12" md="12">
-                        <MudTextField @bind-Value="_vm.BioResume" Lines="5" Variant="Variant.Text" Label="Resumo" />
-                    </MudItem>
-                    <MudItem xs="12" md="6">
-                        <MudTextField @bind-Value="_vm.Course" Label="Curso" />
-                    </MudItem>
+                    <MudGrid GutterSize="GutterSize.Small">
+                        <MudItem xs="12" md="6">
+                            <MudTextField @bind-Value="_vm.FullName" Label="Nome*" Required="true"
+                                          Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Person" />
+                        </MudItem>
 
-                    <MudItem xs="12" md="6">
-                        <MudTextField @bind-Value="_vm.Address.Street" Label="Rua" />
-                    </MudItem>
-                    <MudItem xs="12" md="6">
-                        <MudTextField @bind-Value="_vm.Address.Complement" Label="Complemento" />
-                    </MudItem>
-                    <MudItem xs="12" md="6">
-                        <MudTextField @bind-Value="_vm.Address.Neighborhood" Label="Bairro" />
-                    </MudItem>
-                    <MudItem xs="12" md="6">
-                        <MudTextField @bind-Value="_vm.Address.City" Label="Cidade" />
-                    </MudItem>
-                    <MudItem xs="12" md="3">
-                        <MudTextField @bind-Value="_vm.Address.Uf" Label="UF" MaxLength="2" />
-                    </MudItem>
-                    <MudItem xs="12" md="3">
-                        <MudTextField @bind-Value="_vm.Address.Cep" Label="CEP"
-                                      Mask="@(new PatternMask("00000-000"))"
-                                      MaskChar="_"
-                                      InputMode="InputMode.text" />
-                    </MudItem>
+                        <MudItem xs="12" md="3">
+                            <MudDatePicker @bind-Date="_vm.BirthDate" Label="Data de Nascimento" />
+                        </MudItem>
 
-                    <!-- Foto -->
-                    <MudItem xs="12" md="6" Class="mt-4">
-                        <MudText Typo="Typo.subtitle1">Foto de Perfil</MudText>
-                        <InputFile OnChange="OnPhotoSelected" accept="image/jpeg,image/png,image/webp" />
-                        <MudText Typo="Typo.caption" Class="mt-1">Formatos: JPEG/PNG/WEBP. Máx 5MB.</MudText>
+                        <MudItem xs="12" md="12">
+                            <MudTextField @bind-Value="_vm.BioResume" Lines="4" Label="Resumo"
+                                          HelperText="Breve apresentação sobre você" />
+                        </MudItem>
 
-                        @if (!string.IsNullOrWhiteSpace(_imagePreview))
-                        {
-                            <div class="mt-2">
-                                <img src="@_imagePreview" alt="Preview" style="max-width:220px;border-radius:8px;" />
-                            </div>
-                        }
-                        else if (!string.IsNullOrWhiteSpace(_currentPublicPhoto))
-                        {
-                            <div class="mt-2">
-                                <img src="@_currentPublicPhoto" alt="Atual" style="max-width:220px;border-radius:8px;" />
-                            </div>
-                        }
-                    </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudTextField @bind-Value="_vm.Course" Label="Curso"
+                                          Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.School" />
+                        </MudItem>
+                    </MudGrid>
+                </div>
 
-                    <!-- Currículo -->
-                    <MudItem xs="12" md="6" Class="mt-4">
-                        <MudText Typo="Typo.subtitle1">Currículo (PDF)</MudText>
-                        <InputFile OnChange="OnResumeSelected" accept="application/pdf" />
-                        <MudText Typo="Typo.caption" Class="mt-1">Apenas PDF. Máx 5MB.</MudText>
+                <!-- Seção: Endereço -->
+                <div class="section">
+                    <div class="section__title">
+                        <MudIcon Icon="@Icons.Material.Outlined.HomeWork" />
+                        <MudText Typo="Typo.subtitle1" Class="font-medium">Endereço</MudText>
+                    </div>
 
-                        @if (!string.IsNullOrWhiteSpace(_resumeSelectedName))
-                        {
-                            <MudAlert Severity="Severity.Info" Class="mt-2">
-                                PDF anexado: @_resumeSelectedName
-                            </MudAlert>
-                        }
-                        @* link para o currículo atual *@
-                        @if (!string.IsNullOrWhiteSpace(_currentPublicResume))
-                        {
-                            <MudStack Row Spacing="1" AlignItems="AlignItems.Center" Class="mt-2">
-                                <MudIcon Icon="@Icons.Material.Filled.PictureAsPdf" />
-                                <MudLink Href="@_currentPublicResume" Target="_blank" Rel="noopener">
-                                    Ver currículo (PDF)
-                                </MudLink>
-                            </MudStack>
-                        }
+                    <MudGrid GutterSize="GutterSize.Small">
+                        <MudItem xs="12" md="6">
+                            <MudTextField @bind-Value="_vm.Address.Street" Label="Rua" />
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudTextField @bind-Value="_vm.Address.Complement" Label="Complemento" />
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudTextField @bind-Value="_vm.Address.Neighborhood" Label="Bairro" />
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudTextField @bind-Value="_vm.Address.City" Label="Cidade" />
+                        </MudItem>
+                        <MudItem xs="6" md="3">
+                            <MudTextField @bind-Value="_vm.Address.Uf" Label="UF" MaxLength="2" />
+                        </MudItem>
+                        <MudItem xs="6" md="3">
+                            <MudTextField @bind-Value="_vm.Address.Cep" Label="CEP"
+                                          Mask="@(new PatternMask("00000-000"))" MaskChar="_" InputMode="InputMode.text" />
+                        </MudItem>
+                    </MudGrid>
+                </div>
 
-                    </MudItem>
+                <!-- Seção: Arquivos -->
+                <div class="section">
+                    <div class="section__title">
+                        <MudIcon Icon="@Icons.Material.Outlined.AttachFile" />
+                        <MudText Typo="Typo.subtitle1" Class="font-medium">Arquivos</MudText>
+                    </div>
 
-                    <MudItem xs="12" Class="mt-6">
-                        <MudStack Row Spacing="2">
-                            <MudButton Color="Color.Primary"
-                                       OnClick="SaveAsync"
-                                       Disabled="_busy">
-                                @if (_busy)
+                    <MudGrid GutterSize="GutterSize.Small">
+                        <!-- Foto -->
+                        <MudItem xs="12" md="6">
+                            <MudStack Spacing="1">
+                                <MudText Typo="Typo.body2" Class="font-medium">Foto de Perfil</MudText>
+                                <InputFile OnChange="OnPhotoSelected" accept="image/jpeg,image/png,image/webp" />
+                                <MudText Typo="Typo.caption" Class="text-dim">Formatos: JPEG/PNG/WEBP. Máx 5MB.</MudText>
+
+                                @if (!string.IsNullOrWhiteSpace(_imagePreview) || !string.IsNullOrWhiteSpace(_currentPublicPhoto))
                                 {
-                                    <MudProgressCircular Indeterminate="true" Size="Size.Small" Class="mr-2" />
+                                    <MudPaper Class="preview-card" Elevation="1">
+                                        <img src="@(_imagePreview ?? _currentPublicPhoto)" alt="Foto" class="preview-img" />
+                                    </MudPaper>
                                 }
-                                Salvar
-                            </MudButton>
+                            </MudStack>
+                        </MudItem>
 
-                            <MudButton Variant="Variant.Text"
-                                       Disabled="_busy"
-                                       OnClick="@(() => Nav.NavigateTo("/candidato/home"))">
-                                Cancelar
-                            </MudButton>
-                        </MudStack>
-                    </MudItem>
-                </MudGrid>
+                        <!-- Currículo -->
+                        <MudItem xs="12" md="6">
+                            <MudStack Spacing="1">
+                                <MudText Typo="Typo.body2" Class="font-medium">Currículo (PDF)</MudText>
+                                <InputFile OnChange="OnResumeSelected" accept="application/pdf" />
+                                <MudText Typo="Typo.caption" Class="text-dim">Apenas PDF. Máx 5MB.</MudText>
+
+                                @if (!string.IsNullOrWhiteSpace(_resumeSelectedName))
+                                {
+                                    <MudAlert Severity="Severity.Info" Class="mt-1" Elevation="0">
+                                        PDF anexado: @_resumeSelectedName
+                                    </MudAlert>
+                                }
+
+                                @if (!string.IsNullOrWhiteSpace(_currentPublicResume))
+                                {
+                                    <MudPaper Class="preview-card row" Elevation="1">
+                                        <MudIcon Icon="@Icons.Material.Filled.PictureAsPdf" />
+                                        <MudLink Href="@_currentPublicResume" Target="_blank" Rel="noopener">
+                                            Ver currículo (PDF)
+                                        </MudLink>
+                                    </MudPaper>
+                                }
+                            </MudStack>
+                        </MudItem>
+                    </MudGrid>
+                </div>
+
+                <!-- Ações -->
+                <div class="actions">
+                    <MudStack Row Spacing="2" Justify="Justify.FlexStart" AlignItems="AlignItems.Center">
+                        <MudButton Color="Color.Primary" OnClick="SaveAsync" Disabled="_busy">
+                            @if (_busy)
+                            {
+                                <MudProgressCircular Indeterminate="true" Size="Size.Small" Class="mr-2" />
+                            }
+                            Salvar
+                        </MudButton>
+
+                        <MudButton Variant="Variant.Text" Disabled="_busy"
+                                   OnClick="@(() => Nav.NavigateTo("/candidato/home"))">
+                            Cancelar
+                        </MudButton>
+                    </MudStack>
+                </div>
+
             </MudForm>
         }
     </MudPaper>
 </MudContainer>
+
+<style>
+    /* Hero da página */
+    .hero-card {
+        border: 1px solid var(--mud-palette-divider);
+        border-radius: 14px;
+        background: radial-gradient(900px 220px at 0% -30%, color-mix(in oklab, var(--mud-palette-primary) 12%, transparent) 0%, transparent 60%), var(--mud-palette-surface);
+    }
+
+    .hero-inner {
+        padding: 16px 18px;
+    }
+
+    .font-medium {
+        font-weight: 600;
+    }
+
+    .text-dim {
+        color: var(--mud-palette-text-secondary);
+    }
+
+    /* Paper principal */
+    .elev {
+        border: 1px solid var(--mud-palette-divider);
+        border-radius: 14px;
+    }
+
+    /* Título de seção com barra lateral e tint, no mesmo estilo dos cards */
+    .section {
+        margin-bottom: 22px;
+    }
+
+    .section__title {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        padding: 10px 14px 10px 20px;
+        border: 1px solid var(--mud-palette-divider);
+        border-radius: 10px;
+        margin-bottom: 10px;
+    }
+
+        .section__title::before {
+            content: "";
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 6px;
+            border-radius: 10px 0 0 10px;
+            background: linear-gradient(180deg, color-mix(in oklab, var(--mud-palette-primary) 92%, white 8%), color-mix(in oklab, var(--mud-palette-primary) 62%, white 38%));
+        }
+
+        .section__title .mud-typography {
+            font-weight: 700;
+            color: var(--mud-palette-text-primary);
+        }
+
+        .section__title .mud-icon-root {
+            color: var(--mud-palette-primary);
+            opacity: .95;
+        }
+
+    /* Previews (foto/pdf) */
+    .preview-card {
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+        padding: 8px 10px;
+        border: 1px solid var(--mud-palette-divider);
+        border-radius: 10px;
+        width: fit-content;
+        background: var(--mud-palette-surface);
+    }
+
+        .preview-card.row {
+            flex-direction: row;
+        }
+
+    .preview-img {
+        max-width: 220px;
+        border-radius: 8px;
+        display: block;
+    }
+
+    /* Barra de ações no rodapé do form */
+    .actions {
+        padding-top: 10px;
+        border-top: 1px dashed var(--mud-palette-divider);
+    }
+
+    /* Responsivo */
+    @@media (max-width: 599px) {
+        .hero-inner
+
+    {
+        padding: 12px;
+    }
+
+    }
+</style>
+
 
 @code {
     private MudForm? _form;

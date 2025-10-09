@@ -8,44 +8,123 @@
 @inject PlataformaEstagio.Web.Components.Services.Auth.IAuthService Auth
 @inject Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage.ProtectedSessionStorage Session;
 
+<section class="auth-hero">
+    <MudContainer MaxWidth="MaxWidth.Large">
+        <MudGrid Justify="Justify.Center" AlignItems="AlignItems.Center">
+            <MudItem xs="12" sm="8" md="6" lg="5">
+                <MudPaper Class="auth-card" Elevation="2">
+                    <MudStack Spacing="2">
+                        <MudStack Spacing="0">
+                            <MudText Typo="Typo.h4" Class="title">Bem-vindo ao StartCarreira</MudText>
+                            <MudText Typo="Typo.body2" Class="subtitle">
+                                Acesse sua conta para acompanhar vagas e candidaturas.
+                            </MudText>
+                        </MudStack>
 
-<MudContainer MaxWidth="MaxWidth.ExtraLarge">
-    <MudGrid Justify="Justify.Center" AlignItems="AlignItems.Center" Class="mt-2">
-        <MudItem xs="12" md="6">
-            <MudPaper Class="pa-6">
-                <MudStack>
-                    <MudText Typo="Typo.h4" Color="Color.Secondary" Class="font-weight-bold">
-                        Bem-vindo ao StartCarreira
-                    </MudText>
-                    <MudText Typo="Typo.subtitle2" Class="text-medium-emphasis">
-                        Acesse sua conta para acompanhar vagas e candidaturas.
-                    </MudText>
+                        <EditForm Model="_model" OnValidSubmit="HandleLogin">
+                            <MudStack Spacing="2">
+                                <MudTextField @bind-Value="_model.EmailOrNickname"
+                                              For="@(() => _model.EmailOrNickname)"
+                                              Label="Usuário ou e-mail"
+                                              Required="true" Immediate="true"
+                                              FullWidth="true" />
 
-                   
-                    <EditForm Model="_model" OnValidSubmit="HandleLogin">
-                        <MudTextField @bind-Value="_model.EmailOrNickname" Label="Usuário ou e-mail"
-                                      For="@(() => _model.EmailOrNickname)" Required="true" Immediate="true" />
+                                <!-- Mostrar/ocultar senha com ícone no AdornmentEnd -->
+                                <MudTextField @bind-Value="_model.Password"
+                                              For="@(() => _model.Password)"
+                                              Label="Senha"
+                                              InputType="@(_showPassword? InputType.Text: InputType.Password)"
+                                              Required="true" Immediate="true"
+                                              Adornment="Adornment.End"
+                                              AdornmentIcon="@(_showPassword? Icons.Material.Outlined.VisibilityOff : Icons.Material.Outlined.Visibility)"
+                                              OnAdornmentClick="@TogglePassword"
+                                              AdornmentAriaLabel="Mostrar/ocultar senha"
+                                              FullWidth="true"
+                                              AdornmentIconColor="Color.Default" />
 
-                        <MudTextField @bind-Value="_model.Password" Label="Senha"
-                                      For="@(() => _model.Password)" InputType="InputType.Password" Required="true" Immediate="true" />
 
-                        <MudButton ButtonType="ButtonType.Submit" Disabled="_isSubmitting"
-                                   Variant="Variant.Filled" Color="Color.Primary"
-                                   Class="mt-2" FullWidth="true">
-                            @(_isSubmitting ? "Entrando.." : "Entrar")
-                        </MudButton>
-                    </EditForm>
+                                <!-- Botão principal com spinner durante o submit -->
+                                <MudButton ButtonType="ButtonType.Submit"
+                                           Disabled="_isSubmitting"
+                                           Variant="Variant.Filled"
+                                           Color="Color.Primary"
+                                           Class="submit-btn"
+                                           FullWidth="true">
+                                    @if (_isSubmitting)
+                                    {
+                                        <MudProgressCircular Size="Size.Small" Class="mr-1" Indeterminate="true" />
+                                    }
+                                    @(_isSubmitting ? "Entrando..." : "Entrar")
+                                </MudButton>
 
-                    <MudDivider Class="my-2" />
-                    <MudText Typo="Typo.body2">
-                        Não possui cadastro?
-                        <MudLink Href="/Register">Cadastre-se</MudLink>
-                    </MudText>
-                </MudStack>
-            </MudPaper>
-        </MudItem>
-    </MudGrid>
-</MudContainer>
+                                <!-- Ações secundárias SSO/LGN (sem lógica, apenas UI) -->
+                                <MudStack Spacing="1">
+                                    <MudButton Variant="Variant.Outlined"
+                                               Color="Color.Primary"
+                                               StartIcon="@Icons.Material.Outlined.AccountCircle"
+                                               FullWidth="true"
+                                               Disabled="true"
+                                               Title="Em breve">
+                                        Entrar com Google
+                                    </MudButton>
+
+                                    <MudButton Variant="Variant.Outlined"
+                                               Color="Color.Secondary"
+                                               StartIcon="@Icons.Custom.Brands.GitHub"
+                                               FullWidth="true"
+                                               Disabled="true"
+                                               Title="Em breve">
+                                        Entrar com GitHub
+                                    </MudButton>
+                                </MudStack>
+                            </MudStack>
+                        </EditForm>
+
+                        <MudDivider Class="my-2" />
+                        <MudText Typo="Typo.body2" Class="signup">
+                            Não possui cadastro?
+                            <MudLink Href="/Register">Cadastre-se</MudLink>
+                        </MudText>
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+    </MudContainer>
+</section>
+
+<style>
+    .auth-hero{
+        padding-top: clamp(24px, 8vh, 64px);
+        padding-bottom: clamp(24px, 10vh, 96px);
+    }
+    .auth-card{
+        padding: clamp(20px, 3.2vw, 32px);
+        border: 1px solid var(--mud-palette-divider);
+        border-radius: 16px;
+        background: var(--mud-palette-surface);
+    }
+    .title{
+        font-weight: 700;
+        letter-spacing: .2px;
+    }
+    .subtitle{
+        color: var(--mud-palette-text-secondary);
+        margin-top: 2px;
+    }
+    .submit-btn{
+        margin-top: 6px;
+        height: 42px;
+        font-weight: 600;
+        letter-spacing: .3px;
+    }
+    .signup{
+        color: var(--mud-palette-text-secondary);
+    }
+    @@media (max-width: 599px){
+        .auth-card{ padding: 18px; }
+    }
+</style>
+
 
 @code {
     private MudForm? _form;
@@ -53,6 +132,11 @@
     const string TokenKey = "auth.token";
     const string SessionKey = "auth.session";
     private RequestLoginJson _model = new();
+
+    // ADD: estado local para mostrar/ocultar senha
+    private bool _showPassword;
+    private void TogglePassword() => _showPassword = !_showPassword;
+
 
     private async Task HandleLogin()
     {

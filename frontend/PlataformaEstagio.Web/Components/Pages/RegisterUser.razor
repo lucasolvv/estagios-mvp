@@ -1,6 +1,5 @@
 ﻿@page "/Register"
 @using MudBlazor
-
 @using PlataformaEstagio.Web.Components.Services
 @using PlataformaEstagios.Communication.Requests
 @using PlataformaEstagios.Domain.Enums
@@ -8,93 +7,211 @@
 @inject IUserServices UserServices
 @inject NavigationManager Nav
 
-<MudPaper Class="pa-6 mt-4 mx-auto mb-8" Style="max-width: 70%">
-    <MudText Typo="Typo.h5" Color="Color.Secondary" Align="Align.Center">Aproveite sua vida profissional ao máximo</MudText>
+<section class="auth-hero">
+    <MudContainer MaxWidth="MaxWidth.Large">
+        <MudGrid Justify="Justify.Center">
+            <MudItem xs="12" md="10" lg="8">
+                <MudPaper Class="auth-card" Elevation="2">
+                    <MudStack Spacing="2">
+                        <MudStack Spacing="0">
+                            <MudText Typo="Typo.h5" Class="title" Align="Align.Center">
+                                Aproveite sua vida profissional ao máximo
+                            </MudText>
+                        </MudStack>
 
-    <MudForm @ref="_form" OnValidSubmit="HandleValidSubmit">
+                        <MudForm @ref="_form" OnValidSubmit="HandleValidSubmit">
+                            <MudStack Spacing="2">
 
-        <MudTextField @bind-Value="_user.Nickname" Label="Usuário" Required="true" />
-        <MudTextField @bind-Value="_user.Email" Label="Email" Required="true" />
-        <MudTextField @bind-Value="_user.Password" Label="Senha" InputType="InputType.Password" Required="true" />
+                                <!-- Credenciais -->
+                                <MudStack Spacing="2">
+                                    <MudTextField @bind-Value="_user.Nickname"
+                                                  Label="Usuário"
+                                                  Required="true"
+                                                  Adornment="Adornment.Start"
+                                                  AdornmentIcon="@Icons.Material.Outlined.Person"
+                                                  FullWidth="true" />
+                                    <MudTextField @bind-Value="_user.Email"
+                                                  Label="Email"
+                                                  Required="true"
+                                                  Adornment="Adornment.Start"
+                                                  AdornmentIcon="@Icons.Material.Outlined.AlternateEmail"
+                                                  FullWidth="true" />
+                                    <MudTextField @bind-Value="_user.Password"
+                                                  Label="Senha"
+                                                  InputType="@(_showPassword ? InputType.Text : InputType.Password)"
+                                                  Required="true"
+                                                  Adornment="Adornment.End"
+                                                  AdornmentIcon="@(_showPassword ? Icons.Material.Outlined.VisibilityOff : Icons.Material.Outlined.Visibility)"
+                                                  OnAdornmentClick="@TogglePassword"
+                                                  AdornmentAriaLabel="Mostrar/ocultar senha"
+                                                  FullWidth="true" />
+                                </MudStack>
 
-        <MudSelect T="UserType" Label="Tipo de Usuário"
-                   Value="_user.UserType" Required="true" Class="my-4"
-                   ValueChanged="OnUserTypeChange"
-                   ValueExpression="() => _user.UserType">
-            <MudSelectItem Value="UserType.Candidate">Candidato</MudSelectItem>
-            <MudSelectItem Value="UserType.Enterprise">Empresa</MudSelectItem>
-        </MudSelect>
+                                <!-- Tipo de usuário -->
+                                <MudSelect T="UserType" Label="Tipo de Usuário"
+                                           Value="_user.UserType" Required="true" Class="my-2"
+                                           ValueChanged="OnUserTypeChange"
+                                           ValueExpression="() => _user.UserType">
+                                    <MudSelectItem Value="UserType.Candidate">Candidato</MudSelectItem>
+                                    <MudSelectItem Value="UserType.Enterprise">Empresa</MudSelectItem>
+                                </MudSelect>
 
-        @if (_user.UserType == UserType.Candidate)
+                                <!-- Candidato -->
+                                @if (_user.UserType == UserType.Candidate)
+                                {
+                                    <MudDivider Class="my-2" />
+                                    <MudText Typo="Typo.h6">Dados Pessoais</MudText>
+
+                                    <MudStack Spacing="2">
+                                        <MudTextField @bind-Value="_user.Candidate.FullName" Label="Nome Completo" />
+                                        <MudGrid GutterSize="GutterSize.Small">
+                                            <MudItem xs="12" md="6">
+                                                <MudDatePicker @bind-Date="_user.Candidate.BirthDate" Label="Data de Nascimento" />
+                                            </MudItem>
+                                            <MudItem xs="12" md="6">
+                                                <MudTextField @bind-Value="_user.Candidate.CourseName" Label="Curso" />
+                                            </MudItem>
+                                        </MudGrid>
+
+                                        <MudText Typo="Typo.subtitle1" Class="mt-2">Endereço</MudText>
+                                        <MudTextField @bind-Value="_user.Candidate.Address.Street" Label="Logradouro e número" />
+
+                                        <MudGrid GutterSize="GutterSize.Small">
+                                            <MudItem xs="12" md="6">
+                                                <MudTextField @bind-Value="_user.Candidate.Address.Neighborhood" Label="Bairro" />
+                                            </MudItem>
+                                            <MudItem xs="12" md="6">
+                                                <MudTextField @bind-Value="_user.Candidate.Address.Complement" Label="Complemento" />
+                                            </MudItem>
+                                        </MudGrid>
+
+                                        <MudGrid GutterSize="GutterSize.Small">
+                                            <MudItem xs="12" md="6">
+                                                <MudTextField @bind-Value="_user.Candidate.Address.City" Label="Cidade" />
+                                            </MudItem>
+                                            <MudItem xs="12" md="3">
+                                                <MudSelect T="string" Label="Estado" @bind-Value="_user.Candidate.Address.UF" Required="true">
+                                                    @foreach (var estado in SiglasEstados)
+                                                    {
+                                                        <MudSelectItem Value="@estado">@estado</MudSelectItem>
+                                                    }
+                                                </MudSelect>
+                                            </MudItem>
+                                            <MudItem xs="12" md="3">
+                                                <MudTextField @bind-Value="_user.Candidate.Address.Cep"
+                                                              Label="CEP"
+                                                              Mask="@(new PatternMask("00000-000"))"
+                                                              MaskChar="_"
+                                                              InputMode="InputMode.text" />
+                                            </MudItem>
+                                        </MudGrid>
+                                    </MudStack>
+                                }
+
+                                <!-- Empresa -->
+                                @if (_user.UserType == UserType.Enterprise)
+                                {
+                                    <MudDivider Class="my-2" />
+                                    <MudText Typo="Typo.h6">Dados da Empresa</MudText>
+
+                                    <MudStack Spacing="2">
+                                        <MudTextField @bind-Value="_user.Enterprise.TradeName" Label="Nome Fantasia" />
+
+                                        <MudGrid GutterSize="GutterSize.Small">
+                                            <MudItem xs="12" md="6">
+                                                <MudTextField @bind-Value="_user.Enterprise.Cnpj"
+                                                              Label="CNPJ"
+                                                              Mask="@(new PatternMask("00.000.000/0000-00"))"
+                                                              MaskChar="_"
+                                                              InputMode="InputMode.text" />
+                                            </MudItem>
+                                            <MudItem xs="12" md="6">
+                                                <MudTextField @bind-Value="_user.Enterprise.ActivityArea" Label="Área de Atuação" />
+                                            </MudItem>
+                                        </MudGrid>
+
+                                        <MudText Typo="Typo.subtitle1" Class="mt-2">Endereço</MudText>
+                                        <MudTextField @bind-Value="_user.Enterprise.Address.Street" Label="Logradouro e número" />
+
+                                        <MudGrid GutterSize="GutterSize.Small">
+                                            <MudItem xs="12" md="6">
+                                                <MudTextField @bind-Value="_user.Enterprise.Address.City" Label="Cidade" />
+                                            </MudItem>
+                                            <MudItem xs="12" md="3">
+                                                <MudTextField @bind-Value="_user.Enterprise.Address.Neighborhood" Label="Bairro" />
+                                            </MudItem>
+                                            <MudItem xs="12" md="3">
+                                                <MudSelect T="string" Label="Estado" @bind-Value="_user.Enterprise.Address.UF" Required="true">
+                                                    @foreach (var estado in SiglasEstados)
+                                                    {
+                                                        <MudSelectItem Value="@estado">@estado</MudSelectItem>
+                                                    }
+                                                </MudSelect>
+                                            </MudItem>
+                                        </MudGrid>
+
+                                        <MudGrid GutterSize="GutterSize.Small">
+                                            <MudItem xs="12" md="3">
+                                                <MudTextField @bind-Value="_user.Enterprise.Address.Cep"
+                                                              Label="CEP"
+                                                              Mask="@(new PatternMask("00000-000"))"
+                                                              MaskChar="_"
+                                                              InputMode="InputMode.text" />
+                                            </MudItem>
+                                        </MudGrid>
+                                    </MudStack>
+                                }
+
+                                <!-- Ação -->
+                                <MudButton Variant="Variant.Filled"
+                                           Color="Color.Primary"
+                                           Class="mt-2 submit-btn"
+                                           OnClick="HandleValidSubmit"
+                                           FullWidth="true">
+                                    Criar
+                                </MudButton>
+                            </MudStack>
+                        </MudForm>
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+    </MudContainer>
+</section>
+
+<style>
+    .auth-hero {
+        padding-top: clamp(16px, 5vh, 48px);
+        padding-bottom: clamp(24px, 8vh, 72px);
+    }
+
+    .auth-card {
+        padding: clamp(20px, 3.2vw, 32px);
+        border: 1px solid var(--mud-palette-divider);
+        border-radius: 16px;
+        background: var(--mud-palette-surface);
+    }
+
+    .title {
+        font-weight: 700;
+        letter-spacing: .2px;
+    }
+
+    .submit-btn {
+        height: 44px;
+        font-weight: 600;
+        letter-spacing: .3px;
+    }
+    @@media (max-width: 599px) {
+        .auth-card
         {
-            <MudDivider Class="my-4" />
-            <MudText Typo="Typo.h6">Dados Pessoais</MudText>
-
-            <MudTextField @bind-Value="_user.Candidate.FullName" Label="Nome Completo" />
-            <MudDatePicker @bind-Date="_user.Candidate.BirthDate" Label="Data de Nascimento" />
-            <MudTextField @bind-Value="_user.Candidate.CourseName" Label="Curso" />
-            <MudText Typo="Typo.h6" Class="mt-4">Endereço</MudText>
-            <MudTextField @bind-Value="_user.Candidate.Address.Street" Label="Logradouro e número" />
-            <MudTextField @bind-Value="_user.Candidate.Address.Neighborhood" Label="Bairro" />
-            <MudTextField @bind-Value="_user.Candidate.Address.Complement" Label="Complemento" />
-            <MudTextField @bind-Value="_user.Candidate.Address.City" Label="Cidade" />
-
-            <MudSelect T="string" Label="Estado" @bind-Value="_user.Candidate.Address.UF" Required="true">
-                @foreach (var estado in SiglasEstados)
-                {
-                    <MudSelectItem Value="@estado">@estado</MudSelectItem>
-                }
-            </MudSelect>
-
-            <MudTextField @bind-Value="_user.Candidate.Address.Cep"
-                          Label="CEP"
-                          Mask="@(new PatternMask("00000-000"))"
-                          MaskChar="_"
-                          InputMode="InputMode.text" />
+            padding: 18px;
         }
-
-        @if (_user.UserType == UserType.Enterprise)
-        {
-            <MudDivider Class="my-4" />
-            <MudText Typo="Typo.h6">Dados da Empresa</MudText>
-
-            <MudTextField @bind-Value="_user.Enterprise.TradeName" Label="Nome Fantasia" />
-            <MudTextField @bind-Value="_user.Enterprise.Cnpj"
-                          Label="CNPJ"
-                          Mask="@(new PatternMask("00.000.000/0000-00"))"
-                          MaskChar="_"
-                          InputMode="InputMode.text" />
-            <MudTextField @bind-Value="_user.Enterprise.ActivityArea" Label="Área de Atuação" />
-
-            <MudTextField @bind-Value="_user.Enterprise.Address.Street" Label="Logradouro e número" />
-            <MudTextField @bind-Value="_user.Enterprise.Address.City" Label="Cidade" />
-            <MudTextField @bind-Value="_user.Enterprise.Address.Neighborhood" Label="Bairro" />
-
-            <MudSelect T="string" Label="Estado" @bind-Value="_user.Enterprise.Address.UF" Required="true">
-                @foreach (var estado in SiglasEstados)
-                {
-                    <MudSelectItem Value="@estado">@estado</MudSelectItem>
-                }
-            </MudSelect>
-
-            <MudTextField @bind-Value="_user.Enterprise.Address.Cep"
-                          Label="CEP"
-                          Mask="@(new PatternMask("00000-000"))"
-                          MaskChar="_"
-                          InputMode="InputMode.text" />
-        }
-
-        <MudButton Variant="Variant.Filled"
-                   Color="Color.Primary"
-                   Class="mt-4"
-                   OnClick="HandleValidSubmit">
-                   
-            Criar
-        </MudButton>
-    </MudForm>
-</MudPaper>
-
+    }
+</style>
 @code {
+    private bool _showPassword;
+    private void TogglePassword() => _showPassword = !_showPassword;
     private MudForm _form;
 
     // Inicializa como Candidato por padrão para evitar nulls em binding

@@ -11,91 +11,104 @@
 <MudDialogProvider />
 <MudSnackbarProvider />
 
-<MudLayout>
-    <MudAppBar Color="Color.Primary" Fixed="true">
-        <MudText Typo="Typo.h6">StartCarreira</MudText>
-        <MudSpacer />
+<!-- App Shell: flex column para "footer sticky" sem sobreposição -->
+<MudLayout Class="app-shell">
+    <!-- APP BAR (mais clean, na Surface, com borda sutil) -->
+    <MudAppBar Elevation="0" Dense="true" Class="appbar">
+        <MudContainer MaxWidth="MaxWidth.Large" Class="appbar__inner">
+            <MudText Typo="Typo.h6" Class="brand">
+                StartCarreira
+            </MudText>
 
-        <AuthorizeView>
-            <NotAuthorized>
-                <MudButton Variant="Variant.Text" Color="Color.Inherit"
-                           StartIcon="@Icons.Material.TwoTone.Login"
-                           OnClick="@(() => Nav.NavigateTo("/"))">
-                    Entrar
-                </MudButton>
-            </NotAuthorized>
+            <MudSpacer />
 
-            <Authorized Context="auth">
-                <MudText Class="mr-2">@GetDisplayName(auth.User)</MudText>
+            <AuthorizeView>
+                <NotAuthorized>
+                    <MudButton Variant="Variant.Outlined"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.TwoTone.Login"
+                               OnClick="@(() => Nav.NavigateTo("/"))">
+                        Entrar
+                    </MudButton>
+                </NotAuthorized>
 
-                <MudMenu Dense Variant="Variant.Text" Size="Size.Medium" Color="Color.Inherit"
-                         Icon="@Icons.Material.TwoTone.MoreVert">
+                <Authorized Context="auth">
+                    <MudStack Row AlignItems="AlignItems.Center" Spacing="1">
+                        <MudIconButton Icon="@(DarkLightModeButtonIcon)"
+                                       Color="Color.Default"
+                                       Size="Size.Medium"
+                                       OnClick="@DarkModeToggle"
+                                       AriaLabel="Alternar tema" />
 
-                    <MudMenu StartIcon="@Icons.Material.TwoTone.Settings"
-                             IconColor="Color.Primary"
-                             Label="Settings">
-                        <MudMenuItem Icon="@Icons.Material.TwoTone.DarkMode"
-                                     IconColor="Color.Secondary"
-                                     OnClick="@DarkModeToggle"
-                                     Label="Dark Theme" />
-                    </MudMenu>
+                        <MudText Class="user-name">@GetDisplayName(auth.User)</MudText>
 
-                    <MudDivider />
+                        <MudMenu Dense Variant="Variant.Text"
+                                 Size="Size.Medium"
+                                 Color="Color.Inherit"
+                                 Icon="@Icons.Material.TwoTone.MoreVert"
+                                 AnchorOrigin="Origin.BottomRight"
+                                 TransformOrigin="Origin.TopRight">
 
-                    @if (auth.User.IsInRole("Candidate"))
-                    {
-                        <MudMenuItem Icon="@Icons.Material.Filled.Work"
-                                     Label="Minhas vagas"
-                                     OnClick="@(() => Nav.NavigateTo("/candidato/home"))" />
-                    }
+                            <MudMenu StartIcon="@Icons.Material.TwoTone.Settings"
+                                     IconColor="Color.Primary"
+                                     Label="Settings">
+                                <MudMenuItem Icon="@Icons.Material.TwoTone.DarkMode"
+                                             IconColor="Color.Secondary"
+                                             OnClick="@DarkModeToggle"
+                                             Label="Dark Theme" />
+                            </MudMenu>
 
-                    @if (auth.User.IsInRole("Enterprise"))
-                    {
-                        <MudMenuItem Icon="@Icons.Material.Filled.Dashboard"
-                                     Label="Painel da empresa"
-                                     OnClick="@(() => Nav.NavigateTo("/empresa/home"))" />
-                    }
+                            <MudDivider />
 
-                    <MudDivider />
+                            @if (auth.User.IsInRole("Candidate"))
+                            {
+                                <MudMenuItem Icon="@Icons.Material.Filled.Work"
+                                             Label="Minhas vagas"
+                                             OnClick="@(() => Nav.NavigateTo("/candidato/home"))" />
+                            }
 
-                    <MudMenuItem Icon="@Icons.Material.TwoTone.Logout"
-                                 IconColor="Color.Primary"
-                                 Label="Sign Out"
-                                 OnClick="Logout" />
-                </MudMenu>
-            </Authorized>
-        </AuthorizeView>
+                            @if (auth.User.IsInRole("Enterprise"))
+                            {
+                                <MudMenuItem Icon="@Icons.Material.Filled.Dashboard"
+                                             Label="Painel da empresa"
+                                             OnClick="@(() => Nav.NavigateTo("/empresa/home"))" />
+                            }
+
+                            <MudDivider />
+
+                            <MudMenuItem Icon="@Icons.Material.TwoTone.Logout"
+                                         IconColor="Color.Error"
+                                         Label="Sign Out"
+                                         OnClick="Logout" />
+                        </MudMenu>
+                    </MudStack>
+                </Authorized>
+            </AuthorizeView>
+        </MudContainer>
     </MudAppBar>
-    @* <MudAppBar Elevation="1">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        <MudText Typo="Typo.h5" Class="ml-3">StartCarreira</MudText>
-        <MudSpacer />
-        <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />
-        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
-    </MudAppBar> *@
-    @* <MudDrawer id="nav-drawer" @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
-        <NavMenu />
-    </MudDrawer> *@
-    <MudMainContent>
-        @Body
-    </MudMainContent>
-    <!-- Footer -->
-    <footer class="app-footer">
 
-        <div class="footer-left">© @DateTime.Now.Year Sarah Dine dos Santos Pereira</div>
-        <div class="footer-right">
-            <MudStack Row="true">
-                <MudLink Href="/termos">Termos</MudLink>
-                
-                <MudLink Href="/privacidade">Privacidade</MudLink>
-                
-                <MudLink Href="/contato">Contato</MudLink>
-            </MudStack>
-            
-        </div>
+    <!-- MAIN -->
+    <MudMainContent Class="app-main">
+        <MudContainer MaxWidth="MaxWidth.Large" Class="app-main__container">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+
+    <!-- FOOTER (não fixo; "gruda" no fim sem cobrir conteúdo) -->
+    <footer class="app-footer">
+        <MudContainer MaxWidth="MaxWidth.Large" Class="app-footer__inner">
+            <div class="footer-left">© @DateTime.Now.Year Sarah Dine dos Santos Pereira</div>
+
+            <div class="footer-right">
+                <MudStack Row="true" Spacing="2" AlignItems="AlignItems.Center">
+                    <MudLink Href="/termos">Termos</MudLink>
+                    <MudLink Href="/privacidade">Privacidade</MudLink>
+                    <MudLink Href="/contato">Contato</MudLink>
+                </MudStack>
+            </div>
+        </MudContainer>
     </footer>
 </MudLayout>
-
 
 <div id="blazor-error-ui" data-nosnippet>
     An unhandled error has occurred.
@@ -104,28 +117,92 @@
 </div>
 
 <style>
-    .app-footer {
+    /* ---------- Shell para footer "sticky" sem overlap ---------- */
+    .app-shell {
+        min-height: 100vh;
         display: flex;
-        direction: row;
-        justify-content: space-between;
+        flex-direction: column;
+        background: var(--mud-palette-background);
+    }
+
+    .appbar {
+        background: var(--mud-palette-surface);
+        color: var(--mud-palette-text-primary);
+        border-bottom: 1px solid var(--mud-palette-divider);
+    }
+
+    .appbar__inner {
+        display: flex;
         align-items: center;
-        padding: 12px 16px;
-        border-top: 1px solid rgba(0,0,0,.08);
-        background: var(--mud-palette-surface); /* respeita tema */
-        width: 100%;
-        bottom: 0;
-        left: 0;
-        position: fixed; /* importante p/ ser “sticky” e não flutuante */
-        z-index: 1000;
+        gap: .5rem;
+        min-height: 56px;
+    }
+
+    .brand {
+        font-weight: 700;
+        letter-spacing: .2px;
+    }
+
+    .user-name {
+        font-size: .95rem;
+        color: var(--mud-palette-text-secondary);
+        margin-right: .25rem;
+        max-width: 22ch;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Main ocupa o espaço restante para empurrar o footer */
+    .app-main {
+        flex: 1 0 auto;
+        padding-top: 16px; /* respira sob a appbar */
+        padding-bottom: 16px;
+    }
+
+    .app-main__container {
+        padding-top: 8px;
+        padding-bottom: 24px;
+    }
+
+    /* ---------- Footer elegante, não fixo ---------- */
+    .app-footer {
+        flex-shrink: 0; /* evita encolher */
+        border-top: 1px solid var(--mud-palette-divider);
+        background: var(--mud-palette-surface);
+    }
+
+    .app-footer__inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 8px;
+        gap: 12px;
     }
 
     .footer-left {
         font-size: .875rem;
         color: var(--mud-palette-text-secondary);
+        white-space: nowrap;
     }
 
     .footer-right a {
-        margin-left: 8px;
+        text-decoration: none;
+    }
+
+    /* ---------- Responsividade ---------- */
+    @@media (max-width: 599px) {
+        .appbar__inner, .app-footer__inner
+
+    {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .user-name {
+        display: none;
+    }
+    /* prioriza ações no mobile */
     }
 </style>
 
@@ -136,7 +213,6 @@
 
     private async Task Logout() => await Auth.LogoutAsync();
 
-    // Usa Name ou um claim "nickname" se existir
     private static string GetDisplayName(ClaimsPrincipal user)
         => user.FindFirst("nickname")?.Value
            ?? user.Identity?.Name
@@ -146,7 +222,6 @@
     protected override void OnInitialized()
     {
         base.OnInitialized();
-
         _theme = new()
         {
             PaletteLight = _lightPalette,
@@ -154,28 +229,21 @@
             LayoutProperties = new LayoutProperties()
         };
     }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender && AuthStateProvider is JwtAuthenticationStateProvider jwt)
         {
-            await jwt.RestoreAsync();   // aqui o JS interop já está habilitado
-            //StateHasChanged();          // refaz o render já autenticado
+            await jwt.RestoreAsync();
         }
     }
 
-    private void DrawerToggle()
-    {
-        _drawerOpen = !_drawerOpen;
-    }
-
-    private void DarkModeToggle()
-    {
-        _isDarkMode = !_isDarkMode;
-    }
+    private void DrawerToggle() => _drawerOpen = !_drawerOpen;
+    private void DarkModeToggle() => _isDarkMode = !_isDarkMode;
 
     private readonly PaletteLight _lightPalette = new()
     {
-        Primary = "#0a66c2", // Azul estilo LinkedIn
+        Primary = "#0a66c2",
         PrimaryDarken = "#004182",
         PrimaryLighten = "#e5f0fb",
         Secondary = "#0056a0",
@@ -227,11 +295,9 @@
         OverlayLight = "#1e1e2d80",
     };
 
-
     public string DarkLightModeButtonIcon => _isDarkMode switch
     {
         true => Icons.Material.Rounded.AutoMode,
         false => Icons.Material.Outlined.DarkMode,
     };
 }
-

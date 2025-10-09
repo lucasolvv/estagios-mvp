@@ -9,89 +9,111 @@
 
 <AuthorizeView Context="auth" Roles="Candidate">
     <MudContainer MaxWidth="MaxWidth.False" Class="px-6 py-4">
-    <MudGrid>
-        <!-- Header / Perfil -->
-            <!-- Header / Perfil -->
-            <MudItem xs="12">
-                <MudPaper Class="pa-6">
-                    <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Spacing="2">
-                        <MudStack>
-                            <MudText Typo="Typo.h5" Class="font-weight-bold">
-                                Olá, @GetDisplayName(auth.User) 👋
-                            </MudText>
 
-                            <MudText Typo="Typo.subtitle2" Color="Color.Secondary">
-                                @(ProfileCompletion >= 100
-                                                                ? "Perfil completo! Você já pode focar nas vagas."
-                                                                : "Finalize seu perfil para receber recomendações mais precisas.")
+        <!-- HERO / HEADER -->
+        <MudPaper Class="hero-card mb-4" Elevation="0">
+            <MudGrid Class="hero-inner" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+                <MudItem xs="12" md="8">
+                    <MudStack Spacing="1">
+                        <MudStack Row AlignItems="AlignItems.Center" Spacing="1">
+                            <MudIcon Icon="@Icons.Material.Outlined.Bolt" Size="Size.Medium" />
+                            <MudText Typo="Typo.h5" Class="font-bold">
+                                Olá, @GetDisplayName(auth.User) 👋
                             </MudText>
                         </MudStack>
 
-                        <MudStack Row Spacing="1">
+                        <MudText Typo="Typo.body2" Class="text-dim">
+                            @(ProfileCompletion >= 100
+                                    ? "Perfil completo! Você já pode focar nas vagas."
+                                    : "Finalize seu perfil para receber recomendações mais precisas.")
+                        </MudText>
+
+
+                        <MudStack Row AlignItems="AlignItems.Center" Spacing="1" Class="mt-1">
                             @if (ProfileCompletion < 100)
                             {
-                                <MudButton Variant="Variant.Filled"
-                                           StartIcon="@Icons.Material.Filled.Person"
-                                           Color="Color.Primary"
-                                           OnClick="OnIrParaPerfil">
-                                    Completar Perfil (@ProfileCompletion%)
-                                </MudButton>
+                                <MudProgressLinear Value="@ProfileCompletion" Color="Color.Success" Class="hero-progress" />
+                                <MudText Typo="Typo.caption" Class="text-dim">@ProfileCompletion%</MudText>
                             }
                             else
                             {
-                                <MudChip Color="Color.Success"
+                                <MudChip T="string" Color="Color.Success"
                                          StartIcon="@Icons.Material.Filled.CheckCircle"
-                                         Variant="Variant.Filled"
-                                         T="string">
+                                         Variant="Variant.Filled">
                                     Perfil completo
                                 </MudChip>
-
-                                <!-- Ainda permite edição, mas separado do CTA principal -->
-                                <MudButton Variant="Variant.Outlined"
-                                           StartIcon="@Icons.Material.Filled.Edit"
-                                           OnClick="OnIrParaPerfil">
-                                    Editar
-                                </MudButton>
                             }
-
-                            <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Search" OnClick="OnBuscarvagas">
-                                Buscar Vagas
-                            </MudButton>
-                            <MudButton Variant="Variant.Text" StartIcon="@Icons.Material.Filled.Alarm" OnClick="OnConfigurarAlertas">
-                                Alertas
-                            </MudButton>
                         </MudStack>
                     </MudStack>
+                </MudItem>
 
-                    @if (ProfileCompletion < 100)
-                    {
-                        <MudProgressLinear Class="mt-3" Value="@ProfileCompletion" Color="Color.Success" />
-                    }
-                    else
-                    {
-                        <!-- Mantém respiro visual quando a barra some -->
-                        <MudDivider Class="mt-3" />
-                    }
-                </MudPaper>
-            </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudStack Row Justify="Justify.FlexEnd" Spacing="1" Class="hero-actions">
+                        @if (ProfileCompletion < 100)
+                        {
+                            <MudButton Variant="Variant.Filled"
+                                       StartIcon="@Icons.Material.Filled.Person"
+                                       Color="Color.Primary"
+                                       OnClick="OnIrParaPerfil">
+                                Completar Perfil
+                            </MudButton>
+                        }
+                        else
+                        {
+                            <MudButton Variant="Variant.Outlined"
+                                       StartIcon="@Icons.Material.Filled.Edit"
+                                       OnClick="OnIrParaPerfil">
+                                Editar
+                            </MudButton>
+                        }
 
+                        <MudButton Variant="Variant.Outlined"
+                                   StartIcon="@Icons.Material.Filled.Search"
+                                   OnClick="OnBuscarvagas">
+                            Buscar Vagas
+                        </MudButton>
 
-        <!-- Coluna esquerda -->
-        <MudItem xs="12" md="8">
-            <!-- Vagas recomendadas -->
-            <MudCard Class="mb-4">
-                <MudCardHeader>
-                    <MudText Typo="Typo.h6">Vagas recentes</MudText>
-                </MudCardHeader>
+                        <MudButton Variant="Variant.Text"
+                                   StartIcon="@Icons.Material.Filled.NotificationsActive"
+                                   OnClick="OnConfigurarAlertas">
+                            Alertas
+                        </MudButton>
+                    </MudStack>
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
+
+        <!-- GRID -->
+        <MudGrid GutterSize="GutterSize.Medium">
+            <!-- ESQUERDA -->
+            <MudItem xs="12" md="8">
+                <!-- Vagas recentes -->
+                <MudCard Class="elev mb-4">
+                    <MudCardHeader Class="card-header">
+                        <MudStack Row AlignItems="AlignItems.Center" Spacing="1">
+                            <MudIcon Icon="@Icons.Material.Outlined.WorkOutline" />
+                            <MudText Typo="Typo.h6">Vagas recentes</MudText>
+                        </MudStack>
+                    </MudCardHeader>
+
                     @if (_isLoading)
                     {
-                        <MudProgressLinear Indeterminate="true" Class="mb-2" />
-                        <MudText Color="Color.Secondary">Carregando vagas...</MudText>
+                        <MudCardContent>
+                            <MudSkeleton Height="28px" Class="mb-2" />
+                            <MudSkeleton Height="28px" Class="mb-2" />
+                            <MudSkeleton Height="28px" Class="mb-2" />
+                        </MudCardContent>
                     }
                     else
                     {
                         <MudCardContent>
-                            <MudTable Items="RecentVacancies" Hover="true" Dense="true" FixedHeader="true" Height="230px">
+                            <MudTable Items="RecentVacancies"
+                                      Hover="true"
+                                      Dense="true"
+                                      FixedHeader="true"
+                                      Height="260px"
+                                      Elevation="0"
+                                      Class="table-compact">
                                 <HeaderContent>
                                     <MudTh>Vaga</MudTh>
                                     <MudTh>Empresa</MudTh>
@@ -100,39 +122,62 @@
                                     <MudTh></MudTh>
                                 </HeaderContent>
                                 <RowTemplate>
-                                    <MudTd>@context.Titulo</MudTd>
+                                    <MudTd>
+                                        <MudStack Spacing="0">
+                                            <MudText Typo="Typo.body2" Class="font-medium">@context.Titulo</MudText>
+                                            <MudText Typo="Typo.caption" Class="text-dim">@context.DataAbertura.ToString("dd/MM/yyyy HH:mm")</MudText>
+                                        </MudStack>
+                                    </MudTd>
                                     <MudTd>@context.EnterpriseName</MudTd>
-                                    <MudTd>@context.DataAbertura</MudTd>
-                                    <MudTd>@context.Status</MudTd>
+                                    <MudTd>@context.DataAbertura.ToString("dd/MM/yyyy HH:mm")</MudTd>
+                                    <MudTd>
+                                        <MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Outlined">
+                                            @context.Status
+                                        </MudChip>
+                                    </MudTd>
                                     <MudTd Class="text-right">
-                                        <MudButton Size="Size.Small" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Send" OnClick="@(() => Apply(context))">
+                                        <MudButton Size="Size.Small"
+                                                   Color="Color.Primary"
+                                                   StartIcon="@Icons.Material.Filled.Send"
+                                                   OnClick="@(() => Apply(context))">
                                             Candidatar-se
                                         </MudButton>
                                     </MudTd>
                                 </RowTemplate>
                                 <NoRecordsContent>
-                                    <MudText> Nenhuma vaga disponível. </MudText>
+                                    <MudAlert Severity="Severity.Info" Elevation="0">
+                                        Nenhuma vaga disponível no momento.
+                                    </MudAlert>
                                 </NoRecordsContent>
                             </MudTable>
                         </MudCardContent>
                     }
-                   
-            </MudCard>
+                </MudCard>
 
-            <!-- Minhas inscrições recentes -->
-            <MudCard>
-                <MudCardHeader>
-                    <MudText Typo="Typo.h6">Minhas inscrições recentes</MudText>
-                </MudCardHeader>
-                 @if (_isLoading)
+                <!-- Minhas inscrições recentes -->
+                <MudCard Class="elev">
+                    <MudCardHeader Class="card-header">
+                        <MudStack Row AlignItems="AlignItems.Center" Spacing="1">
+                            <MudIcon Icon="@Icons.Material.Outlined.History" />
+                            <MudText Typo="Typo.h6">Minhas inscrições recentes</MudText>
+                        </MudStack>
+                    </MudCardHeader>
+
+                    @if (_isLoading)
                     {
-                        <MudProgressLinear Indeterminate="true" Class="mb-2" />
-                        <MudText Color="Color.Secondary">Carregando candidaturas...</MudText>
+                        <MudCardContent>
+                            <MudSkeleton Height="28px" Class="mb-2" />
+                            <MudSkeleton Height="28px" Class="mb-2" />
+                        </MudCardContent>
                     }
                     else
                     {
                         <MudCardContent>
-                            <MudTable Items="RecentApplications" Dense="true" Hover="true">
+                            <MudTable Items="RecentApplications"
+                                      Dense="true"
+                                      Hover="true"
+                                      Elevation="0"
+                                      Class="table-compact">
                                 <HeaderContent>
                                     <MudTh>Vaga</MudTh>
                                     <MudTh>Empresa</MudTh>
@@ -150,81 +195,67 @@
                                     </MudTd>
                                 </RowTemplate>
                                 <NoRecordsContent>
-                                    <MudText Nenhuma candidatura até o momento.></MudText>
+                                    <MudAlert Severity="Severity.Info" Elevation="0">
+                                        Nenhuma candidatura até o momento.
+                                    </MudAlert>
                                 </NoRecordsContent>
                             </MudTable>
                         </MudCardContent>
                     }
-            </MudCard>
-        </MudItem>
+                </MudCard>
+            </MudItem>
 
-        <!-- Coluna direita -->
-        <MudItem xs="12" md="4">
-            <!-- Horas obrigatórias -->
-            <MudCard Class="mb-4">
-                <MudCardHeader>
-                    <MudText Typo="Typo.h6">Horas obrigatórias</MudText>
-                </MudCardHeader>
-                <MudCardContent>
-                    <MudStack>
-                        <MudText>@CompletedHours/@RequiredHours h</MudText>
-                        <MudProgressLinear Value="@HoursPercent" Color="Color.Info" />
-                        <MudButton Variant="Variant.Text" StartIcon="@Icons.Material.Filled.UploadFile"
-                                   OnClick="@(()=>Snackbar.Add("Enviar relatório de horas (TODO)", Severity.Info))">
-                            Enviar relatório
-                        </MudButton>
-                    </MudStack>
-                </MudCardContent>
-            </MudCard>
+            <!-- DIREITA -->
+            <MudItem xs="12" md="4">
+                <!-- Horas obrigatórias -->
+                <MudCard Class="elev mb-4">
+                    <MudCardHeader Class="card-header">
+                        <MudStack Row AlignItems="AlignItems.Center" Spacing="1">
+                            <MudIcon Icon="@Icons.Material.Outlined.Schedule" />
+                            <MudText Typo="Typo.h6">Horas obrigatórias</MudText>
+                        </MudStack>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudStack Spacing="1">
+                            <MudStack Row AlignItems="AlignItems.Center" Spacing="1" Justify="Justify.SpaceBetween">
+                                <MudText Typo="Typo.body2">@CompletedHours/@RequiredHours h</MudText>
+                                <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Info">@Math.Round(HoursPercent)%</MudChip>
+                            </MudStack>
+                            <MudProgressLinear Value="@HoursPercent" Color="Color.Info" />
+                            <MudButton Variant="Variant.Outlined"
+                                       StartIcon="@Icons.Material.Filled.UploadFile"
+                                       OnClick="@(()=>Snackbar.Add("Enviar relatório de horas (TODO)", Severity.Info))">
+                                Enviar relatório
+                            </MudButton>
+                        </MudStack>
+                    </MudCardContent>
+                </MudCard>
 
-            @* <!-- Próximos compromissos -->
-            <MudCard Class="mb-4">
-                <MudCardHeader>
-                    <MudText Typo="Typo.h6">Próximos compromissos</MudText>
-                </MudCardHeader>
-                <MudCardContent>
-                    @if (Appointments.Count == 0)
-                    {
-                        <MudText Color="Color.Secondary">Sem compromissos.</MudText>
-                    }
-                    else
-                    {
-                            <MudList Dense="true" T="AppointmentVm">
-                            @foreach (var a in Appointments)
-                            {
-                                <MudListItem>
-                                    <MudListItemIcon><MudIcon Icon="@Icons.Material.Filled.Event" /></MudListItemIcon>
-                                    <MudListItemText>
-                                        <div class="font-semibold">@a.Titulo</div>
-                                        <small>@a.Data.ToString("dd/MM HH:mm") • @a.Local</small>
-                                    </MudListItemText>
-                                </MudListItem>
-                            }
-                        </MudList>
-                    }
-                </MudCardContent>
-            </MudCard> *@
-
-             <!-- Próximas entrevistas -->
-                <MudCard Class="mb-4">
-                    <MudCardHeader>
-                        <MudText Typo="Typo.h6">Próximas entrevistas</MudText>
+                <!-- Próximas entrevistas -->
+                <MudCard Class="elev mb-4">
+                    <MudCardHeader Class="card-header">
+                        <MudStack Row AlignItems="AlignItems.Center" Spacing="1">
+                            <MudIcon Icon="@Icons.Material.Outlined.Event" />
+                            <MudText Typo="Typo.h6">Próximas entrevistas</MudText>
+                        </MudStack>
                     </MudCardHeader>
                     <MudCardContent>
                         @if (UpcomingInterviews.Count == 0)
                         {
-                            <MudText Color="Color.Secondary">Sem entrevistas marcadas.</MudText>
+                            <MudAlert Severity="Severity.Info" Elevation="0">Sem entrevistas marcadas.</MudAlert>
                         }
                         else
                         {
-                            <MudList Dense="true" T="InterviewVm">
+                            <MudList Dense="true" Class="list-clean" T="string">
                                 @foreach (var i in UpcomingInterviews)
                                 {
                                     <MudListItem>
-                                        <MudListItemIcon><MudIcon Icon="@Icons.Material.Filled.Event" /></MudListItemIcon>
+                                        <MudListItemIcon>
+                                            <MudIcon Icon="@Icons.Material.Filled.Event" />
+                                        </MudListItemIcon>
                                         <MudListItemText>
-                                            <div class="font-semibold">@i.NomeEmpresa • @i.TituloVaga</div>
-                                            <small>@i.DataEntrevista.ToString("dd/MM HH:mm") • @i.Canal</small>
+                                            <div class="font-medium">@i.NomeEmpresa • @i.TituloVaga</div>
+                                            <small class="text-dim">@i.DataEntrevista.ToString("dd/MM HH:mm") • @i.Canal</small>
                                         </MudListItemText>
                                     </MudListItem>
                                 }
@@ -233,36 +264,142 @@
                     </MudCardContent>
                 </MudCard>
 
-            <!-- Notificações -->
-            <MudCard>
-                <MudCardHeader>
-                    <MudText Typo="Typo.h6">Notificações</MudText>
-                </MudCardHeader>
-                <MudCardContent>
-                    @if (Notifications.Count == 0)
-                    {
-                        <MudText Color="Color.Secondary">Sem novas notificações.</MudText>
-                    }
-                    else
-                    {
-                        <MudTimeline>
-                            @foreach (var n in Notifications)
-                            {
-                                <MudTimelineItem>
-                                    <div class="font-medium">@n.Texto</div>
-                                    <small>@n.Data.ToString("dd/MM HH:mm")</small>
-                                </MudTimelineItem>
-                            }
-                        </MudTimeline>
-                    }
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
-    </MudGrid>
-</MudContainer>
-
-
+                <!-- Notificações -->
+                <MudCard Class="elev">
+                    <MudCardHeader Class="card-header">
+                        <MudStack Row AlignItems="AlignItems.Center" Spacing="1">
+                            <MudIcon Icon="@Icons.Material.Outlined.Notifications" />
+                            <MudText Typo="Typo.h6">Notificações</MudText>
+                        </MudStack>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        @if (Notifications.Count == 0)
+                        {
+                            <MudAlert Severity="Severity.Info" Elevation="0">Sem novas notificações.</MudAlert>
+                        }
+                        else
+                        {
+                            <MudTimeline Class="timeline-clean">
+                                @foreach (var n in Notifications)
+                                {
+                                    <MudTimelineItem>
+                                        <div class="font-medium">@n.Texto</div>
+                                        <small class="text-dim">@n.Data.ToString("dd/MM HH:mm")</small>
+                                    </MudTimelineItem>
+                                }
+                            </MudTimeline>
+                        }
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        </MudGrid>
+    </MudContainer>
 </AuthorizeView>
+
+<style>
+    /* ---- Hero ---- */
+    .hero-card {
+        border: 1px solid var(--mud-palette-divider);
+        border-radius: 16px;
+        background: radial-gradient(1200px 250px at 10% -40%, color-mix(in oklab, var(--mud-palette-primary) 12%, transparent) 0%, transparent 60%), var(--mud-palette-surface);
+    }
+
+    .hero-inner {
+        padding: 18px 20px;
+    }
+
+    .hero-actions > * {
+        white-space: nowrap;
+    }
+
+    .hero-progress {
+        width: 200px;
+        max-width: 50vw;
+    }
+
+    .text-dim {
+        color: var(--mud-palette-text-secondary);
+    }
+
+    .font-bold {
+        font-weight: 700;
+    }
+
+    .font-medium {
+        font-weight: 600;
+    }
+
+    /* ---- Cards / Containers ---- */
+    .elev {
+        border: 1px solid var(--mud-palette-divider);
+        border-radius: 12px;
+        overflow: hidden; /* impede a barra do header de “vazar” */
+    }
+
+    /* Header com barra lateral + tint que respeita o tema */
+    .card-header {
+        position: relative;
+        padding: 10px 14px 10px 20px; /* espaço extra p/ a barra */
+        border-bottom: 1px solid var(--mud-palette-divider);
+    }
+
+        .card-header::before {
+            content: "";
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 6px;
+            border-radius: 12px 0 0 0; /* acompanha o raio do card */
+            background: linear-gradient(180deg, color-mix(in oklab, var(--mud-palette-primary) 92%, white 8%), color-mix(in oklab, var(--mud-palette-primary) 62%, white 38%));
+        }
+        /* Tipografia do título e cor do ícone */
+        .card-header .mud-typography {
+            font-weight: 700;
+            color: var(--mud-palette-text-primary);
+            letter-spacing: .2px;
+        }
+
+        .card-header .mud-icon-root {
+            color: var(--mud-palette-primary);
+            opacity: .95;
+        }
+
+    /* ---- Tabelas ---- */
+    .table-compact .mud-table-container {
+        border-radius: 10px;
+    }
+
+    .table-compact .mud-table * th {
+        font-weight: 600;
+    }
+
+    .table-compact .mud-table-row:hover {
+        background: color-mix(in oklab, var(--mud-palette-primary) 9%, transparent);
+    }
+
+    /* ---- Lists / Timeline ---- */
+    .list-clean .mud-list-item:hover {
+        background: color-mix(in oklab, var(--mud-palette-primary) 7%, transparent);
+    }
+
+    .timeline-clean .mud-timeline {
+        --mud-palette-lines-default: var(--mud-palette-divider);
+    }
+
+    /* ---- Responsivo ---- */
+    @@media (max-width: 899px) {
+        .hero-progress
+
+    {
+        width: 100%;
+    }
+
+    .hero-inner {
+        padding: 14px;
+    }
+
+    }
+</style>
+
 
 
 @code {

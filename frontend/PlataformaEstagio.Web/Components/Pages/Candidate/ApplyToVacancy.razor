@@ -10,12 +10,15 @@
 @inject IDialogService DialogService
 
 <MudContainer MaxWidth="MaxWidth.Medium" Class="px-6 py-4">
-    <MudPaper Class="px-4 py-4">
+    <!-- HERO -->
+    <MudPaper Class="hero-card mb-3" Elevation="0">
+        <MudStack Row AlignItems="AlignItems.Center" Spacing="1" Class="hero-inner">
+            <MudIcon Icon="@Icons.Material.Outlined.WorkOutline" Size="Size.Large" />
+            <MudText Typo="Typo.h5" Class="font-bold">Detalhes da vaga</MudText>
+        </MudStack>
+    </MudPaper>
 
-        <MudText Typo="Typo.h5" Color="Color.Secondary" Class="mb-3">
-            Detalhes da vaga
-        </MudText>
-
+    <MudPaper Class="px-0 py-0 elev">
         @if (!_loaded)
         {
             <MudStack AlignItems="AlignItems.Center" Class="py-6">
@@ -25,79 +28,160 @@
         }
         else if (_vacancy is null)
         {
-            <MudAlert Severity="Severity.Error">Vaga não encontrada.</MudAlert>
+            <MudAlert Severity="Severity.Error" Class="m-4">Vaga não encontrada.</MudAlert>
         }
         else
         {
-            <MudCard Class="mb-3">
-                <MudCardContent>
-                    <MudStack Spacing="1">
-                        <MudText Typo="Typo.h6">@_vacancy.Title</MudText>
-                        <MudText Typo="Typo.subtitle2" Color="Color.Secondary">
-                            @(_vacancy.EnterpriseName ?? "Empresa não informada")
-                        </MudText>
+            <!-- CABEÇALHO DO CARD -->
+            <div class="card-header">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6" Class="font-medium">@_vacancy.Title</MudText>
+                    <MudLink Href="#" Disabled="true">@(_vacancy.EnterpriseName ?? "Empresa não informada")</MudLink>
+                </MudStack>
+            </div>
 
-                        <MudDivider Class="my-2" />
+            <!-- CONTEÚDO -->
+            <MudCardContent Class="px-4 py-4">
+                <MudStack Spacing="2">
+                    <!-- Tags principais -->
+                    <MudStack Row Spacing="1" T="string">
+                        <MudChip T="string" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small">
+                            @(_vacancy.JobFunction.ToString() ?? "Função")
+                        </MudChip>
+                        <MudChip T="string"  Variant="Variant.Outlined" Color="Color.Secondary" Size="Size.Small">
+                            @(_vacancy.Location ?? "Local")
+                        </MudChip>
+                    </MudStack>
 
-                        <MudStack Row="true" Spacing="2">
-                            <MudChip Variant="Variant.Outlined" T="string">
-                                @( _vacancy.JobFunction.ToString() ?? "Função não informada" )
-                            </MudChip>
-                            <MudChip Variant="Variant.Outlined" T="string">
-                                @(_vacancy.Location ?? "Local não informado")
-                            </MudChip>
-                        </MudStack>
+                    <!-- Descrição -->
+                    @if (!string.IsNullOrWhiteSpace(_vacancy.Description))
+                    {
+                        <MudText Typo="Typo.body2">@_vacancy.Description</MudText>
+                    }
 
-
-                        @if (!string.IsNullOrWhiteSpace(_vacancy.Description))
-                        {
-                            <MudText Class="mt-3">@_vacancy.Description</MudText>
-                        }
-
-                        @if (_vacancy.RequiredSkills is { Count: > 0 })
-                        {
-                            <MudText Class="mt-3" Typo="Typo.subtitle2">Habilidades desejadas</MudText>
-                            <MudChipSet T="string" Class="mb-2">
+                    <!-- Habilidades -->
+                    @if (_vacancy.RequiredSkills is { Count: > 0 })
+                    {
+                        <div class="section">
+                            <div class="section__title">
+                                <MudIcon Icon="@Icons.Material.Outlined.StarBorder" />
+                                <MudText Typo="Typo.subtitle2" Class="font-medium">Habilidades desejadas</MudText>
+                            </div>
+                            <MudChipSet T="string">
                                 @foreach (var s in _vacancy.RequiredSkills)
                                 {
                                     <MudChip T="string" Variant="Variant.Outlined">@s</MudChip>
                                 }
                             </MudChipSet>
-                        }
+                        </div>
+                    }
 
-                        <MudStack Row="true" Spacing="2" Class="mt-2">
-                            <MudText Typo="Typo.caption">
-                                <b>Abertura:</b> @_vacancy.OpenedAt.ToLocalTime().ToString("dd/MM/yyyy")
-                            </MudText>
+                    <!-- Metadados -->
+                    <div class="meta">
+                        <MudStack Row Spacing="2" AlignItems="AlignItems.Center">
+                            <MudStack Row Spacing="1" AlignItems="AlignItems.Center">
+                                <MudIcon Icon="@Icons.Material.Outlined.Schedule" />
+                                <MudText Typo="Typo.caption"><b>Abertura:</b> @_vacancy.OpenedAt.ToLocalTime().ToString("dd/MM/yyyy")</MudText>
+                            </MudStack>
+
                             @if (_vacancy.ExpiresAtUtc is DateTime exp)
                             {
-                                <MudText Typo="Typo.caption">
-                                    <b>Expira:</b> @exp.ToLocalTime().ToString("dd/MM/yyyy")
-                                </MudText>
+                                <MudStack Row Spacing="1" AlignItems="AlignItems.Center">
+                                    <MudIcon Icon="@Icons.Material.Outlined.EventBusy" />
+                                    <MudText Typo="Typo.caption"><b>Expira:</b> @exp.ToLocalTime().ToString("dd/MM/yyyy")</MudText>
+                                </MudStack>
                             }
-                            <MudText Typo="Typo.caption">
-                                <b>Candidatos:</b> @_vacancy.ApplicantsCount
-                            </MudText>
+
+                            <MudStack Row Spacing="1" AlignItems="AlignItems.Center">
+                                <MudIcon Icon="@Icons.Material.Outlined.People" />
+                                <MudText Typo="Typo.caption"><b>Candidatos:</b> @_vacancy.ApplicantsCount</MudText>
+                            </MudStack>
                         </MudStack>
-                    </MudStack>
-                </MudCardContent>
-            </MudCard>
+                    </div>
+                </MudStack>
+            </MudCardContent>
 
-            <MudStack Row Spacing="2">
-                <MudButton Color="Color.Primary"
-                           StartIcon="@Icons.Material.Filled.HowToReg"
-                           Disabled="@_busy"
-                           OnClick="ConfirmAndApplyAsync">
-                    @(_busy ? "Enviando..." : "Inscrever-se")
-                </MudButton>
+            <!-- AÇÕES -->
+            <MudDivider />
+            <div class="actions px-4 py-3">
+                <MudStack Row Spacing="2">
+                    <MudButton Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.HowToReg"
+                               Disabled="@_busy"
+                               OnClick="ConfirmAndApplyAsync">
+                        @(_busy ? "Enviando..." : "Inscrever-se")
+                    </MudButton>
 
-                <MudButton Variant="Variant.Text" Disabled="@_busy" OnClick="@(() => Nav.NavigateTo("/candidato/home"))">
-                    Voltar
-                </MudButton>
-            </MudStack>
+                    <MudButton Variant="Variant.Text" Disabled="@_busy"
+                               OnClick="@(() => Nav.NavigateTo("/candidato/home"))">
+                        Voltar
+                    </MudButton>
+                </MudStack>
+            </div>
         }
     </MudPaper>
 </MudContainer>
+
+<style>
+/* Hero */
+.hero-card{
+  border:1px solid var(--mud-palette-divider);
+  border-radius:14px;
+  background:
+    radial-gradient(900px 220px at 0% -30%,
+      color-mix(in oklab, var(--mud-palette-primary) 12%, transparent) 0%,
+      transparent 60%),
+    var(--mud-palette-surface);
+}
+.hero-inner{ padding:16px 18px; }
+.font-medium{ font-weight:600; }
+.font-bold{ font-weight:700; }
+
+/* Card principal */
+.elev{ border:1px solid var(--mud-palette-divider); border-radius:12px; overflow:hidden; }
+
+/* Header com “accent bar” consistente com as outras páginas */
+.card-header{
+  position:relative;
+  padding:12px 16px 12px 20px;
+  border-bottom:1px solid var(--mud-palette-divider);
+  background:
+    linear-gradient(0deg,
+      color-mix(in oklab, var(--mud-palette-primary) 7%, transparent) 0%,
+      transparent 100%),
+    var(--mud-palette-surface);
+}
+.card-header::before{
+  content:"";
+  position:absolute; inset:0 auto 0 0; width:6px;
+  border-radius:12px 0 0 0;
+  background: linear-gradient(180deg,
+    color-mix(in oklab, var(--mud-palette-primary) 92%, white 8%),
+    color-mix(in oklab, var(--mud-palette-primary) 62%, white 38%));
+}
+
+/* Seção skills */
+.section{ margin-top:8px; }
+.section__title{
+  display:flex; align-items:center; gap:.5rem;
+  margin-bottom:6px;
+}
+
+/* Meta info com linha superior sutil */
+.meta{
+  padding-top:8px;
+  border-top:1px dashed var(--mud-palette-divider);
+}
+
+/* Barra de ações */
+.actions{ background: var(--mud-palette-surface); }
+
+/* Responsivo */
+@@media (max-width: 599px){
+  .hero-inner{ padding:12px; }
+}
+</style>
+
 
 @code {
     [Parameter] public Guid VacancyId { get; set; }
