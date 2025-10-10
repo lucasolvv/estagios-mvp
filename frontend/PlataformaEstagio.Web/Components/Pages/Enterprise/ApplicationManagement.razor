@@ -14,19 +14,26 @@
 @inject IDialogService DialogService
 
 <MudContainer MaxWidth="MaxWidth.False" Class="px-6 py-4">
-    <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
-        <MudStack>
-            <MudText Typo="Typo.h5" Class="font-weight-bold">Gerenciar candidatura</MudText>
-            <MudText Typo="Typo.caption" Color="Color.Secondary">
-                Visualize o perfil do candidato, atualize o status e agende entrevistas.
-            </MudText>
-        </MudStack>
-        <MudButton Variant="Variant.Outlined" OnClick="@(()=> Nav.NavigateTo("/empresa/home"))">
-            <MudIcon Icon="@Icons.Material.Filled.ArrowBack" Class="mr-2" /> Voltar
-        </MudButton>
-    </MudStack>
 
-    <MudDivider Class="my-4" />
+    <!-- HERO -->
+    <MudPaper Class="hero-card elev mb-4">
+        <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="hero-inner">
+            <MudStack Spacing="1">
+                <MudStack Row AlignItems="AlignItems.Center" Spacing="1">
+                    <MudIcon Icon="@Icons.Material.Filled.ManageAccounts" />
+                    <MudText Typo="Typo.h5" Class="font-bold">Gerenciar candidatura</MudText>
+                </MudStack>
+                <MudText Typo="Typo.subtitle2" Class="text-dim">
+                    Visualize o perfil do candidato, atualize o status e agende entrevistas.
+                </MudText>
+            </MudStack>
+
+            <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.ArrowBack"
+                       OnClick="@(()=> Nav.NavigateTo("/empresa/home"))">
+                Voltar
+            </MudButton>
+        </MudStack>
+    </MudPaper>
 
     @if (!_loaded)
     {
@@ -34,167 +41,195 @@
     }
     else if (_notFound)
     {
-        <MudAlert Severity="Severity.Warning" Variant="Variant.Filled" Dense>
+        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Dense>
             Candidatura não encontrada ou você não tem acesso.
         </MudAlert>
     }
     else
     {
         <MudGrid>
+
             <!-- Coluna esquerda: Candidato -->
             <MudItem xs="12" md="4">
-                <MudPaper Class="pa-4">
-                    <MudStack Spacing="2">
-                        <MudStack Row AlignItems="AlignItems.Center" Spacing="2">
-                            <MudAvatar Size="Size.Large" Image="@_vm.Candidate.ProfilePictureUrl" Color="Color.Primary">
-                                @if (string.IsNullOrEmpty(@_vm.Candidate.ProfilePictureUrl))
-                                {
-                                    @(_vm.Candidate.Initials)
-                                }
-                                else 
-                                {
-                                    <MudImage Src="@_vm.Candidate.ProfilePictureUrl"></MudImage>
-                                }
-                            </MudAvatar>
-                            <MudStack>
-                                <MudText Typo="Typo.h6">@_vm.Candidate.FullName</MudText>
-                                <MudText Typo="Typo.caption" Color="Color.Secondary">
-                                    @_vm.Candidate.Course @(_vm.Candidate.Semester is null ? "" : $" • {_vm.Candidate.Semester}º período")
-                                </MudText>
-                            </MudStack>
+                <MudCard Class="elev">
+                    <div class="card-header accent-info">
+                        <MudStack Row AlignItems="AlignItems.Center" Spacing="1">
+                            <MudIcon Icon="@Icons.Material.Filled.Person" />
+                            <MudText Typo="Typo.subtitle1">Candidato</MudText>
                         </MudStack>
+                    </div>
 
-                        <MudList Dense="true" T="string">
-                            <MudListItem>
-                                <MudIcon Icon="@Icons.Material.Filled.LocationOn" Class="mr-2" />
-                                @_vm.Candidate.City - @_vm.Candidate.UF
-                            </MudListItem>
-                            <MudListItem>
-                                <MudIcon Icon="@Icons.Material.Filled.Email" Class="mr-2" />
-                                @_vm.Candidate.Email
-                            </MudListItem>
-                            @* <MudListItem>
-                                <MudIcon Icon="@Icons.Material.Filled.Phone" Class="mr-2" />
-                                @_vm.Candidate.Phone
-                            </MudListItem> *@
-                        </MudList>
+                    <MudCardContent Class="pa-4">
+                        <MudStack Spacing="2">
+                            <MudStack Row AlignItems="AlignItems.Center" Spacing="2">
+                                <MudAvatar Size="Size.Large" Image="@_vm.Candidate.ProfilePictureUrl" Color="Color.Primary"> @if (string.IsNullOrEmpty(@_vm.Candidate.ProfilePictureUrl)) {
+                                @(_vm.Candidate.Initials)
+                                    } else
+                                    {
 
-                        <MudStack Row Spacing="2">
-                            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@OpenCandidateInlineDialog">
-                                <MudIcon Icon="@Icons.Material.Filled.PersonSearch" Class="mr-2" />
-                                Ver mais
-                            </MudButton>
-                            <MudButton Variant="Variant.Outlined"
-                                       Disabled="@string.IsNullOrWhiteSpace(_vm.Candidate.ResumeUrl)"
-                                       StartIcon="@Icons.Material.Filled.Description"
-                                       Href="@_vm.Candidate.ResumeUrl"
-                                       Target="_blank">
-                                Ver currículo
-                            </MudButton>
-                        </MudStack>
-                    </MudStack>
-                </MudPaper>
-            </MudItem>
-
-            <!-- Coluna direita: Vaga + Status + Entrevista -->
-            <MudItem xs="12" md="8">
-                <MudGrid>
-                    <!-- Card Vaga & Status -->
-                    <MudItem xs="12">
-                        <MudPaper Class="pa-4">
-                            <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                                <MudImage Src="@_vm.Candidate.ProfilePictureUrl"></MudImage>
+                            }
+                                </MudAvatar>
                                 <MudStack>
-                                    <MudText Typo="Typo.subtitle1" Class="font-weight-bold">@_vm.Vacancy.Title</MudText>
-                                    <MudText Typo="Typo.caption" Color="Color.Secondary">
-                                        Aberta em @(_vm.Vacancy.OpeningDate?.ToString("dd/MM/yyyy") ?? "-") •
-                                        Candidatou-se em @_vm.AppliedAt.ToString("dd/MM/yyyy")
+                                    <MudText Typo="Typo.subtitle1" Class="font-bold">@_vm.Candidate.FullName</MudText>
+                                    <MudText Typo="Typo.caption" Class="text-dim">
+                                        @_vm.Candidate.Course @(_vm.Candidate.Semester is null ? "" : $" • {_vm.Candidate.Semester}º período")
                                     </MudText>
                                 </MudStack>
-
-                                <MudChip T="string" Color="@StatusColor(_vm.Status)" Variant="Variant.Filled" Style="font-weight:600">
-                                    @DisplayStatus(_vm.Status)
-                                </MudChip>
                             </MudStack>
 
+                            <MudList Dense="true" Class="list-clean" T="string">
+                                <MudListItem>
+                                    <MudListItemIcon><MudIcon Icon="@Icons.Material.Filled.LocationOn" /></MudListItemIcon>
+                                    <MudListItemText>@_vm.Candidate.City - @_vm.Candidate.UF</MudListItemText>
+                                </MudListItem>
+                                <MudListItem>
+                                    <MudListItemIcon><MudIcon Icon="@Icons.Material.Filled.Email" /></MudListItemIcon>
+                                    <MudListItemText>@_vm.Candidate.Email</MudListItemText>
+                                </MudListItem>
+                            </MudList>
+
+                            <MudStack Row Spacing="1">
+                                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@OpenCandidateInlineDialog"
+                                           StartIcon="@Icons.Material.Filled.PersonSearch">
+                                    Ver mais
+                                </MudButton>
+                                <MudButton Variant="Variant.Outlined"
+                                           Disabled="@string.IsNullOrWhiteSpace(_vm.Candidate.ResumeUrl)"
+                                           StartIcon="@Icons.Material.Filled.Description"
+                                           Href="@_vm.Candidate.ResumeUrl"
+                                           Target="_blank">
+                                    Ver currículo
+                                </MudButton>
+                            </MudStack>
+                        </MudStack>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+
+            <!-- Coluna direita -->
+            <MudItem xs="12" md="8">
+
+                <!-- Vaga + Status -->
+                <MudCard Class="elev mb-4">
+                    <div class="card-header accent-primary">
+                        <MudStack Row AlignItems="AlignItems.Center" Spacing="1">
+                            <MudIcon Icon="@Icons.Material.Filled.WorkOutline" />
+                            <MudText Typo="Typo.subtitle1">Vaga e status</MudText>
+                        </MudStack>
+                    </div>
+
+                    <MudCardContent Class="pa-4">
+                        <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                            <MudStack>
+                                <MudText Typo="Typo.subtitle1" Class="font-bold">@_vm.Vacancy.Title</MudText>
+                                <MudText Typo="Typo.caption" Class="text-dim">
+                                    Aberta em @(_vm.Vacancy.OpeningDate?.ToString("dd/MM/yyyy") ?? "-") •
+                                    Candidatou-se em @_vm.AppliedAt.ToString("dd/MM/yyyy")
+                                </MudText>
+                            </MudStack>
+
+                            <MudChip T="string" Color="@StatusColor(_vm.Status)" Variant="Variant.Filled" Style="font-weight:600">
+                                @DisplayStatus(_vm.Status)
+                            </MudChip>
+                        </MudStack>
+
+                        <MudDivider Class="my-3" />
+
+                        <MudStack Row Spacing="1">
+                            <MudButton Color="Color.Success" Disabled="@(_busy || _vm.Status == ApplicationStatus.Approved)"
+                                       StartIcon="@Icons.Material.Filled.CheckCircle"
+                                       OnClick="@(()=>UpdateStatusAsync(ApplicationStatus.Approved))">
+                                Aprovar
+                            </MudButton>
+                            <MudButton Color="Color.Error" Variant="Variant.Outlined"
+                                       Disabled="@(_busy || _vm.Status == ApplicationStatus.Rejected)"
+                                       StartIcon="@Icons.Material.Filled.Cancel"
+                                       OnClick="@(()=>UpdateStatusAsync(ApplicationStatus.Rejected))">
+                                Rejeitar
+                            </MudButton>
+                        </MudStack>
+                    </MudCardContent>
+                </MudCard>
+
+                <!-- Agendar Entrevista -->
+                <MudCard Class="elev">
+                    <div class="card-header accent-info">
+                        <MudStack Row AlignItems="AlignItems.Center" Spacing="1">
+                            <MudIcon Icon="@Icons.Material.Filled.Event" />
+                            <MudText Typo="Typo.subtitle1">Agendar entrevista</MudText>
+                        </MudStack>
+                    </div>
+
+                    <MudCardContent Class="pa-4">
+                        <MudForm @ref="_form" Disabled="_busy">
+                            <MudGrid>
+                                <MudItem xs="12" md="4">
+                                    <MudDatePicker Label="Data*" @bind-Date="_interview.StartDate" Required="true" />
+                                </MudItem>
+                                <MudItem xs="12" md="4">
+                                    <MudTimePicker Label="Hora*" @bind-Time="_interview.StartTime" Required="true" />
+                                </MudItem>
+                                <MudItem xs="12" md="4">
+                                    <MudSelect T="int" Label="Duração (min)*" @bind-Value="_interview.DurationMinutes" Required="true">
+                                        @foreach (var d in new[] {30,45,60,90})
+                                        {
+                                            <MudSelectItem Value="@(d)">@d</MudSelectItem>
+                                        }
+                                    </MudSelect>
+                                </MudItem>
+
+                                <MudItem xs="12" md="6">
+                                    <MudTextField Label="Local (presencial)" @bind-Value="_interview.Location" />
+                                </MudItem>
+                                <MudItem xs="12" md="6">
+                                    <MudTextField Label="Link (Meet/Teams)" @bind-Value="_interview.MeetingLink" />
+                                </MudItem>
+
+                                <MudItem xs="12">
+                                    <MudTextField Label="Observações" @bind-Value="_interview.Notes" Lines="3" />
+                                </MudItem>
+
+                                <MudItem xs="12">
+                                    <MudButton Color="Color.Primary" OnClick="ScheduleInterviewAsync" Disabled="_busy"
+                                               StartIcon="@Icons.Material.Filled.EventAvailable">
+                                        Agendar
+                                    </MudButton>
+                                </MudItem>
+                            </MudGrid>
+                        </MudForm>
+
+                        @if (_vm.Interviews.Any())
+                        {
                             <MudDivider Class="my-3" />
+                            <MudText Typo="Typo.subtitle2" Class="font-bold mb-2">Agenda de entrevistas</MudText>
 
-                            <MudStack Row Spacing="2">
-                                <MudButton Color="Color.Success" Disabled="@(_busy || _vm.Status == ApplicationStatus.Approved)" OnClick="@(()=>UpdateStatusAsync(ApplicationStatus.Approved))">
-                                    <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Class="mr-2" />
-                                    Aprovar
-                                </MudButton>
-                                <MudButton Color="Color.Error" Variant="Variant.Outlined" Disabled="@(_busy || _vm.Status == ApplicationStatus.Rejected)" OnClick="@(()=>UpdateStatusAsync(ApplicationStatus.Rejected))">
-                                    <MudIcon Icon="@Icons.Material.Filled.Cancel" Class="mr-2" />
-                                    Rejeitar
-                                </MudButton>
-                            </MudStack>
-                        </MudPaper>
-                    </MudItem>
+                            <MudList Dense="true" Class="list-clean" T="string">
+                                @foreach (var it in _vm.Interviews.OrderByDescending(i => i.StartAt))
+                                {
+                                    <MudListItem>
+                                        <MudListItemIcon><MudIcon Icon="@Icons.Material.Filled.Event" /></MudListItemIcon>
+                                        <MudListItemText>
+                                            <div class="font-medium">
+                                                @it.StartAt.LocalDateTime.ToString("dd/MM/yyyy HH:mm")
+                                                — @($"{it.DurationMinutes} min")
+                                            </div>
+                                            <small class="text-dim">
+                                                @if (!string.IsNullOrWhiteSpace(it.Location))
+                                                { <span>Presencial: @it.Location</span> }
+                                                @if (!string.IsNullOrWhiteSpace(it.Location) && !string.IsNullOrWhiteSpace(it.MeetingLink))
+                                                { <span> • </span> }
+                                                @if (!string.IsNullOrWhiteSpace(it.MeetingLink))
+                                                { <span>Link: @it.MeetingLink</span> }
+                                            </small>
+                                        </MudListItemText>
+                                    </MudListItem>
+                                }
+                            </MudList>
+                        }
+                    </MudCardContent>
+                </MudCard>
 
-                    <!-- Card Agendar Entrevista -->
-                    <MudItem xs="12">
-                        <MudPaper Class="pa-4">
-                            <MudText Typo="Typo.subtitle1" Class="font-weight-bold mb-2">Agendar entrevista</MudText>
-
-                            <MudForm @ref="_form" Disabled="_busy">
-                                <MudGrid>
-                                    <MudItem xs="12" md="4">
-                                        <MudDatePicker Label="Data" @bind-Date="_interview.StartDate" Required="true" />
-                                    </MudItem>
-                                    <MudItem xs="12" md="4">
-                                        <MudTimePicker Label="Hora" @bind-Time="_interview.StartTime" Required="true" />
-                                    </MudItem>
-                                    <MudItem xs="12" md="4">
-                                        <MudSelect T="int" Label="Duração (min)" @bind-Value="_interview.DurationMinutes" Required="true">
-                                            @foreach (var d in new[] {30,45,60,90})
-                                            {
-                                                <MudSelectItem Value="@(d)">@d</MudSelectItem>
-                                            }
-                                        </MudSelect>
-                                    </MudItem>
-
-                                    <MudItem xs="12" md="6">
-                                        <MudTextField Label="Local (presencial)" @bind-Value="_interview.Location" />
-                                    </MudItem>
-                                    <MudItem xs="12" md="6">
-                                        <MudTextField Label="Link (Meet/Teams)" @bind-Value="_interview.MeetingLink" />
-                                    </MudItem>
-
-                                    <MudItem xs="12">
-                                        <MudTextField Label="Observações" @bind-Value="_interview.Notes" Lines="3" />
-                                    </MudItem>
-
-                                    <MudItem xs="12">
-                                        <MudButton Color="Color.Primary" OnClick="ScheduleInterviewAsync" Disabled="_busy">
-                                            <MudIcon Icon="@Icons.Material.Filled.EventAvailable" Class="mr-2" />
-                                            Agendar
-                                        </MudButton>
-                                    </MudItem>
-                                </MudGrid>
-                            </MudForm>
-
-                            @if (_vm.Interviews.Any())
-                            {
-                                <MudDivider Class="my-3" />
-                                <MudText Typo="Typo.subtitle2" Class="font-weight-bold mb-2">Agenda de Entrevistas</MudText>
-                                <MudList Dense="true" T="string">
-                                    @foreach (var it in _vm.Interviews.OrderByDescending(i => i.StartAt))
-                                    {
-                                        <MudListItem>
-                                            <MudIcon Icon="@Icons.Material.Filled.Event" Class="mr-2" />
-                                            @it.StartAt.LocalDateTime.ToString("dd/MM/yyyy HH:mm") —
-                                            @($"{it.DurationMinutes} min")
-                                            @if (!string.IsNullOrWhiteSpace(it.Location))
-                                            { <span class="ml-2">• @it.Location</span> }
-                                            @if (!string.IsNullOrWhiteSpace(it.MeetingLink))
-                                            { <span class="ml-2">• @it.MeetingLink</span> }
-                                        </MudListItem>
-                                    }
-                                </MudList>
-                            }
-                        </MudPaper>
-                    </MudItem>
-                </MudGrid>
             </MudItem>
         </MudGrid>
     }
@@ -202,12 +237,21 @@
 
 @if (_showDetails)
 {
-    <MudOverlay Visible="true" OnClick="@CloseCandidateInlineDialog" DarkBackground="true" Class="d-flex align-center justify-center">
+    <!-- Overlay de detalhes do candidato -->
+    <MudOverlay Visible="true" OnClick="@CloseCandidateInlineDialog" DarkBackground="true"
+                Class="d-flex align-center justify-center">
         <MudPaper Class="pa-4" Style="width: 720px; max-width: 95vw;" Elevation="8" @onclick:stopPropagation="true">
             <MudStack Spacing="2">
                 <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
                     <MudStack Row AlignItems="AlignItems.Center" Spacing="2">
-                        <MudAvatar Size="Size.Large" Image="@_vm.Candidate.ProfilePictureUrl">@_vm.Candidate.Initials</MudAvatar>
+                         <MudAvatar Size="Size.Large" Image="@_vm.Candidate.ProfilePictureUrl" Color="Color.Primary"> @if (string.IsNullOrEmpty(@_vm.Candidate.ProfilePictureUrl)) {
+                                @(_vm.Candidate.Initials)
+                                    } else
+                                    {
+
+                                <MudImage Src="@_vm.Candidate.ProfilePictureUrl"></MudImage>
+                            }
+                        </MudAvatar>
                         <MudText Typo="Typo.h6">@_vm.Candidate.FullName</MudText>
                     </MudStack>
                     <MudIconButton Icon="@Icons.Material.Filled.Close" Color="Color.Default" OnClick="@CloseCandidateInlineDialog" />
@@ -216,9 +260,7 @@
                 <MudDivider Class="my-2" />
 
                 <MudSimpleTable Dense="true">
-                    <thead>
-                        <tr><th>Campo</th><th>Valor</th></tr>
-                    </thead>
+                    <thead><tr><th>Campo</th><th>Valor</th></tr></thead>
                     <tbody>
                         <tr><td>Curso</td><td>@_vm.Candidate.Course</td></tr>
                         <tr><td>Período</td><td>@_vm.Candidate.Semester</td></tr>
@@ -228,8 +270,12 @@
                 </MudSimpleTable>
 
                 <MudStack Row Spacing="2" Class="mt-2">
-                    <MudButton Variant="Variant.Outlined" Disabled="@(!_vm.Candidate.HasResume)" OnClick="@OpenResume">
-                        <MudIcon Icon="@Icons.Material.Filled.Description" Class="mr-2" /> Ver currículo
+                    <MudButton Variant="Variant.Outlined"
+                               Disabled="@string.IsNullOrWhiteSpace(_vm.Candidate.ResumeUrl)"
+                               StartIcon="@Icons.Material.Filled.Description"
+                               Href="@_vm.Candidate.ResumeUrl"
+                               Target="_blank">
+                        Ver currículo
                     </MudButton>
                     <MudSpacer />
                     <MudButton Color="Color.Primary" OnClick="@CloseCandidateInlineDialog">Fechar</MudButton>
@@ -238,6 +284,32 @@
         </MudPaper>
     </MudOverlay>
 }
+
+
+<style>
+    /* barra de acento dos headers */
+    .card-header.accent-primary::before {
+        background: var(--mud-palette-primary);
+    }
+
+    .card-header.accent-info::before {
+        background: var(--mud-palette-info);
+    }
+
+    /* tipografia utilitária */
+    .font-bold {
+        font-weight: 700;
+    }
+
+    .font-medium {
+        font-weight: 600;
+    }
+
+    .text-dim {
+        color: var(--mud-palette-text-secondary);
+    }
+</style>
+
 
 
 @code {

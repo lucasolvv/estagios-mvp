@@ -51,11 +51,15 @@
 
                             <MudMenu StartIcon="@Icons.Material.TwoTone.Settings"
                                      IconColor="Color.Primary"
-                                     Label="Settings">
+                                     Label="Configurações">
                                 <MudMenuItem Icon="@Icons.Material.TwoTone.DarkMode"
                                              IconColor="Color.Secondary"
                                              OnClick="@DarkModeToggle"
                                              Label="Dark Theme" />
+                                <MudMenuItem Icon="@Icons.Material.Filled.Person"
+                                             IconColor="Color.Secondary"
+                                             OnClick="@(() => Nav.NavigateTo("/candidato/perfil/editar"))"
+                                             Label="Editar perfil" />
                             </MudMenu>
 
                             <MudDivider />
@@ -63,7 +67,7 @@
                             @if (auth.User.IsInRole("Candidate"))
                             {
                                 <MudMenuItem Icon="@Icons.Material.Filled.Work"
-                                             Label="Minhas vagas"
+                                             Label="Home"
                                              OnClick="@(() => Nav.NavigateTo("/candidato/home"))" />
                             }
 

@@ -1,0 +1,118 @@
+﻿/* ---------- UTILITÁRIOS DE TEXTO ---------- */
+.font-bold {
+    font-weight: 700;
+}
+
+.font-medium {
+    font-weight: 600;
+}
+
+.text-dim {
+    color: var(--mud-palette-text-secondary);
+}
+
+/* ---------- CONTAINERS / CARDS ---------- */
+.elev {
+    border: 1px solid var(--mud-palette-divider);
+    border-radius: 12px;
+    overflow: hidden; /* impede a barra do header de “vazar” */
+    background: var(--mud-palette-surface);
+}
+
+/* Cabeçalho com “accent bar” (coerente com claro/escuro) */
+.card-header {
+    position: relative;
+    padding: 10px 14px 10px 20px; /* espaço extra p/ a barra */
+    border-bottom: 1px solid var(--mud-palette-divider);
+}
+
+    .card-header::before {
+        content: "";
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 6px;
+        border-radius: 12px 0 0 0; /* acompanha o raio do card */
+    }
+
+    .card-header .mud-typography {
+        font-weight: 700;
+        color: var(--mud-palette-text-primary);
+        letter-spacing: .2px;
+    }
+
+    .card-header .mud-icon-root {
+        color: var(--mud-palette-primary);
+        opacity: .95;
+    }
+
+/* ---------- HERO / SEÇÕES ---------- */
+.hero-card {
+    border: 1px solid var(--mud-palette-divider);
+    border-radius: 14px;
+    background: radial-gradient(1000px 240px at 5% -35%, color-mix(in oklab, var(--mud-palette-primary) 12%, transparent) 0%, transparent 60%), var(--mud-palette-surface);
+}
+
+.hero-inner {
+    padding: 16px 18px;
+}
+
+/* Título de seção com o mesmo padrão dos cards */
+.section {
+    margin-bottom: 22px;
+}
+
+    .section__title .mud-icon-root {
+        color: var(--mud-palette-primary);
+        opacity: .95;
+    }
+
+/* ---------- TABELAS / LISTAS / TIMELINE ---------- */
+.table-compact .mud-table-container {
+    border-radius: 10px;
+}
+
+.table-compact .mud-table * th {
+    font-weight: 600;
+}
+
+.table-compact .mud-table-row:hover {
+    background: color-mix(in oklab, var(--mud-palette-primary) 9%, transparent);
+}
+
+.list-clean .mud-list-item:hover {
+    background: color-mix(in oklab, var(--mud-palette-primary) 7%, transparent);
+}
+
+.timeline-clean .mud-timeline {
+    --mud-palette-lines-default: var(--mud-palette-divider);
+}
+
+/* ---------- BLOCOS AUXILIARES ---------- */
+.preview-card {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    padding: 8px 10px;
+    border: 1px solid var(--mud-palette-divider);
+    border-radius: 10px;
+    width: fit-content;
+    background: var(--mud-palette-surface);
+}
+
+.preview-img {
+    max-width: 220px;
+    border-radius: 8px;
+    display: block;
+}
+
+.actions {
+    padding-top: 10px;
+    border-top: 1px dashed var(--mud-palette-divider);
+}
+
+/* ---------- RESPONSIVO ---------- */
+@media (max-width: 899px) {
+    .hero-inner {
+        padding: 12px;
+    }
+}

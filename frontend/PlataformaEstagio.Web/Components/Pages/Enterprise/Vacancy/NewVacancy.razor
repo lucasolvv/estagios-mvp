@@ -10,81 +10,151 @@
 @inject NavigationManager Nav
 
 @* <AuthorizeView Roles="Enterprise"> *@
-    <MudContainer MaxWidth="MaxWidth.Medium" Class="px-6 py-4">
-        <MudPaper Class="px-4 py-4">
+<MudContainer MaxWidth="MaxWidth.Medium" Class="px-6 py-4">
 
-            <MudText Typo="Typo.h5" Color="Color.Secondary" Class="mb-2">Criar nova vaga</MudText>
-
-            @if (!_loaded)
-            {
-                <MudStack AlignItems="AlignItems.Center" Class="py-6">
-                    <MudProgressCircular Indeterminate="true" />
-                    <MudText Color="Color.Secondary">Carregando dados da empresa...</MudText>
+    <!-- HERO -->
+    <MudPaper Class="hero-card elev mb-4">
+        <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="hero-inner">
+            <MudStack Spacing="1">
+                <MudStack Row AlignItems="AlignItems.Center" Spacing="1">
+                    <MudIcon Icon="@Icons.Material.Filled.WorkOutline" />
+                    <MudText Typo="Typo.h5" Class="font-bold">Criar nova vaga</MudText>
                 </MudStack>
-            }
-            else
-            {
+                <MudText Typo="Typo.subtitle2" Class="text-dim">
+                    Defina título, descrição, localização e requisitos. Você poderá editar depois.
+                </MudText>
+            </MudStack>
+
+            <MudStack Row Spacing="1">
+                <MudButton Variant="Variant.Text" Color="Color.Default" OnClick="@(() => Nav.NavigateTo("/empresa/home"))">
+                    Cancelar
+                </MudButton>
+                <MudButton Color="Color.Primary" StartIcon="@Icons.Material.Filled.Save" Disabled="@_busy" OnClick="HandleSubmit">
+                    Salvar
+                </MudButton>
+            </MudStack>
+        </MudStack>
+    </MudPaper>
+
+    <MudPaper Class="elev">
+
+        <div class="card-header accent-primary">
+            <MudStack Row AlignItems="AlignItems.Center" Spacing="1">
+                <MudIcon Icon="@Icons.Material.Filled.Description" />
+                <MudText Typo="Typo.subtitle1">Dados da vaga</MudText>
+            </MudStack>
+        </div>
+
+        @if (!_loaded)
+        {
+            <MudStack AlignItems="AlignItems.Center" Class="py-6">
+                <MudProgressCircular Indeterminate="true" />
+                <MudText Class="text-dim">Carregando dados da empresa...</MudText>
+            </MudStack>
+        }
+        else
+        {
+            <MudCardContent Class="pa-4">
+
                 <MudForm @ref="_form" Model="_model" OnValidSubmit="HandleSubmit">
 
-                    <!-- Título e Descrição (já existiam) -->
-                    <MudTextField @bind-Value="_model.Title"
-                                  Label="Título"
-                                  Required="true"
-                                  For="@(() => _model.Title)" />
+                    <!-- Seção: Básico -->
+                    <MudGrid Class="section">
+                        <MudItem xs="12">
+                            <MudTextField @bind-Value="_model.Title"
+                                          Label="Título*"
+                                          Required="true"
+                                          For="@(() => _model.Title)"
+                                          Placeholder="Ex.: Estagiário(a) de Sistemas de Informação" />
+                        </MudItem>
 
-                    <MudTextField @bind-Value="_model.Description"
-                                  Label="Descrição"
-                                  Lines="6" />
+                        <MudItem xs="12">
+                            <MudTextField @bind-Value="_model.Description"
+                                          Label="Descrição"
+                                          Lines="6"
+                                          Placeholder="Fale sobre as responsabilidades, rotina e benefícios." />
+                        </MudItem>
+                    </MudGrid>
 
-                    <!-- NOVO: Localização -->
-                    <MudTextField @bind-Value="_model.Location"
-                                  Label="Localização"
-                                  Required="true"
-                                  Placeholder="Ex.: Remoto - Brasil / São Paulo - SP (Remoto)" />
+                    <MudDivider Class="my-2" />
 
-                    <!-- NOVO: Área/Função (enum) -->
-                    <MudSelect T="JobFunction"
-                               @bind-Value="_model.JobFunction"
-                               Label="Área de atuação"
-                               Required="true">
-                        @foreach (var a in Enum.GetValues<JobFunction>())
-                        {
-                            
-                            <MudSelectItem Value="a">@a</MudSelectItem>
-                        }
-                    </MudSelect>
+                    <!-- Seção: Local e área -->
+                    <MudGrid Class="section">
+                        <MudItem xs="12" md="7">
+                            <MudTextField @bind-Value="_model.Location"
+                                          Label="Localização*"
+                                          Required="true"
+                                          Placeholder="Ex.: Remoto - Brasil / São Paulo - SP (Remoto)" />
+                        </MudItem>
 
-                    <!-- NOVO: Habilidades necessárias (chips) -->
-                <MudTextField @bind-Value="_skillInput"
-                              Label="Adicionar habilidade"
-                              Placeholder="Ex.: C#, Git, SQL"
-                              OnKeyUp="OnSkillKeyUp" />
+                        <MudItem xs="12" md="5">
+                            <MudSelect T="JobFunction"
+                                       @bind-Value="_model.JobFunction"
+                                       Label="Área de atuação*"
+                                       Required="true">
+                                @foreach (var a in Enum.GetValues<JobFunction>())
+                                {
+                                    <MudSelectItem Value="a">@a</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+                    </MudGrid>
 
-                        <MudChipSet T="string" Class="mb-2">
-                            @foreach (var s in _model.RequiredSkills)
-                            {
+                    <MudDivider Class="my-2" />
+
+                    <!-- Seção: Habilidades -->
+                    <MudGrid Class="section">
+                        <MudItem xs="12">
+                            <MudText Typo="Typo.caption" Class="text-dim">Habilidades desejadas</MudText>
+                            <MudTextField @bind-Value="_skillInput"
+                                          Label="Adicionar habilidade"
+                                          Placeholder="Ex.: C#, Git, SQL"
+                                          OnKeyUp="OnSkillKeyUp" />
+                            <MudChipSet T="string" Class="mb-1">
+                                @foreach (var s in _model.RequiredSkills)
+                                {
                                     <MudChip T="string"
+                                             Color="Color.Default"
+                                             Variant="Variant.Outlined"
+                                             Size="Size.Small"
                                              Closeable="true"
                                              OnClose="@( (MudChip<string> _) => RemoveSkill(s) )">@s</MudChip>
-                            }
-                        </MudChipSet>
+                                }
+                            </MudChipSet>
+                            <MudText Typo="Typo.caption" Class="text-dim">
+                                Pressione <strong>Enter</strong> para adicionar.
+                            </MudText>
+                        </MudItem>
+                    </MudGrid>
 
-                    <!-- NOVO: Expiração -->
-                    <MudDatePicker Label="Expira em"
-                                   @bind-Date="_expiresDate"
-                                   Editable="true"
-                                   Clearable="true"
-                                   DisplayMonths="1"
-                                   DisableToolbar="false"
-                                   PickerMonth="@DateTime.Today"
-                                   MinDate="@DateTime.Today" 
-                                   T="DateTime?"
-                                   />
+                    <MudDivider Class="my-2" />
 
-                    <!-- Ativa -->
-                    <MudSwitch T="bool" @bind-Checked="_model.IsActive" Color="Color.Success">Ativa</MudSwitch>
+                    <!-- Seção: Publicação -->
+                    <MudGrid Class="section">
+                        <MudItem xs="12" md="6">
+                            <MudDatePicker Label="Expira em"
+                                           @bind-Date="_expiresDate"
+                                           Editable="true"
+                                           Clearable="true"
+                                           DisplayMonths="1"
+                                           DisableToolbar="false"
+                                           PickerMonth="@DateTime.Today"
+                                           MinDate="@DateTime.Today"
+                                           T="DateTime?" />
+                        </MudItem>
 
-                    <MudStack Row Spacing="2" Class="mt-3">
+                        <MudItem xs="12" md="6" Class="flex-center-y">
+                            <MudSwitch T="bool" @bind-Checked="_model.IsActive" Color="Color.Success">Ativa</MudSwitch>
+                        </MudItem>
+                    </MudGrid>
+
+                    <MudDivider Class="my-2" />
+
+                    <!-- Ações -->
+                    <MudStack Row Spacing="1" Class="actions">
+                        <MudButton Variant="Variant.Text" Color="Color.Default" OnClick="@(() => Nav.NavigateTo("/empresa/home"))">
+                            Cancelar
+                        </MudButton>
                         <MudButton Type="Submit"
                                    Color="Color.Primary"
                                    StartIcon="@Icons.Material.Filled.Save"
@@ -92,14 +162,32 @@
                                    OnClick="HandleSubmit">
                             Salvar
                         </MudButton>
-                        <MudButton Variant="Variant.Text" OnClick="@(() => Nav.NavigateTo("/empresa/home"))">
-                            Cancelar
-                        </MudButton>
                     </MudStack>
+
                 </MudForm>
-            }
-        </MudPaper>
-    </MudContainer>
+            </MudCardContent>
+        }
+    </MudPaper>
+</MudContainer>
+
+<style>
+    /* mantém consistência com seu global */
+    .section {
+        margin-bottom: .25rem;
+    }
+
+    /* centraliza verticalmente o switch no grid */
+    .flex-center-y {
+        display: flex;
+        align-items: center;
+    }
+
+    /* barra do header com cor primária */
+    .card-header.accent-primary::before {
+        background: var(--mud-palette-primary);
+    }
+</style>
+
 @* </AuthorizeView> *@
 
 @code {
