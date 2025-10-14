@@ -1,12 +1,3 @@
-USUARIOS DE TESTE
-CANDIDATO:
-lvksounds
-Mir@gem18
-
-EMPRESA:
-empresa01
-Empres@01
-
 ----- MIGRATIONS 
 * NA RAIZ: 
 
