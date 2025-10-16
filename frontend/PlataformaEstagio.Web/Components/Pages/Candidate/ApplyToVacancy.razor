@@ -262,7 +262,8 @@
             _model.CandidateIdentifier = candidateId;
             _model.VacancyId = VacancyId;
 
-            await CandidateService.ApplyToVacancyAsync(_model);
+            var (ok, err) = await CandidateService.ApplyToVacancyAsync(_model);
+            if (!ok) { Snackbar.Add(err ?? "Não foi possível aplicar para a vaga", Severity.Error); return; }
 
             Snackbar.Add("Inscrição realizada com sucesso!", Severity.Success);
             Nav.NavigateTo("/candidato/home");

@@ -7,6 +7,8 @@
 @inject NavigationManager Nav
 @inject PlataformaEstagio.Web.Components.Services.Auth.IAuthService Auth
 @inject Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage.ProtectedSessionStorage Session;
+@inject AuthenticationStateProvider Provider
+
 
 <section class="auth-hero">
     <MudContainer MaxWidth="MaxWidth.Large">
@@ -137,6 +139,38 @@
     private bool _showPassword;
     private void TogglePassword() => _showPassword = !_showPassword;
 
+    private bool _ran;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender || _ran) return;
+        _ran = true;
+
+        // Garante que o restore ocorreu (idempotente)
+        if (Provider is PlataformaEstagio.Web.Components.Services.Auth.JwtAuthenticationStateProvider jwt)
+            await jwt.RestoreAsync(); // JS/storage só é seguro após render. :contentReference[oaicite:1]{index=1}
+
+        // Se já autenticado, decide o destino
+        var auth = await Provider.GetAuthenticationStateAsync();
+        if (auth.User.Identity?.IsAuthenticated == true)
+        {
+            // respeita returnUrl se vier de rota protegida
+            if (TryGetReturnUrl(out var returnUrl))
+            {
+                Nav.NavigateTo(returnUrl, replace: true);
+                return;
+            }
+
+            var session = await Auth.GetSessionAsync();
+            var target = session?.UserType.ToString() switch
+            {
+                "Candidate" => "/candidato/home",
+                "Enterprise" => "/empresa/home",
+                _ => "/"
+            };
+            Nav.NavigateTo(target, replace: true); // evita "voltar" para /login
+        }
+    }
 
     private async Task HandleLogin()
     {

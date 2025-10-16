@@ -26,13 +26,10 @@ namespace PlataformaEstagio.Web.Components.Services.Candidate
                 Content = JsonContent.Create(request)
             };
 
-            var resp = await SendAsync(req, ct);
-            if (resp.IsSuccessStatusCode)
-            {
-                return (true, null);
-            }
+            var resp = await SendAsync(req);
+            var text = await resp.Content.ReadAsStringAsync();
 
-            return (false, await resp.Content.ReadAsStringAsync());
+            return (resp.IsSuccessStatusCode, string.IsNullOrWhiteSpace(text) ? null : text);
         }
 
         public async Task<IReadOnlyList<ResponseGetApplicationJson>> GetRecentApplicationsAsync(Guid candidateId)

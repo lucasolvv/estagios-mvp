@@ -1,5 +1,9 @@
 ﻿@inject NavigationManager Nav
 @code {
     protected override void OnInitialized()
-        => Nav.NavigateTo("/?returnUrl=" + Uri.EscapeDataString(Nav.Uri), forceLoad: true);
+    {
+        var here = new Uri(Nav.Uri);
+        if (!here.AbsolutePath.Equals("/", StringComparison.OrdinalIgnoreCase))
+            Nav.NavigateTo("/?returnUrl=" + Uri.EscapeDataString(Nav.Uri), replace: true);
+    }
 }

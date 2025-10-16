@@ -472,8 +472,6 @@
             var (ok, err) = await EnterpriseService.ScheduleInterviewAsync(_vm.ApplicationIdentifier, req);
             if (!ok) { Snackbar.Add(err ?? "Não foi possível agendar a entrevista.", Severity.Error); return; }
 
-            // await RefreshInterviewsAsync(); busca no back e repopula a lista
-
             _vm.Interviews.Add(new InterviewVm
             {
                 InterviewIdentifier = Guid.NewGuid(), // <- substitui o iid
@@ -498,34 +496,12 @@
 
     private void OpenResume()
     {
-        // TODO: Navegar para endpoint de download/visualização do currículo
         Snackbar.Add("Abrindo currículo…", Severity.Normal);
     }
 
     private bool _showDetails;
-
     private void OpenCandidateInlineDialog() => _showDetails = true;
     private void CloseCandidateInlineDialog() => _showDetails = false;
-
-
-    private async Task RefreshInterviewsAsync()
-    {
-        // var items = await EnterpriseService.GetInterviewsByApplicationId(_vm.ApplicationIdentifier);
-        // _vm.Interviews = items
-        //     .OrderByDescending(i => i.StartAt)
-        //     .Select(i => new InterviewVm
-        //     {
-        //         InterviewIdentifier = i.InterviewIdentifier,
-        //         StartAt = i.StartAt,
-        //         DurationMinutes = i.DurationMinutes,
-        //         Location = i.Location,
-        //         MeetingLink = i.MeetingLink,
-        //         Notes = i.Notes
-        //     }).ToList();
-
-       
-    }
-
 
     // -------- helpers de UI --------
     private static string DisplayStatus(ApplicationStatus s) => s switch
