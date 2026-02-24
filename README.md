@@ -1,163 +1,145 @@
-Plataforma de Estágios – MVP
+# 🎓 Plataforma de Estágios – MVP
 
-Sistema desenvolvido em .NET 8 para gerenciamento de estágios, utilizando Blazor Server no frontend e ASP.NET Core Web API no backend, com arquitetura baseada em Clean Architecture e boas práticas de engenharia de software.
+Sistema desenvolvido em **.NET 8** para gerenciamento de estágios, utilizando **Blazor Server** no frontend e **ASP.NET Core Web API** no backend. O projeto conta com uma arquitetura baseada em **Clean Architecture** e adota as melhores práticas de engenharia de software.
 
-📐 Arquitetura
+---
 
-O projeto é organizado em camadas com responsabilidades bem definidas:
+## 📐 Arquitetura
 
+O projeto é organizado em camadas com responsabilidades bem definidas, visando o isolamento e a facilidade de manutenção:
+
+```text
 📦 PlataformaEstagios
- ├── PlataformaEstagios.Presentation   → API / Blazor Server
- ├── PlataformaEstagios.Application    → Casos de Uso
- ├── PlataformaEstagios.Domain         → Entidades e Regras de Negócio
- ├── PlataformaEstagios.Infrastructure → Persistência e Implementações
- └── Shared
-      ├── Communication
-      └── Exceptions
-🔹 Domain
+ ├── 📁 PlataformaEstagios.Presentation   → API / Blazor Server
+ ├── 📁 PlataformaEstagios.Application    → Casos de Uso
+ ├── 📁 PlataformaEstagios.Domain         → Entidades e Regras de Negócio
+ ├── 📁 PlataformaEstagios.Infrastructure → Persistência e Implementações
+ └── 📁 Shared
+      ├── 📁 Communication
+      └── 📁 Exceptions
+```
 
-Entidades
+### 🔹 Domain
+* **Entidades:** Representação dos modelos de dados fundamentais.
+* **Regras de negócio:** Lógica central da aplicação.
+* **Objetos de valor:** Estruturas imutáveis para compor o domínio.
+* **Independência:** Totalmente isolado de frameworks externos.
 
-Regras de negócio
+### 🔹 Application
+* **Implementação dos Use Cases:** Fluxos de execução da aplicação.
+* **Validações isoladas:** Tratamento de dados separado por responsabilidade.
+* **Interfaces (Ports):** Contratos para comunicação com camadas externas.
+* **Orquestração do domínio:** Coordenação das regras de negócio.
 
-Objetos de valor
+### 🔹 Infrastructure
+* **Entity Framework Core:** ORM utilizado.
+* **Implementação de Repositories:** Acesso a dados abstrato.
+* **Unit of Work:** Controle transacional das operações.
+* **Configuração de banco de dados:** Mapeamentos e integrações.
 
-Independente de frameworks
+### 🔹 Presentation
+* **Controllers da API:** Exposição de endpoints (REST).
+* **Configuração de DI:** Registro da injeção de dependência.
+* **Blazor Server (UI):** Interface do usuário.
+* **Middlewares:** Interceptadores de requisições e exceções.
 
-🔹 Application
+---
 
-Implementação dos Use Cases
+## 🛠 Stack Tecnológica
 
-Validações isoladas por responsabilidade
+* **.NET 8**
+* **ASP.NET Core Web API**
+* **Blazor Server**
+* **Entity Framework Core**
+* **PostgreSQL**
+* **NUnit** (Testes Unitários)
+* **Injeção de Dependência** (Nativa do .NET)
 
-Interfaces (ports)
+---
 
-Orquestração do domínio
+## 🔧 Padrões e Princípios Aplicados
 
-🔹 Infrastructure
+* **Clean Architecture**
+* **SOLID**
+* **Repository Pattern**
+* **Unit of Work**
+* **Dependency Injection (DI)**
+* **Separação de validações**
+* **Encapsulamento das regras de negócio** no domínio
 
-Entity Framework Core
+---
 
-Implementação de Repositories
+## 🗄 Banco de Dados
 
-Unit of Work
+**Banco utilizado:** PostgreSQL
 
-Configuração de banco de dados
+### Criação do banco local
 
-🔹 Presentation
+Execute o script abaixo no seu servidor PostgreSQL para provisionar o banco de dados e o usuário da aplicação:
 
-Controllers da API
-
-Configuração de DI
-
-Blazor Server (UI)
-
-Middlewares
-
-🛠 Stack Tecnológica
-
-.NET 8
-
-ASP.NET Core Web API
-
-Blazor Server
-
-Entity Framework Core
-
-PostgreSQL
-
-NUnit (Testes Unitários)
-
-Injeção de Dependência nativa
-
-🔧 Padrões e Princípios Aplicados
-
-Clean Architecture
-
-SOLID
-
-Repository Pattern
-
-Unit of Work
-
-Dependency Injection
-
-Separação de validações
-
-Encapsulamento das regras de negócio no domínio
-
-🗄 Banco de Dados
-
-Banco utilizado: PostgreSQL
-
-Criação do banco local:
+```sql
 CREATE USER estagios WITH PASSWORD 'estagiospwd';
 CREATE DATABASE plataforma_estagios OWNER estagios;
 GRANT ALL PRIVILEGES ON DATABASE plataforma_estagios TO estagios;
-Connection String (appsettings.json)
+```
+
+### Connection String (`appsettings.json`)
+
+Configure a sua string de conexão no arquivo de configurações da aplicação:
+
+```json
 "ConnectionStrings": {
   "PlataformaEstagios": "Host=localhost;Port=5432;Database=plataforma_estagios;Username=estagios;Password=estagiospwd"
 }
-🚀 Como Executar o Projeto
-1️⃣ Pré-requisitos
+```
 
-.NET SDK 8+
+---
 
-PostgreSQL 16+
+## 🚀 Como Executar o Projeto
 
-Visual Studio 2022 (17.8+ recomendado)
+### 1️⃣ Pré-requisitos
 
-Verificar SDK instalado:
+Certifique-se de ter as seguintes ferramentas instaladas:
+* **.NET SDK 8+**
+* **PostgreSQL 16+**
+* **Visual Studio 2022** (17.8+ recomendado) ou VS Code
 
+Para verificar o SDK instalado, execute no terminal:
+```bash
 dotnet --list-sdks
-2️⃣ Aplicar Migrations
+```
 
-Dentro do projeto da API:
+### 2️⃣ Aplicar Migrations
 
+Dentro do diretório do projeto da API (ou via Package Manager Console apontando para o projeto de Infrastructure), aplique as migrações para criar as tabelas no banco:
+```bash
 dotnet ef database update
-3️⃣ Executar aplicação
+```
+
+### 3️⃣ Executar aplicação
+
+Inicie o projeto através do terminal:
+```bash
 dotnet run
+```
+> **Nota:** Alternativamente, você pode definir o projeto `Presentation` como *Startup Project* no Visual Studio e iniciar com `F5` ou `Ctrl+F5`.
 
-Ou definir o projeto Presentation como Startup no Visual Studio.
+---
 
-🧪 Testes
+## 📌 Funcionalidades do MVP
 
-Framework utilizado: NUnit
+* ✅ Cadastro de estudantes
+* ✅ Cadastro de empresas
+* ✅ Cadastro de vagas
+* ✅ Aplicação em vagas
+* ✅ Listagem e gerenciamento de candidaturas
 
-Executar testes:
+---
 
-dotnet test
+## 🎯 Objetivo Técnico
 
-Os testes cobrem:
-
-Casos de uso
-
-Fluxos de sucesso e falha
-
-Validações
-
-Comportamento esperado dos controllers
-
-📌 Funcionalidades do MVP
-
-Cadastro de estudantes
-
-Cadastro de empresas
-
-Cadastro de vagas
-
-Aplicação em vagas
-
-Listagem e gerenciamento de candidaturas
-
-🎯 Objetivo Técnico
-
-O projeto foi desenvolvido com foco em:
-
-Estruturação arquitetural escalável
-
-Separação clara de responsabilidades
-
-Manutenção facilitada
-
-Evolução futura para autenticação, logging estruturado e deploy em ambiente cloud
+O projeto foi desenvolvido com foco primário em:
+* **Estruturação arquitetural escalável** para facilitar o crescimento do software.
+* **Separação clara de responsabilidades**, reduzindo o acoplamento.
+* **Manutenção facilitada**, com código limpo e testável.
+* **Evolução futura**, preparando o terreno para implementação de autenticação (ex: JWT/Identity), logging estruturado e deploy em ambientes Cloud.
